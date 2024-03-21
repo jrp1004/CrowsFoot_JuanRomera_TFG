@@ -1,3 +1,7 @@
+let model;
+let graph;
+let count=0;
+
 function main(container){
     if(!mxClient.isBrowserSupported()){
         console.log("navegador no soportado");
@@ -5,8 +9,8 @@ function main(container){
 
     console.log("cargando...");
 
-    var model=new mxGraphModel();
-    var graph=new mxGraph(container,model);
+    model=new mxGraphModel();
+    graph=new mxGraph(container,model);
 
     // Gets the default parent for inserting new cells. This
     // is normally the first child of the root (ie. layer 0).
@@ -24,6 +28,23 @@ function main(container){
     finally
     {
         // Updates the display
+        model.endUpdate();
+    }
+}
+
+//Añadir un vértice pulsando un botón
+function prueba_boton(){
+    const parent=graph.getDefaultParent();
+
+    model.beginUpdate();
+    try {
+        graph.insertVertex(parent,null,new MiVertice("Vértice "+count),100,100,80,30);
+        count+=1;
+        console.log("vertice añadido");
+    } catch (error) {
+        console.log("ERROR:");
+        console.log(error);
+    }finally{
         model.endUpdate();
     }
 }
