@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="./index.js"></script>
+        <style>
+            div{
+                border-radius: 5px;
+            }
+            .droppable{
+                position: absolute;
+                top: 10px;
+                width: 250px;
+                height: 20px;
+                left: 20px;
+            }
+            .draggable{
+                cursor: pointer;
+                position: absolute;
+                top: 7px;
+                width: 20px;
+                height: 25px;
+                left: 25px;
+            }
+        </style>
+    </head>
+    <body onload="main()">
+        <div style="background: lightblue" class="droppable" id="objetivo"></div>
+        <div style="background: blue" id="slide" class="draggable"></div>
+        <br>
+        <br>
+        <p id="num">Pos: </p>
+    </body>
+</html>
