@@ -32,13 +32,14 @@ function main(container){
     }
 }
 
+
 //Añadir un vértice pulsando un botón
 function prueba_boton(){
     const parent=graph.getDefaultParent();
 
     model.beginUpdate();
     try {
-        graph.insertVertex(parent,null,new MiVertice("Vértice "+count),100,100,80,30);
+        graph.insertVertex(parent,null,"Vértice "+count,100,100,80,30);
         count+=1;
         console.log("vertice añadido");
     } catch (error) {
