@@ -1,0 +1,7 @@
+node_modules
+tareas.docx
+
+# Archivos de formación
+Formación/
+package-lock.json
+package.json
