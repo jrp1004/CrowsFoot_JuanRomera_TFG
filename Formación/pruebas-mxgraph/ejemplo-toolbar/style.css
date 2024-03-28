@@ -1,0 +1,38 @@
+body{
+    margin: 20px;
+}
+
+
+.app-container{
+    display: grid;
+    grid-template-columns: 200px 1fr;
+}
+
+
+#toolbar{
+    background-color: lightgray;
+    position: absolute;
+    overflow: hidden;
+    padding: 2px;
+    left: 0px;
+    top: 26px;
+    width: 24px;
+    bottom: 0px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#graph-container{
+    background-size: 40px 40px;
+    background-image: 
+        linear-gradient(to right, grey 1px,transparent 1px),
+        linear-gradient(to bottom, grey 1px, transparent 1px);
+
+    position: absolute;
+    overflow: hidden;
+    left: 26px;
+    top: 26px;
+    right: 0px;
+    bottom: 0px;
+}
