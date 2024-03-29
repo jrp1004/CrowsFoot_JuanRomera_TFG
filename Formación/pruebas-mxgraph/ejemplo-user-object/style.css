@@ -1,0 +1,26 @@
+body{
+    margin: 20px;
+}
+
+#toolbar{
+    padding: 10px;
+    background-color: lightgray;
+}
+
+#graph-container{
+    background-color: lightblue;
+
+    background-size: 20px 20px;
+    background-image: 
+        linear-gradient(to right, grey 1px,transparent 1px),
+        linear-gradient(to bottom, grey 1px, transparent 1px);
+    display: flex;
+    flex-direction: column;
+}
+
+#properties{
+    background-color: lightgreen;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
