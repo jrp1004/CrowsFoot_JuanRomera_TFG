@@ -43,7 +43,7 @@ function main(){
         //Sobreescribimos el método que proporciona la etiqueta de una celda para mostrar
 
         //ERROR: this.convertValueToString is not a function
-        graph.convertValueToString=(cell)=>{
+        graph.convertValueToString=function(cell){
             //Comprobamos si es nodo o arista
             if(mxUtils.isNode(cell.value)){
                 //Comprobamos si el nodo es de tipo persona
@@ -63,7 +63,7 @@ function main(){
                 }
             }
             return '';
-        }
+        };
 
         //Sobreescribimos el método para almacenar la etiqueta de una celda en el modelo
         let cellLabelChanged=graph.cellLabelChanged;
@@ -178,9 +178,14 @@ function selectionChanged(graph){
     }
 }
 
+//Función para crear los campos de texto del formulario
 function createTextField(graph,form,cell,attribute){
+    //Creamos el input con los atributos del nodo, le nombre y su valor
     let input=form.addText(attribute.nodeName+':',attribute.nodeValue);
 
+    //Función que aplicamos cuando se pulse enter en el formulario o
+    //se pierda el foco en este
+    //Actualizamos los atributos de los nodos en caso de que hayan cambiado
     const applyHandler=()=>{
         let newValue=input.value || '';
         let oldValue=cell.getAttribute(attribute.nodeName,'');
@@ -200,6 +205,8 @@ function createTextField(graph,form,cell,attribute){
         }
     };
 
+    //Añadimos los listeners para cuando se pulse enter o se pierda el foco
+    //Los listeners aplicarán la función anterior aplicando los cambios que se hayan podido producir
     mxEvent.addListener(input,'keypress',(event)=>{
         if(event.keyCode==/*enter*/13&&!mxEvent.isShiftDown(event)){
             input.blur();
