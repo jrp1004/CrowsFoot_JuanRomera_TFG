@@ -562,13 +562,17 @@ function addSidebarIcon(graph,sidebar,prototype,image){
     //Las zonas donde se pueden soltar los iconos se resaltan
     ds.highlightDropTargets=true;
     ds.getDropTarget=function(graph,x,y){
+        //Si el draggable es una tabla devolvemos null, se añade al grafo
         if(graph.isSwimlane(prototype)){
             return null;
         }else{
             let cell=graph.getCellAt(x,y);
+            //Si el draggable es una columna, comprobamos donde se está soltando
             if(graph.isSwimlane(cell)){
+                //Si se suelta en la celda tabla se añade a esta
                 return cell;
             }else{
+                //Si se suelta encima de otra columna se añade a la tabla padre de dicha columna
                 let parent=graph.getModel().getParent(cell);
                 if(graph.isSwimlane(parent)){
                     return parent;
@@ -620,8 +624,11 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
 }
 
+//Función para crear las entradas del menú popup
 function createPopupMenu(editor,graph,menu,cell,evt){
+    //Comprobamos si hemos hecho click en una tabla o en una columna
     if(cell!=null){
+        //Si hemos hecho click en una columna añadimos la entrada propiedades
         if(graph.isHtmlLabel(cell)){
             menu.addItem('Propiedades','editors/images/properties.gif',function(){
                 editor.execute('properties',cell);
@@ -652,9 +659,11 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     })
 }
 
+//Función que crea un formulario para editar los parámetros de las columnas
 function showProperties(graph,cell){
     let form=new mxForm('properties');
 
+    //Añadimos los campos al formulario
     let nameField=form.addText('Nombre',cell.value.name);
     let typeField=form.addText('Tipo',cell.value.type);
 
@@ -668,6 +677,7 @@ function showProperties(graph,cell){
 
     let wnd=null;
 
+    //Si pulsamos el botón ok del formulario actualizamos los datos de la columna
     const okFunction=function(){
         let clone=cell.value.clone();
 
@@ -690,6 +700,7 @@ function showProperties(graph,cell){
         wnd.destroy();
     }
 
+    //Función que se ejecuta cuando se pulsa el botón cancelar
     const cancelFunction=function(){
         wnd.destroy();
     }
@@ -697,9 +708,11 @@ function showProperties(graph,cell){
 
     let parent=graph.model.getParent(cell);
     let name=parent.value.name+'.'+cell.value.name;
+    //Mostramos el formualrio utilizando la función anterior
     wnd=showModalWindow(name,form.table,240,240);
 }
 
+//Función que crea el código SQL según los elementos del grafo
 function createSql(graph){
     const sql=[];
     let parent=graph.getDefaultParent();
@@ -744,6 +757,8 @@ function createSql(graph){
     return sql.join('');
 }
 
+
+//Definición del objeto de usuario columna
 function Column(name){
     this.name=name;
 }
@@ -758,6 +773,8 @@ Column.prototype.clone=function(){
     return mxUtils.clone(this);
 }
 
+
+//Definición del objeto de usuario tabla
 function Table(name){
     this.name=name;
 }
