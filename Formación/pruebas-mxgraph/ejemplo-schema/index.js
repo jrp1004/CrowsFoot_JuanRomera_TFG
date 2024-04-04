@@ -22,17 +22,17 @@ function main(container,outline,toolbar,sidebar,status){
         //Establece el icono que utilizamos para representar una nueva conexión en el manejador de conexiones
         //Corresponde con la flecha que aparece encima del nombre de la tabla al pasar el ratón por encima
         //Deshabilita automáticamente el resaltado del vértice fuente
-        mxConnectionHandler.prototype.connectImage=new mxImage('images/connector.gif',16,16);
+        mxConnectionHandler.prototype.connectImage=new mxImage('../images/connector.gif',16,16);
 
         //Precargamos las imágenes que utilizaremos en las columnas para evitar problemas con el auto-layout
         let keyImage=new Image();
-        keyImage.src='images/key.png';
+        keyImage.src='../images/key.png';
 
         let plusImage=new Image();
-        plusImage.src='images/plus.png';
+        plusImage.src='../images/plus.png';
 
         let checkImage=new Image();
-        checkImage.src='images/check.png';
+        checkImage.src='../images/check.png';
 
         //Creamos el grafo en el container dado
         //El editor se utiliza para crear determinadas funcionalidades para el grafo, como
@@ -75,7 +75,7 @@ function main(container,outline,toolbar,sidebar,status){
         editor.setGraphContainer(container);
         /* //NO FUNCIONA
         var config = mxUtils.load(
-            'editors/config/keyhandler-minimal.xml').
+            '../editors/config/keyhandler-minimal.xml').
                 getDocumentElement();
         editor.configure(config);
         */
@@ -159,15 +159,15 @@ function main(container,outline,toolbar,sidebar,status){
                 let label='';
 
                 if(cell.value.primaryKey){
-                    label+='<img title="Primary key" src="images/key.png" width="16" height="16" align="top">&nbsp;';
+                    label+='<img title="Primary key" src="../images/key.png" width="16" height="16" align="top">&nbsp;';
                 }else{
                     label+='<img src="spacer/key.png" width="16" height="1" >&nbsp;';
                 }
 
                 if(cell.value.autoIncrement){
-                    label+='<img title="Auto Increment" src="images/plus.png" width="16" height="16" align="top">&nbsp;';
+                    label+='<img title="Auto Increment" src="../images/plus.png" width="16" height="16" align="top">&nbsp;';
                 }else if(cell.value.unique){
-                    label+='<img title="Unique" src="images/check.png" width="16" height="16" align="top">&nbsp;';
+                    label+='<img title="Unique" src="../images/check.png" width="16" height="16" align="top">&nbsp;';
                 }else{
                     label+='<img src="spacer/key.png" width="16" height="1" >&nbsp;';
                 }
@@ -213,7 +213,7 @@ function main(container,outline,toolbar,sidebar,status){
         let table=new mxCell(tableObject,new mxGeometry(0,0,200,28),'table');
 
         table.setVertex(true);
-        addSidebarIcon(graph,sidebar,table,'images/icons48/table.png');
+        addSidebarIcon(graph,sidebar,table,'../images/icons48/table.png');
 
         //Icono de columna
         let columnObject=new Column('COLUMNNAME');
@@ -221,7 +221,7 @@ function main(container,outline,toolbar,sidebar,status){
 
         column.setVertex(true);
         column.setConnectable(false);
-        addSidebarIcon(graph,sidebar,column,'images/icons48/column.png');
+        addSidebarIcon(graph,sidebar,column,'../images/icons48/column.png');
 
         //Creamos la columna que actuará como clave primaria de la tabla
         let firstColumn=column.clone();
@@ -309,7 +309,7 @@ function main(container,outline,toolbar,sidebar,status){
         spacer.style.padding='8px';
 
         //Añadimos el botón propiedades
-        addToolbarButton(editor,toolbar,'properties','Properties','editors/images/properties.gif');
+        addToolbarButton(editor,toolbar,'properties','Properties','../editors/images/properties.gif');
         //Añadimos la función del editor 'properties' a la función especificada
         editor.addAction('properties',function(editor,cell){
             //Cuando se pulse el botón propiedades recibimos una celda que comprobaremos si es null
@@ -328,16 +328,16 @@ function main(container,outline,toolbar,sidebar,status){
         
         //Añadimos el resto de botones
         //Para estos botones no hace falta añadir funciones puesto que ya están definidas en el editor
-        addToolbarButton(editor,toolbar,'delete','Delete','images/delete2.png');
+        addToolbarButton(editor,toolbar,'delete','Delete','../images/delete2.png');
         toolbar.appendChild(spacer.cloneNode(true));
 
-        addToolbarButton(editor,toolbar,'undo','','images/undo.png');
-        addToolbarButton(editor,toolbar,'redo','','images/redo.png');
+        addToolbarButton(editor,toolbar,'undo','','../images/undo.png');
+        addToolbarButton(editor,toolbar,'redo','','../images/redo.png');
 
         toolbar.appendChild(spacer.cloneNode(true));
 
-        addToolbarButton(editor,toolbar,'show','Show','images/camera.png');
-        addToolbarButton(editor,toolbar,'print','Print','images/printer.png');
+        addToolbarButton(editor,toolbar,'show','Show','../images/camera.png');
+        addToolbarButton(editor,toolbar,'print','Print','../images/printer.png');
 
         toolbar.appendChild(spacer.cloneNode(true));
 
@@ -356,7 +356,7 @@ function main(container,outline,toolbar,sidebar,status){
                 mxUtils.alert('Esquema vacío');
             }
         });
-        addToolbarButton(editor,toolbar,'showSql','Mostrar SQL','images/export1.png');
+        addToolbarButton(editor,toolbar,'showSql','Mostrar SQL','../images/export1.png');
 
         //Añadimos la función que exporta el grafo a XML
         editor.addAction('export',function(editor,cell){
@@ -372,18 +372,18 @@ function main(container,outline,toolbar,sidebar,status){
             textarea.value = mxUtils.getPrettyXml(node);
             showModalWindow('XML', textarea, 410, 440);
         });
-        addToolbarButton(editor,toolbar,'export','Export XML','images/export1.png');
+        addToolbarButton(editor,toolbar,'export','Export XML','../images/export1.png');
 
 
-        addToolbarButton(editor,status,'collapseAll','Collapse All','images/navigate_minus.png');
-        addToolbarButton(editor,status,'expandAll','Expand All','images/navigate_plus.png');
+        addToolbarButton(editor,status,'collapseAll','Collapse All','../images/navigate_minus.png');
+        addToolbarButton(editor,status,'expandAll','Expand All','../images/navigate_plus.png');
 
         status.appendChild(spacer.cloneNode(true));
 
-        addToolbarButton(editor,status,'zoomIn','','images/zoom_in.png');
-        addToolbarButton(editor,status,'zoomOut','','images/zoom_out.png');
-        addToolbarButton(editor,status,'actualSize','','images/view_1_1.png');
-        addToolbarButton(editor,status,'fit','','images/fit_to_size.png');
+        addToolbarButton(editor,status,'zoomIn','','../images/zoom_in.png');
+        addToolbarButton(editor,status,'zoomOut','','../images/zoom_out.png');
+        addToolbarButton(editor,status,'actualSize','','../images/view_1_1.png');
+        addToolbarButton(editor,status,'fit','','../images/fit_to_size.png');
 
         //Creamos la vista que se ve arriba a la derecha en el grafo
         let outln=new mxOutline(graph,outline);
@@ -611,7 +611,7 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_VERTICAL_ALIGN] = 'middle';
     style[mxConstants.STYLE_FONTSIZE] = '12';
     style[mxConstants.STYLE_FONTSTYLE] = 1;
-    style[mxConstants.STYLE_IMAGE] = 'images/icons48/table.png';
+    style[mxConstants.STYLE_IMAGE] = '../images/icons48/table.png';
     // Looks better without opacity if shadow is enabled
     //style[mxConstants.STYLE_OPACITY] = '80';
     style[mxConstants.STYLE_SHADOW] = 1;
@@ -630,31 +630,31 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     if(cell!=null){
         //Si hemos hecho click en una columna añadimos la entrada propiedades
         if(graph.isHtmlLabel(cell)){
-            menu.addItem('Propiedades','editors/images/properties.gif',function(){
+            menu.addItem('Propiedades','../editors/images/properties.gif',function(){
                 editor.execute('properties',cell);
             });
 
             menu.addSeparator();
         }
 
-        menu.addItem('Borrar','images/delete2.png',function(){
+        menu.addItem('Borrar','../images/delete2.png',function(){
             editor.execute('delete',cell);
         });
 
         menu.addSeparator();
     }
 
-    menu.addItem('Deshacer','images/undo.png',function(){
+    menu.addItem('Deshacer','../images/undo.png',function(){
         editor.execute('undo',cell);
     });
 
-    menu.addItem('Rehacer','images/redo.png',function(){
+    menu.addItem('Rehacer','../images/redo.png',function(){
         editor.execute('redo',cell);
     });
 
     menu.addSeparator();
 
-    menu.addItem('Mostrar SQL','images/export1.png',function(){
+    menu.addItem('Mostrar SQL','../images/export1.png',function(){
         editor.execute('showSql',cell);
     })
 }
