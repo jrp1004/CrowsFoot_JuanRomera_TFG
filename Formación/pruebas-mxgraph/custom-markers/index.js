@@ -205,12 +205,13 @@ function main(container){
         //Actualizamos el valor de la etiqueta del objeto Relacion asignado a la arista
         graph.model.valueForCellChanged=function(cell,value){
             if(this.isEdge(cell)){
-                let old=cell.value.name;
-                cell.value.name=value;
-                return old;
-            }else{
-                return mxGraphModel.prototype.valueForCellChanged.apply(this,arguments);
+                if(value.name==null){
+                    let old=cell.value.name;
+                    cell.value.name=value;
+                    return old;
+                }
             }
+            return mxGraphModel.prototype.valueForCellChanged.apply(this,arguments);
         };
 
         graph.getView().updateStyle=true;
@@ -233,7 +234,7 @@ function main(container){
         try {
             let v1=graph.insertVertex(parent,null,'v1',20,20,80,30);
             let v2=graph.insertVertex(parent,null,'v2',440,20,80,30);
-            let e1=graph.insertEdge(parent,null,new Relacion("Etiqueta"),v1,v2,
+            let e1=graph.insertEdge(parent,null,new Relacion("Etiqueta 1"),v1,v2,
                 'dashed=1;startArrow=cero_o_uno;endArrow=cero_o_mas;startFill=0;endFill=0;labelBackgroundColor=#FFFFFF;');
 
             let v3=graph.insertVertex(parent,null,'v3',20,120,80,30);
