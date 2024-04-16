@@ -31,7 +31,11 @@ function main(container){
                 canvas.begin();
                 //CIRCULO
                 canvas.ellipse(centro.x - a, centro.y - a, size, size);
+                canvas.setFillColor("white");
                 canvas.fill();
+                canvas.begin();
+                canvas.ellipse(centro.x - a, centro.y - a, size, size);
+                canvas.fillAndStroke();
                 
                 canvas.begin();
                 
@@ -141,8 +145,12 @@ function main(container){
 
                 //CIRCULO
                 canvas.ellipse(pt.x - a, pt.y - a, size, size);
-
+                canvas.setFillColor("white");
                 canvas.fill();
+                canvas.begin();
+                canvas.ellipse(pt.x - a, pt.y - a, size, size);
+                canvas.fillAndStroke();
+
                 canvas.begin();
 
                 //HORIZONTAL
