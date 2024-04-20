@@ -14,6 +14,162 @@ function main(container,outline,toolbar,sidebar,status){
         mxSwimlane.prototype.imageDx=16;
         mxSwimlane.prototype.imageDy=4;
 
+        //Custom markers
+        mxMarker.addMarker('cero_o_mas',function(canvas,shape,type,pe,unitX,unitY,size,source,sw,filled){
+            let a = size / 2;
+
+            let pt = pe.clone();
+            pt.x -= unitX * a*2;
+            pt.y -= unitY * a*2;
+
+            let pt_2=pe.clone();
+            pt_2.x-=unitX*a/2;
+            pt_2.y-=unitY*a/2;
+
+            let centro=pe.clone();
+            centro.x-=unitX*a*5;
+            centro.y-=unitY*a*5;
+
+            unitX = unitX * (size + sw);
+			unitY = unitY * (size + sw);
+
+            let widthFactor=2/3;
+
+            return function()
+            {
+                canvas.begin();
+                //CIRCULO
+                canvas.ellipse(centro.x - a, centro.y - a, size, size);
+                canvas.setFillColor("white");
+                canvas.fill();
+                canvas.begin();
+                canvas.ellipse(centro.x - a, centro.y - a, size, size);
+                canvas.fillAndStroke();
+                
+                canvas.begin();
+                
+                //DIAGONALES
+                canvas.moveTo(pt.x-unitX,pt.y-unitY);
+                canvas.lineTo(pt_2.x-unitX-unitY*widthFactor,pt_2.y-unitY+unitX*widthFactor);
+                canvas.moveTo(pt.x-unitX,pt.y-unitY);
+                canvas.lineTo(pt_2.x+unitY*widthFactor-unitX,pt_2.y-unitY-unitX*widthFactor);
+
+                canvas.stroke();
+                
+            };
+        });
+
+        mxMarker.addMarker('uno_o_mas',function(canvas,shape,type,pe,unitX,unitY,size,source,sw,filled){
+            let a = size / 2;
+
+            let pt = pe.clone();
+            pt.x -= unitX * a*2;
+            pt.y -= unitY * a*2;
+
+            let pt_2=pe.clone();
+            pt_2.x-=unitX*a/2;
+            pt_2.y-=unitY*a/2;
+
+            unitX = unitX * (size + sw);
+			unitY = unitY * (size + sw);
+
+            let widthFactor=2/3;
+
+            return function()
+            {
+                canvas.begin();
+                //HORIZONTAL
+                canvas.moveTo(pt.x-unitX-unitY*widthFactor,pt.y-unitY+unitX*widthFactor);
+                canvas.lineTo(pt.x+unitY*widthFactor-unitX,pt.y-unitY-unitX*widthFactor);
+
+                canvas.stroke();
+                
+                canvas.begin();
+                
+                //DIAGONALES
+                canvas.moveTo(pt.x-unitX,pt.y-unitY);
+                canvas.lineTo(pt_2.x-unitX-unitY*widthFactor,pt_2.y-unitY+unitX*widthFactor);
+                canvas.moveTo(pt.x-unitX,pt.y-unitY);
+                canvas.lineTo(pt_2.x+unitY*widthFactor-unitX,pt_2.y-unitY-unitX*widthFactor);
+
+                canvas.stroke();
+                
+            };
+        });
+
+        mxMarker.addMarker('solo_uno',function(canvas,shape,type,pe,unitX,unitY,size,source,sw,filled){
+            let a = size / 2;
+
+            let pt = pe.clone();
+            pt.x -= unitX * a*2;
+            pt.y -= unitY * a*2;
+
+            let pt_2=pe.clone();
+            pt_2.x-=unitX*a;
+            pt_2.y-=unitY*a;
+
+            unitX = unitX * (size + sw);
+			unitY = unitY * (size + sw);
+
+            let widthFactor=2/3;
+
+            return function()
+            {
+                canvas.begin();
+
+                //HORIZONTAL 1
+                canvas.moveTo(pt.x-unitX-unitY*widthFactor,pt.y-unitY+unitX*widthFactor);
+                canvas.lineTo(pt.x+unitY*widthFactor-unitX,pt.y-unitY-unitX*widthFactor);
+
+                canvas.stroke();
+                canvas.begin();
+
+                //HORIZONTAL 2
+                canvas.moveTo(pt_2.x-unitX-unitY*widthFactor,pt_2.y-unitY+unitX*widthFactor);
+                canvas.lineTo(pt_2.x+unitY*widthFactor-unitX,pt_2.y-unitY-unitX*widthFactor);
+                            
+                canvas.stroke();
+            };
+        });
+
+        mxMarker.addMarker('cero_o_uno',function(canvas,shape,type,pe,unitX,unitY,size,source,sw,filled){
+            let a = size / 2;
+
+            let pt = pe.clone();
+            pt.x -= unitX * a*6;
+            pt.y -= unitY * a*6;
+
+            let pt_linea=pe.clone();
+            pt_linea.x-=unitX*a;
+            pt_linea.y-=unitY*a;
+
+            unitX = unitX * (size + sw);
+			unitY = unitY * (size + sw);
+
+            let widthFactor=2/3;
+
+            return function()
+            {
+                canvas.begin();
+
+                //CIRCULO
+                canvas.ellipse(pt.x - a, pt.y - a, size, size);
+                canvas.setFillColor("white");
+                canvas.fill();
+                canvas.begin();
+                canvas.ellipse(pt.x - a, pt.y - a, size, size);
+                canvas.fillAndStroke();
+
+                canvas.begin();
+
+                //HORIZONTAL
+                canvas.moveTo(pt_linea.x-unitX-unitY*widthFactor,pt_linea.y-unitY+unitX*widthFactor);
+                canvas.lineTo(pt_linea.x+unitY*widthFactor-unitX,pt_linea.y-unitY-unitX*widthFactor);
+                            
+                canvas.stroke();
+            };
+        });
+
         //Establece los límites del icono
         mxSwimlane.prototype.getImageBounds=function(x,y,w,h){
             return new mxRectangle(x+this.imageDx,y+this.imageDy,this.imageSize,this.imageSize);
@@ -125,9 +281,11 @@ function main(container,outline,toolbar,sidebar,status){
         };
 
         //No se pueden editar las aristas
+        /*
         graph.isCellEditable=function(cell){
             return !this.model.isEdge(cell);
         };
+        */
 
         //Devuelve el campo name como etiqueta de la celda
         graph.convertValueToString=function(cell){
@@ -267,6 +425,8 @@ function main(container,outline,toolbar,sidebar,status){
 
                 //Con los nuevos parámetros llamamos a la función añadir arista por defecto, uniendo la celda de la columna con la
                 //referencia de la tabla objetivo con la celda con la clave primaria
+                edge.setValue(new Relacion("Relacion"));
+
                 return mxGraph.prototype.addEdge.apply(this,arguments);
             } catch (error) {
                 console.log("ERROR añadir arista");
@@ -277,6 +437,28 @@ function main(container,outline,toolbar,sidebar,status){
 
             return null;
         }
+
+        graph.getView().updateStyle=true;
+        let previous=graph.model.getStyle;
+
+        graph.model.getStyle=function(cell){
+            if(cell!=null){
+                let style=previous.apply(this,arguments);
+
+                if(this.isEdge(cell)){
+                    if(style!=null){
+                        style[mxConstants.STYLE_STARTARROW]=cell.value.startArrow;
+                        style[mxConstants.STYLE_ENDARROW]=cell.value.endArrow;
+                    }else{
+                        style="startArrow="+cell.value.startArrow+";endArrow="+cell.value.endArrow+";";
+                    }
+                }
+
+                return style;
+                
+            }
+            return null;
+        };
 
         //Texto que se muestra abajo a la derecha
         let hints = document.createElement('div');
@@ -321,7 +503,7 @@ function main(container,outline,toolbar,sidebar,status){
             }
 
             //Comprobamos si lo seleccionado es una columna para mostrar sus propiedades
-            if(graph.isHtmlLabel(cell)){
+            if(graph.isHtmlLabel(cell)||graph.model.isEdge(cell)){
                 showProperties(graph,cell);
             }
         });
@@ -622,6 +804,8 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_STROKEWIDTH] = '2';
     style[mxConstants.STYLE_ROUNDED] = true;
     style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
+    style[mxConstants.STYLE_STARTSIZE]='8';
+    style[mxConstants.STYLE_ENDSIZE]='8';
 }
 
 //Función para crear las entradas del menú popup
@@ -629,7 +813,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     //Comprobamos si hemos hecho click en una tabla o en una columna
     if(cell!=null){
         //Si hemos hecho click en una columna añadimos la entrada propiedades
-        if(graph.isHtmlLabel(cell)){
+        if(graph.isHtmlLabel(cell)||graph.model.isEdge(cell)){
             menu.addItem('Propiedades','../editors/images/properties.gif',function(){
                 editor.execute('properties',cell);
             });
@@ -665,51 +849,107 @@ function showProperties(graph,cell){
 
     //Añadimos los campos al formulario
     let nameField=form.addText('Nombre',cell.value.name);
-    let typeField=form.addText('Tipo',cell.value.type);
+    let name;
 
-    let primaryKeyField=form.addCheckbox('Clave primaria',cell.value.primaryKey);
-    let autoIncrementField=form.addCheckbox('Auto Incrementar',cell.value.autoIncrement);
-    let notNullField=form.addCheckbox('No Nulo',cell.value.notNull);
-    let uniqueField=form.addCheckbox('Unico',cell.value.unique);
+    if(graph.isHtmlLabel(cell)){
+        let typeField=form.addText('Tipo',cell.value.type);
 
-    let defaultField=form.addText('Por defecto',cell.value.defaultValue||'');
-    let useDefaultValue=form.addCheckbox('Usar por defecto',(cell.value.defaultValue!=null));
+        let primaryKeyField=form.addCheckbox('Clave primaria',cell.value.primaryKey);
+        let autoIncrementField=form.addCheckbox('Auto Incrementar',cell.value.autoIncrement);
+        let notNullField=form.addCheckbox('No Nulo',cell.value.notNull);
+        let uniqueField=form.addCheckbox('Unico',cell.value.unique);
 
-    let wnd=null;
+        let defaultField=form.addText('Por defecto',cell.value.defaultValue||'');
+        let useDefaultValue=form.addCheckbox('Usar por defecto',(cell.value.defaultValue!=null));
 
-    //Si pulsamos el botón ok del formulario actualizamos los datos de la columna
-    const okFunction=function(){
-        let clone=cell.value.clone();
+        let wnd=null;
 
-        clone.name=nameField.value;
-        clone.type=typeField.value;
-
-        if(useDefaultValue.checked){
-            clone.defaultValue=defaultField.value;
-        }else{
-            clone.defaultValue=null;
+        //Si pulsamos el botón ok del formulario actualizamos los datos de la columna
+        const okFunction=function(){
+            let clone=cell.value.clone();
+    
+            clone.name=nameField.value;
+            clone.type=typeField.value;
+    
+            if(useDefaultValue.checked){
+                clone.defaultValue=defaultField.value;
+            }else{
+                clone.defaultValue=null;
+            }
+    
+            clone.primaryKey=primaryKeyField.checked;
+            clone.autoIncrement=autoIncrementField.checked;
+            clone.notNull=notNullField.checked;
+            clone.unique=uniqueField.checked;
+    
+            graph.model.setValue(cell,clone);
+    
+            wnd.destroy();
         }
 
-        clone.primaryKey=primaryKeyField.checked;
-        clone.autoIncrement=autoIncrementField.checked;
-        clone.notNull=notNullField.checked;
-        clone.unique=uniqueField.checked;
+        
+        //Función que se ejecuta cuando se pulsa el botón cancelar
+        const cancelFunction=function(){
+            wnd.destroy();
+        }
+        form.addButtons(okFunction,cancelFunction);
 
-        graph.model.setValue(cell,clone);
+        let parent=graph.model.getParent(cell);
+        name=parent.value.name+'.'+cell.value.name;
+        //Mostramos el formualrio utilizando la función anterior
+        wnd=showModalWindow(name,form.table,240,240);
+    }else{
+        let valor_actual_s=cell.value.startArrow;
+        let valor_actual_e=cell.value.endArrow;
 
-        wnd.destroy();
+        let combo_s=form.addCombo("startArrow",false,4);
+        //Marcamos como seleccionado el que coincida con valor_actual
+        form.addOption(combo_s,"solo uno","solo_uno","solo_uno"==valor_actual_s);
+        form.addOption(combo_s,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_s);
+        form.addOption(combo_s,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_s);
+        form.addOption(combo_s,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_s);
+
+        let combo_e=form.addCombo("endArrow",false,4);
+        form.addOption(combo_e,"solo uno","solo_uno","solo_uno"==valor_actual_e);
+        form.addOption(combo_e,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_e);
+        form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
+        form.addOption(combo_e,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_e);
+
+        let wnd=null;
+
+        const okFunction=function(){
+            let newValue_s=combo_s.value || '';
+            let oldValue_s=valor_actual_s;
+            let newValue_e=combo_e.value || '';
+            let oldValue_e=valor_actual_e;
+
+            if(newValue_s!=oldValue_s||newValue_e!=oldValue_e){
+                graph.getModel().beginUpdate();
+                try {
+                    let clone=cell.value.clone();
+                    clone.startArrow=newValue_s;
+                    clone.endArrow=newValue_e;
+
+                    graph.model.setValue(cell,clone);
+
+                } catch (error) {
+                    console.log("ERROR update");
+                    console.log(error);
+                }finally{
+                    graph.getModel().endUpdate();
+                }
+            }
+
+            wnd.destroy();
+        }
+        const cancelFunction=function(){
+            wnd.destroy();
+        }
+        form.addButtons(okFunction,cancelFunction);
+
+        let name=cell.value.name;
+        wnd=showModalWindow(name,form.table,240,240);
     }
-
-    //Función que se ejecuta cuando se pulsa el botón cancelar
-    const cancelFunction=function(){
-        wnd.destroy();
-    }
-    form.addButtons(okFunction,cancelFunction);
-
-    let parent=graph.model.getParent(cell);
-    let name=parent.value.name+'.'+cell.value.name;
-    //Mostramos el formualrio utilizando la función anterior
-    wnd=showModalWindow(name,form.table,240,240);
 }
 
 //Función que crea el código SQL según los elementos del grafo
@@ -779,5 +1019,15 @@ function Table(name){
     this.name=name;
 }
 Table.prototype.clone=function(){
+    return mxUtils.clone(this);
+}
+
+//Objeto asociado a las relaciones
+function Relacion(name){
+    this.name=name;
+}
+Relacion.prototype.startArrow="solo_uno";
+Relacion.prototype.endArrow="solo_uno";
+Relacion.prototype.clone=function(){
     return mxUtils.clone(this);
 }
