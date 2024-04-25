@@ -821,6 +821,22 @@ function createPopupMenu(editor,graph,menu,cell,evt){
             });
 
             menu.addSeparator();
+        }else{
+            menu.addItem('Anadir columna','../images/plus.png',function(){
+                //Nueva columna
+                let columnCount=graph.model.getChildCount(cell)+1;
+                let name=mxUtils.prompt('Introduce el nombre para la nueva columna','COLUMN'+columnCount);
+
+                let columnObject=new Column(name);
+                let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+
+                column.setVertex(true);
+                column.setConnectable(false);
+                //Añadimos la nueva columna a la tabla
+                graph.addCell(column,cell);
+            });
+
+            menu.addSeparator();
         }
 
         menu.addItem('Borrar','../images/delete2.png',function(){
