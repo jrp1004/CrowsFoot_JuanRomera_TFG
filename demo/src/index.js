@@ -299,7 +299,9 @@ function main(container,outline,toolbar,sidebar,status){
         //Tooltip para las columnas y las aristas
         graph.getTooltip=function(state){
             if(this.isHtmlLabel(state.cell)){
-                return 'Tipo: '+state.cell.value.type;
+                return 'Titulo: '+state.cell.value.titulo+'\n'
+                    +'Descripcion: '+state.cell.value.desc+'\n'
+                    +'Tipo de datos: '+state.cell.value.type;
             }else if(this.model.isEdge(state.cell)){
                 let src=this.model.getTerminal(state.cell,true);
                 let parent=this.model.getParent(src);
@@ -862,6 +864,9 @@ function showProperties(graph,cell){
         let defaultField=form.addText('Por defecto',cell.value.defaultValue||'');
         let useDefaultValue=form.addCheckbox('Usar por defecto',(cell.value.defaultValue!=null));
 
+        let titulo=form.addText('Titulo',cell.value.titulo);
+        let descripcion=form.addTextarea('Descripcion',cell.value.desc,5);
+
         let wnd=null;
 
         //Si pulsamos el botón ok del formulario actualizamos los datos de la columna
@@ -881,6 +886,9 @@ function showProperties(graph,cell){
             clone.autoIncrement=autoIncrementField.checked;
             clone.notNull=notNullField.checked;
             clone.unique=uniqueField.checked;
+
+            clone.titulo=titulo.value;
+            clone.desc=descripcion.value;
     
             graph.model.setValue(cell,clone);
     
@@ -897,7 +905,7 @@ function showProperties(graph,cell){
         let parent=graph.model.getParent(cell);
         name=parent.value.name+'.'+cell.value.name;
         //Mostramos el formualrio utilizando la función anterior
-        wnd=showModalWindow(name,form.table,240,240);
+        wnd=showModalWindow(name,form.table,240,320);
     }else{
         let valor_actual_s=cell.value.startArrow;
         let valor_actual_e=cell.value.endArrow;
@@ -1153,6 +1161,8 @@ Column.prototype.unique=false;
 Column.prototype.clone=function(){
     return mxUtils.clone(this);
 }
+Column.prototype.desc='DESCRIPCION';
+Column.prototype.titulo='TITULO';
 
 
 //Definición del objeto de usuario tabla
