@@ -902,14 +902,17 @@ function showProperties(graph,cell){
         let valor_actual_s=cell.value.startArrow;
         let valor_actual_e=cell.value.endArrow;
 
-        let combo_s=form.addCombo("startArrow",false,4);
+        let table_s=cell.getTerminal(true).getParent();//Tabla source
+        let table_t=cell.getTerminal(false).getParent();//tabla target
+
+        let combo_s=form.addCombo(table_s.value.name,false,4);
         //Marcamos como seleccionado el que coincida con valor_actual
         form.addOption(combo_s,"solo uno","solo_uno","solo_uno"==valor_actual_s);
         form.addOption(combo_s,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_s);
         form.addOption(combo_s,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_s);
         form.addOption(combo_s,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_s);
 
-        let combo_e=form.addCombo("endArrow",false,4);
+        let combo_e=form.addCombo(table_t.value.name,false,4);
         form.addOption(combo_e,"solo uno","solo_uno","solo_uno"==valor_actual_e);
         form.addOption(combo_e,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_e);
         form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
@@ -931,7 +934,7 @@ function showProperties(graph,cell){
                     clone.endArrow=newValue_e;
 
                     graph.model.setValue(cell,clone);
-
+                    actualizarClaves(graph,cell);
                 } catch (error) {
                     console.log("ERROR update");
                     console.log(error);
@@ -939,6 +942,11 @@ function showProperties(graph,cell){
                     graph.getModel().endUpdate();
                 }
             }
+
+            let clone=cell.value.clone();
+
+            clone.name=nameField.value;
+            graph.model.setValue(cell,clone);
 
             wnd.destroy();
         }
@@ -950,6 +958,139 @@ function showProperties(graph,cell){
         let name=cell.value.name;
         wnd=showModalWindow(name,form.table,240,240);
     }
+}
+
+function actualizarClaves(graph,cell){
+    let columnObject=new Column("COLUMNA");
+    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+
+    column.setVertex(true);
+    column.setConnectable(false);
+
+    let relacion=cell.value;
+
+    let table_s=cell.getTerminal(true).getParent();
+    let table_t=cell.getTerminal(false).getParent();
+    let primaryKey_s=obtenerClavePrimaria(graph,table_s);
+    let primaryKey_t=obtenerClavePrimaria(graph,table_t);
+
+    //Eliminamos la clave foranea en la otra tabla y el enlace
+    let clone=cell.clone();
+    graph.removeCells([cell]); //Se activa el listener definido anteriormente
+
+    if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
+        if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
+            console.log("Clave en target");
+            column.value.name=primaryKey_s.value.name;
+            column.value.type=primaryKey_s.value.type;
+            graph.addCell(column,table_t);
+            
+            let e_1=clone.clone();
+            let temp=relacion.startArrow;
+            relacion.startArrow=relacion.endArrow;
+            relacion.endArrow=temp;
+            e_1.setValue(relacion);
+            e_1.setTerminal(column,true);
+            e_1.setTerminal(primaryKey_s,false);
+            graph.addCell(e_1);
+        }else{
+            console.log("Indiferente");
+            column.value.name=primaryKey_t.value.name;
+            column.value.type=primaryKey_t.value.type;
+            graph.addCell(column,table_s);
+            
+            let e_1=clone.clone();
+            let temp=relacion.startArrow;
+            relacion.startArrow=relacion.endArrow;
+            relacion.endArrow=temp;
+            e_1.setValue(relacion);
+            e_1.setTerminal(column,true);
+            e_1.setTerminal(primaryKey_t,false);
+            graph.addCell(e_1);
+        }
+    }else{
+        if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
+            console.log("Tabla intermedia");
+
+            //Calculamos donde colocar la nueva tabla
+            let distancia=table_t.geometry.x-(table_s.geometry.x+200);
+
+            let x=table_t.geometry.x-100-distancia/2;
+            let y=table_s.geometry.y<table_t.geometry.y?table_t.geometry.y:table_s.geometry.y;
+
+            //Creamos nueva tabla para la relación
+            let tableObject=new Table(table_s.value.name+'_'+table_t.value.name);
+            let table=new mxCell(tableObject,new mxGeometry(x,y,200,28),'table');
+    
+            table.setVertex(true);
+            let firstColumn=column.clone();
+            firstColumn.value.name=tableObject.name+'_ID';
+            firstColumn.value.type='INTEGER';
+            firstColumn.value.primaryKey=true;
+            firstColumn.value.autoIncrement=true;
+            //Insertamos la celda columna en la tabla
+            table.insert(firstColumn);
+
+            //Insertamos claves foráneas
+            let k_1=column.clone();
+            k_1.value.name=primaryKey_s.value.name;
+            k_1.value.type=primaryKey_s.value.type;
+            table.insert(k_1);
+            let k_2=column.clone();
+            k_2.value.name=primaryKey_t.value.name;
+            k_2.value.type=primaryKey_t.value.type;
+            table.insert(k_2);
+
+            graph.addCell(table);
+
+            //Creamos relaciones nuevas
+            let relacion_s=new Relacion("Relacion_s");
+            relacion_s.startArrow='uno_o_mas';
+            relacion_s.endArrow='solo_uno';
+            let e_1=clone.clone();
+            e_1.setValue(relacion_s);
+            e_1.setTerminal(primaryKey_s,false);
+            e_1.setTerminal(k_1,true);
+            graph.addCell(e_1);
+
+            let relacion_t=new Relacion("Relacion_t");
+            relacion_t.startArrow='uno_o_mas';
+            relacion_t.endArrow='solo_uno';
+            let e_2=clone.clone();
+            e_2.setValue(relacion_t);
+            e_2.setTerminal(primaryKey_t,false);
+            e_2.setTerminal(k_2,true);
+            graph.addCell(e_2);
+        }else{
+            console.log("Clave en source");
+            column.value.name=primaryKey_t.value.name;
+            column.value.type=primaryKey_t.value.type;
+            graph.addCell(column,table_s);
+            
+            let e_1=clone.clone();
+            e_1.setValue(relacion);
+            e_1.setTerminal(column,true);
+            e_1.setTerminal(primaryKey_t,false);
+            graph.addCell(e_1);
+        }
+    }
+}
+
+//Devuelve la celda correspondiente a la clave primaria de la tabla indicada
+function obtenerClavePrimaria(graph,tabla){
+    let primaryKey=null;
+    let childCount=graph.model.getChildCount(tabla);
+
+    //Obtenemos la clave primaria de la tabla objetivo
+    for(let i=0;i<childCount;i++){
+        let child=graph.model.getChildAt(tabla,i);
+        if(child.value.primaryKey){
+            primaryKey=child;
+            break;
+        }
+    }
+
+    return primaryKey;
 }
 
 //Función que crea el código SQL según los elementos del grafo
