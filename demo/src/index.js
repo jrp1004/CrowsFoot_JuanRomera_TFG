@@ -333,6 +333,42 @@ function main(container,outline,toolbar,sidebar,status){
                 }
 
                 return label+mxUtils.htmlEntities(cell.value.name,false)+': '+mxUtils.htmlEntities(cell.value.type,false);
+            }else{
+                if(this.isSwimlane(cell)){
+                    let label=cell.value.name;
+                    
+                    const style=graph.getStylesheet().getCellStyle(cell.style);
+
+                    let fontfamily;
+                    if(style[mxConstants.STYLE_FONTFAMILY]){
+                        fontfamily=style[mxConstants.STYLE_FONTFAMILY];
+                    }else{
+                        //La fuente por defecto es arial
+                        fontfamily="arial";
+                    }
+
+                    let size=style[mxConstants.STYLE_FONTSIZE];
+
+                    let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
+                    let fontstyle="";
+                    if(fontstyle_n&mxConstants.FONT_BOLD){
+                        fontstyle+="bold ";
+                    }
+                    if(fontstyle_n&mxConstants.FONT_ITALIC){
+                        fontstyle+="italic ";
+                    }
+
+                    const font=fontstyle+size+"pt "+fontfamily;
+
+                    if(getTextWidth(label,font)>cell.geometry.width){
+                        for(let i=label.length-1;i>0;i--){
+                            let nueva_etiqueta=label.slice(0,i)+"...";
+                            if(getTextWidth(nueva_etiqueta,"bold 12pt arial")<cell.geometry.width){
+                                return nueva_etiqueta;
+                            }
+                        }
+                    }
+                }
             }
 
             return mxGraph.prototype.getLabel.apply(this,arguments);
@@ -775,7 +811,7 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_FONTCOLOR] = '#000000';
     style[mxConstants.STYLE_FONTSIZE] = '11';
     style[mxConstants.STYLE_FONTSTYLE] = 0;
-    style[mxConstants.STYLE_SPACING_LEFT] = '4';
+    style[mxConstants.STYLE_SPACING_LEFT] = 4; //Modificado para evitar error con getPreferredSizeForCell
     style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
     style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
     graph.getStylesheet().putDefaultVertexStyle(style);
@@ -783,7 +819,7 @@ function configureStylesheet(graph){
     style = new Object();
     style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_SWIMLANE;
     style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-    style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+    style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
     style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
     style[mxConstants.STYLE_GRADIENTCOLOR] = '#41B9F5';
     style[mxConstants.STYLE_FILLCOLOR] = '#8CCDF5';
@@ -799,6 +835,7 @@ function configureStylesheet(graph){
     // Looks better without opacity if shadow is enabled
     //style[mxConstants.STYLE_OPACITY] = '80';
     style[mxConstants.STYLE_SHADOW] = 1;
+    style[mxConstants.STYLE_SPACING_LEFT]=48;
     graph.getStylesheet().putCellStyle('table', style);
 
     style = graph.stylesheet.getDefaultEdgeStyle();
@@ -1160,6 +1197,15 @@ function createSql(graph){
         }
     }
     return sql.join('');
+}
+
+//Función para obtener la anchura de una cadena de texto en píxeles
+function getTextWidth(text,font){
+    const canvas=getTextWidth.canvas || (getTextWidth.canvas=document.createElement("canvas"));
+    const context=canvas.getContext("2d");
+    context.font=font;
+    const metrics=context.measureText(text);
+    return metrics.width;
 }
 
 
