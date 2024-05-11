@@ -332,11 +332,51 @@ function main(container,outline,toolbar,sidebar,status){
                     label+='<img src="spacer/key.png" width="16" height="1" >&nbsp;';
                 }
 
-                return label+mxUtils.htmlEntities(cell.value.name,false)+': '+mxUtils.htmlEntities(cell.value.type,false);
+                let style=graph.getStylesheet().getCellStyle(cell.style);
+                if(style==null){
+                    style=graph.getStylesheet().getDefaultVertexStyle();
+                }
+
+                let fontfamily;
+                if(style[mxConstants.STYLE_FONTFAMILY]){
+                    fontfamily=style[mxConstants.STYLE_FONTFAMILY];
+                }else{
+                    //La fuente por defecto es arial
+                    fontfamily="arial";
+                }
+
+                let size=style[mxConstants.STYLE_FONTSIZE];
+
+                let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
+                let fontstyle="";
+                if(fontstyle_n&mxConstants.FONT_BOLD){
+                    fontstyle+="bold ";
+                }
+                if(fontstyle_n&mxConstants.FONT_ITALIC){
+                    fontstyle+="italic ";
+                }
+
+                const font=fontstyle+size+"pt "+fontfamily
+
+
+                let nueva_etiqueta=cell.value.name+": "+cell.value.type;
+                const nombre=cell.value.name;
+
+                if(getTextWidth(nueva_etiqueta,font)>cell.geometry.width){
+                    for(let i=nombre.length;i>0;i--){
+                        let etiqueta_temp=nombre.slice(0,i)+"..."+": "+cell.value.type;
+                        if(getTextWidth(etiqueta_temp,font)<cell.geometry.width){
+                            nueva_etiqueta=etiqueta_temp;
+                            break;
+                        }
+                    }
+                }
+
+                return label+mxUtils.htmlEntities(nueva_etiqueta,false);
             }else{
                 if(this.isSwimlane(cell)){
                     let label=cell.value.name;
-                    
+
                     const style=graph.getStylesheet().getCellStyle(cell.style);
 
                     let fontfamily;
