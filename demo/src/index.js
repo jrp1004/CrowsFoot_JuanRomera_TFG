@@ -320,6 +320,8 @@ function main(container,outline,toolbar,sidebar,status){
 
                 if(cell.value.primaryKey){
                     label+='<img title="Primary key" src="../images/key.png" width="16" height="16" align="top">&nbsp;';
+                }else if(cell.value.foreignKey){
+                    label+='<img title="Foreign key" src="../images/foreign_key.png" width="16" height="16" align="top">&nbsp;';
                 }else{
                     label+='<img src="spacer/key.png" width="16" height="1" >&nbsp;';
                 }
@@ -495,6 +497,7 @@ function main(container,outline,toolbar,sidebar,status){
                 let coll=this.model.cloneCell(column);
                 coll.value.name=primaryKey.value.name;
                 coll.value.type=primaryKey.value.type;
+                coll.value.foreignKey=true;
 
                 this.addCell(coll,source);
                 //Modificamos los parámetros source y target
@@ -950,6 +953,7 @@ function showProperties(graph,cell){
         let typeField=form.addText('Tipo',cell.value.type);
 
         let primaryKeyField=form.addCheckbox('Clave primaria',cell.value.primaryKey);
+        let foreignKeyField=form.addCheckbox('Clave foranea',cell.value.foreignKey);
         let autoIncrementField=form.addCheckbox('Auto Incrementar',cell.value.autoIncrement);
         let notNullField=form.addCheckbox('No Nulo',cell.value.notNull);
         let uniqueField=form.addCheckbox('Unico',cell.value.unique);
@@ -976,6 +980,7 @@ function showProperties(graph,cell){
             }
     
             clone.primaryKey=primaryKeyField.checked;
+            clone.foreignKey=foreignKeyField.checked;
             clone.autoIncrement=autoIncrementField.checked;
             clone.notNull=notNullField.checked;
             clone.unique=uniqueField.checked;
@@ -998,7 +1003,7 @@ function showProperties(graph,cell){
         let parent=graph.model.getParent(cell);
         name=parent.value.name+'.'+cell.value.name;
         //Mostramos el formualrio utilizando la función anterior
-        wnd=showModalWindow(name,form.table,240,320);
+        wnd=showModalWindow(name,form.table,240,340);
     }else{
         let valor_actual_s=cell.value.startArrow;
         let valor_actual_e=cell.value.endArrow;
@@ -1077,13 +1082,14 @@ function actualizarClaves(graph,cell){
 
     //Eliminamos la clave foranea en la otra tabla y el enlace
     let clone=cell.clone();
-    graph.removeCells([cell]); //Se activa el listener definido anteriormente
+    graph.removeCells([cell]); //Se activa el listener definido anteriormente REMOVE_CELLS
 
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
             column.value.name=primaryKey_s.value.name;
             column.value.type=primaryKey_s.value.type;
+            column.value.foreignKey=true;
             graph.addCell(column,table_t);
             
             let e_1=clone.clone();
@@ -1098,6 +1104,7 @@ function actualizarClaves(graph,cell){
             console.log("Indiferente");
             column.value.name=primaryKey_t.value.name;
             column.value.type=primaryKey_t.value.type;
+            column.value.foreignKey=true;
             graph.addCell(column,table_s);
             
             let e_1=clone.clone();
@@ -1136,10 +1143,12 @@ function actualizarClaves(graph,cell){
             let k_1=column.clone();
             k_1.value.name=primaryKey_s.value.name;
             k_1.value.type=primaryKey_s.value.type;
+            k_1.value.foreignKey=true;
             table.insert(k_1);
             let k_2=column.clone();
             k_2.value.name=primaryKey_t.value.name;
             k_2.value.type=primaryKey_t.value.type;
+            k_2.value.foreignKey=true;
             table.insert(k_2);
 
             graph.addCell(table);
@@ -1166,6 +1175,7 @@ function actualizarClaves(graph,cell){
             console.log("Clave en source");
             column.value.name=primaryKey_t.value.name;
             column.value.type=primaryKey_t.value.type;
+            column.value.foreignKey=true;
             graph.addCell(column,table_s);
             
             let e_1=clone.clone();
@@ -1257,6 +1267,7 @@ function Column(name){
 Column.prototype.type='TEXT';
 Column.prototype.defaultValue=null;
 Column.prototype.primaryKey=false;
+Column.prototype.foreignKey=false;
 Column.prototype.autoIncrement=false;
 Column.prototype.notNull=false;
 Column.prototype.unique=false;
