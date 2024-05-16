@@ -1087,10 +1087,7 @@ function actualizarClaves(graph,cell){
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
-            column.value.name=primaryKey_s.value.name;
-            column.value.type=primaryKey_s.value.type;
-            column.value.foreignKey=true;
-            graph.addCell(column,table_t);
+            column=addClaveForanea(graph,table_t,primaryKey_s);
             
             let e_1=clone.clone();
             let temp=relacion.startArrow;
@@ -1102,10 +1099,7 @@ function actualizarClaves(graph,cell){
             graph.addCell(e_1);
         }else{
             console.log("Indiferente");
-            column.value.name=primaryKey_t.value.name;
-            column.value.type=primaryKey_t.value.type;
-            column.value.foreignKey=true;
-            graph.addCell(column,table_s);
+            column=addClaveForanea(graph,table_s,primaryKey_t);
             
             let e_1=clone.clone();
             let temp=relacion.startArrow;
@@ -1173,10 +1167,7 @@ function actualizarClaves(graph,cell){
             graph.addCell(e_2);
         }else{
             console.log("Clave en source");
-            column.value.name=primaryKey_t.value.name;
-            column.value.type=primaryKey_t.value.type;
-            column.value.foreignKey=true;
-            graph.addCell(column,table_s);
+            column=addClaveForanea(graph,table_s,primaryKey_t);
             
             let e_1=clone.clone();
             e_1.setValue(relacion);
@@ -1185,6 +1176,22 @@ function actualizarClaves(graph,cell){
             graph.addCell(e_1);
         }
     }
+}
+
+function addClaveForanea(graph,table,key){
+    let columnObject=new Column("COLUMNA");
+    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+
+    column.setVertex(true);
+    column.setConnectable(false);
+
+    column.value.name=key.value.name;
+    column.value.type=key.value.type;
+    column.value.foreignKey=true;
+
+    graph.addCell(column,table);
+
+    return column;
 }
 
 //Devuelve la celda correspondiente a la clave primaria de la tabla indicada
