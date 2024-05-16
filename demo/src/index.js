@@ -1090,25 +1090,13 @@ function actualizarClaves(graph,cell){
             column=addClaveForanea(graph,table_t,primaryKey_s);
             
             let e_1=clone.clone();
-            let temp=relacion.startArrow;
-            relacion.startArrow=relacion.endArrow;
-            relacion.endArrow=temp;
-            e_1.setValue(relacion);
-            e_1.setTerminal(column,true);
-            e_1.setTerminal(primaryKey_s,false);
-            graph.addCell(e_1);
+            editarRelacion(graph,e_1,relacion,column,primaryKey_s,true);
         }else{
             console.log("Indiferente");
             column=addClaveForanea(graph,table_s,primaryKey_t);
             
             let e_1=clone.clone();
-            let temp=relacion.startArrow;
-            relacion.startArrow=relacion.endArrow;
-            relacion.endArrow=temp;
-            e_1.setValue(relacion);
-            e_1.setTerminal(column,true);
-            e_1.setTerminal(primaryKey_t,false);
-            graph.addCell(e_1);
+            editarRelacion(graph,e_1,relacion,column,primaryKey_t,true);
         }
     }else{
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
@@ -1170,10 +1158,7 @@ function actualizarClaves(graph,cell){
             column=addClaveForanea(graph,table_s,primaryKey_t);
             
             let e_1=clone.clone();
-            e_1.setValue(relacion);
-            e_1.setTerminal(column,true);
-            e_1.setTerminal(primaryKey_t,false);
-            graph.addCell(e_1);
+            editarRelacion(graph,e_1,relacion,column,primaryKey_t,false);
         }
     }
 }
@@ -1192,6 +1177,20 @@ function addClaveForanea(graph,table,key){
     graph.addCell(column,table);
 
     return column;
+}
+
+function editarRelacion(graph,edge,relacion,source,target,invertir){
+    if(invertir){
+        let temp=relacion.startArrow;
+        relacion.startArrow=relacion.endArrow;
+        relacion.endArrow=temp;
+    }
+
+    edge.setValue(relacion);
+    edge.setTerminal(source,true);
+    edge.setTerminal(target,false);
+    
+    graph.addCell(edge);
 }
 
 //Devuelve la celda correspondiente a la clave primaria de la tabla indicada
