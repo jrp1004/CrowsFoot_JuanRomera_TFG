@@ -1067,12 +1067,6 @@ function showProperties(graph,cell){
 }
 
 function actualizarClaves(graph,cell){
-    let columnObject=new Column("COLUMNA");
-    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
-
-    column.setVertex(true);
-    column.setConnectable(false);
-
     let relacion=cell.value;
 
     let table_s=cell.getTerminal(true).getParent();
@@ -1087,13 +1081,13 @@ function actualizarClaves(graph,cell){
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
-            column=addClaveForanea(graph,table_t,primaryKey_s);
+            let column=addClaveForanea(graph,table_t,primaryKey_s);
             
             let e_1=clone.clone();
             editarRelacion(graph,e_1,relacion,column,primaryKey_s,true);
         }else{
             console.log("Indiferente");
-            column=addClaveForanea(graph,table_s,primaryKey_t);
+            let column=addClaveForanea(graph,table_s,primaryKey_t);
             
             let e_1=clone.clone();
             editarRelacion(graph,e_1,relacion,column,primaryKey_t,true);
@@ -1113,6 +1107,11 @@ function actualizarClaves(graph,cell){
             let table=new mxCell(tableObject,new mxGeometry(x,y,200,28),'table');
     
             table.setVertex(true);
+
+            let columnObject=new Column("COLUMNA");
+            let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+            column.setVertex(true);
+            column.setConnectable(false);
             let firstColumn=column.clone();
             firstColumn.value.name=tableObject.name+'_ID';
             firstColumn.value.type='INTEGER';
@@ -1120,42 +1119,28 @@ function actualizarClaves(graph,cell){
             firstColumn.value.autoIncrement=true;
             //Insertamos la celda columna en la tabla
             table.insert(firstColumn);
+            //Añadimos la tabla intermedia al grafo
+            graph.addCell(table,graph.getDefaultParent());
 
-            //Insertamos claves foráneas
-            let k_1=column.clone();
-            k_1.value.name=primaryKey_s.value.name;
-            k_1.value.type=primaryKey_s.value.type;
-            k_1.value.foreignKey=true;
-            table.insert(k_1);
-            let k_2=column.clone();
-            k_2.value.name=primaryKey_t.value.name;
-            k_2.value.type=primaryKey_t.value.type;
-            k_2.value.foreignKey=true;
-            table.insert(k_2);
+            //Claves foraneas
+            let k_1=addClaveForanea(graph,table,primaryKey_s);
+            let k_2=addClaveForanea(graph,table,primaryKey_t);
 
-            graph.addCell(table);
-
-            //Creamos relaciones nuevas
+            //Relaciones con las claves
             let relacion_s=new Relacion("Relacion_s");
             relacion_s.startArrow='uno_o_mas';
             relacion_s.endArrow='solo_uno';
             let e_1=clone.clone();
-            e_1.setValue(relacion_s);
-            e_1.setTerminal(primaryKey_s,false);
-            e_1.setTerminal(k_1,true);
-            graph.addCell(e_1);
+            editarRelacion(graph,e_1,relacion_s,k_1,primaryKey_s,false);
 
             let relacion_t=new Relacion("Relacion_t");
             relacion_t.startArrow='uno_o_mas';
             relacion_t.endArrow='solo_uno';
             let e_2=clone.clone();
-            e_2.setValue(relacion_t);
-            e_2.setTerminal(primaryKey_t,false);
-            e_2.setTerminal(k_2,true);
-            graph.addCell(e_2);
+            editarRelacion(graph,e_2,relacion_t,k_2,primaryKey_t,false);
         }else{
             console.log("Clave en source");
-            column=addClaveForanea(graph,table_s,primaryKey_t);
+            let column=addClaveForanea(graph,table_s,primaryKey_t);
             
             let e_1=clone.clone();
             editarRelacion(graph,e_1,relacion,column,primaryKey_t,false);
@@ -1173,6 +1158,8 @@ function addClaveForanea(graph,table,key){
     column.value.name=key.value.name;
     column.value.type=key.value.type;
     column.value.foreignKey=true;
+
+    column.geometry.y=table.geometry.y; //Ajuste para corregir error con la tabla intermedia
 
     graph.addCell(column,table);
 
