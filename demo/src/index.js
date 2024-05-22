@@ -425,9 +425,10 @@ function main(container,outline,toolbar,sidebar,status){
                 let cell=cells[i];
 
                 if(this.model.isEdge(cell)){
-                    let terminal=this.model.getTerminal(cell,true);
-                    let parent=this.model.getParent(terminal);
-                    this.model.remove(terminal);
+                    const clavesForaneas=cell.value.clavesForaneas;
+                    for(let i=0;i<clavesForaneas.length;i++){
+                        this.model.remove(clavesForaneas[i]);
+                    }
                 }
             }
         });
@@ -484,10 +485,12 @@ function main(container,outline,toolbar,sidebar,status){
             //Actualizamos el grafo con la nueva columna
             this.model.beginUpdate();
             try {
+                let relacion=new Relacion("Relacion");
                 for(let i=0;i<primaryKey.length;i++){
-                    let coll=addClaveForanea(this,source,primaryKey[i])
+                    let columna=addClaveForanea(this,source,primaryKey[i]);
+                    relacion.clavesForaneas.push(columna);
                 }
-                edge.setValue(new Relacion("Relacion"));
+                edge.setValue(relacion);
 
                 return mxGraph.prototype.addEdge.apply(this,arguments);
             } catch (error) {
@@ -1264,6 +1267,7 @@ function Relacion(name){
 }
 Relacion.prototype.startArrow="solo_uno";
 Relacion.prototype.endArrow="solo_uno";
+Relacion.prototype.clavesForaneas=[];
 Relacion.prototype.clone=function(){
     return mxUtils.clone(this);
 }
