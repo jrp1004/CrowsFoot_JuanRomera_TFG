@@ -474,17 +474,7 @@ function main(container,outline,toolbar,sidebar,status){
         //Editamos la función para añadir aristas para que esta añada una columna con la referencia
         //a la tabla objetivo en la tabla de la que nace la arista
         graph.addEdge=function(edge,parent,source,target,index){
-            let primaryKey=null;
-            let childCount=this.model.getChildCount(target);
-
-            //Obtenemos la clave primaria de la tabla objetivo
-            for(let i=0;i<childCount;i++){
-                let child=this.model.getChildAt(target,i);
-                if(child.value.primaryKey){
-                    primaryKey=child;
-                    break;
-                }
-            }
+            const primaryKey=obtenerClavePrimaria(this,target);
 
             if(primaryKey==null){
                 mxUtils.alert('La tabla objetivo debe tener una clave primaria');
@@ -494,18 +484,9 @@ function main(container,outline,toolbar,sidebar,status){
             //Actualizamos el grafo con la nueva columna
             this.model.beginUpdate();
             try {
-                let coll=this.model.cloneCell(column);
-                coll.value.name=primaryKey.value.name;
-                coll.value.type=primaryKey.value.type;
-                coll.value.foreignKey=true;
-
-                this.addCell(coll,source);
-                //Modificamos los parámetros source y target
-                source=coll;    //source corresponde a la nueva columna
-                target=primaryKey; //target corresponde a la columna con la clave primaria de la tabla objetivo
-
-                //Con los nuevos parámetros llamamos a la función añadir arista por defecto, uniendo la celda de la columna con la
-                //referencia de la tabla objetivo con la celda con la clave primaria
+                for(let i=0;i<primaryKey.length;i++){
+                    let coll=addClaveForanea(this,source,primaryKey[i])
+                }
                 edge.setValue(new Relacion("Relacion"));
 
                 return mxGraph.prototype.addEdge.apply(this,arguments);
@@ -1008,8 +989,8 @@ function showProperties(graph,cell){
         let valor_actual_s=cell.value.startArrow;
         let valor_actual_e=cell.value.endArrow;
 
-        let table_s=cell.getTerminal(true).getParent();//Tabla source
-        let table_t=cell.getTerminal(false).getParent();//tabla target
+        let table_s=cell.getTerminal(true);//Tabla source
+        let table_t=cell.getTerminal(false);//Tabla target
 
         let combo_s=form.addCombo(table_s.value.name,false,4);
         //Marcamos como seleccionado el que coincida con valor_actual
@@ -1182,15 +1163,13 @@ function editarRelacion(graph,edge,relacion,source,target,invertir){
 
 //Devuelve la celda correspondiente a la clave primaria de la tabla indicada
 function obtenerClavePrimaria(graph,tabla){
-    let primaryKey=null;
+    const primaryKey=[]
     let childCount=graph.model.getChildCount(tabla);
 
-    //Obtenemos la clave primaria de la tabla objetivo
     for(let i=0;i<childCount;i++){
         let child=graph.model.getChildAt(tabla,i);
         if(child.value.primaryKey){
-            primaryKey=child;
-            break;
+            primaryKey.push(child);
         }
     }
 
