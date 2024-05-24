@@ -303,10 +303,10 @@ function main(container,outline,toolbar,sidebar,status){
                     +'Descripcion: '+state.cell.value.desc+'\n'
                     +'Tipo de datos: '+state.cell.value.type;
             }else if(this.model.isEdge(state.cell)){
-                let src=this.model.getTerminal(state.cell,true);
-                let parent=this.model.getParent(src);
+                let source=this.model.getTerminal(state.cell,true);
+                let target=this.model.getTerminal(state.cell,false);
 
-                return parent.value.name+','+src.value.name;
+                return source.value.name+', '+state.cell.value.name+', '+target.value.name;
             }
 
             return mxGraph.prototype.getTooltip.apply(this,arguments);
