@@ -1022,6 +1022,7 @@ function showProperties(graph,cell){
                     let clone=cell.value.clone();
                     clone.startArrow=newValue_s;
                     clone.endArrow=newValue_e;
+                    clone.clavesForaneas=cell.value.clavesForaneas;
 
                     graph.model.setValue(cell,clone);
                     actualizarClaves(graph,cell);
@@ -1051,12 +1052,12 @@ function showProperties(graph,cell){
 }
 
 function actualizarClaves(graph,cell){
-    let relacion=cell.value;
+    let relacion=cell.value.clone();
 
-    let table_s=cell.getTerminal(true).getParent();
-    let table_t=cell.getTerminal(false).getParent();
-    let primaryKey_s=obtenerClavePrimaria(graph,table_s);
-    let primaryKey_t=obtenerClavePrimaria(graph,table_t);
+    let table_s=cell.getTerminal(true);
+    let table_t=cell.getTerminal(false);
+    const primaryKey_s=obtenerClavePrimaria(graph,table_s);
+    const primaryKey_t=obtenerClavePrimaria(graph,table_t);
 
     //Eliminamos la clave foranea en la otra tabla y el enlace
     let clone=cell.clone();
@@ -1065,16 +1066,22 @@ function actualizarClaves(graph,cell){
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
-            let column=addClaveForanea(graph,table_t,primaryKey_s);
-            
+            for(let i=0;i<primaryKey_s.length;i++){
+                let column=addClaveForanea(graph,table_t,primaryKey_s[i]);
+                relacion.clavesForaneas.push(column);
+            }
+
             let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,column,primaryKey_s,true);
+            editarRelacion(graph,e_1,relacion,table_t,table_s,true);
         }else{
             console.log("Indiferente");
-            let column=addClaveForanea(graph,table_s,primaryKey_t);
-            
+            for(let i=0;i<primaryKey_t.length;i++){
+                let column=addClaveForanea(graph,table_s,primaryKey_t[i]);
+                relacion.clavesForaneas.push(column);
+            }
+
             let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,column,primaryKey_t,true);
+            editarRelacion(graph,e_1,relacion,table_s,table_t,true);
         }
     }else{
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
@@ -1107,27 +1114,36 @@ function actualizarClaves(graph,cell){
             graph.addCell(table,graph.getDefaultParent());
 
             //Claves foraneas
-            let k_1=addClaveForanea(graph,table,primaryKey_s);
-            let k_2=addClaveForanea(graph,table,primaryKey_t);
-
-            //Relaciones con las claves
             let relacion_s=new Relacion("Relacion_s");
             relacion_s.startArrow='uno_o_mas';
             relacion_s.endArrow='solo_uno';
+            for(let i=0;i<primaryKey_s.length;i++){
+                let column=addClaveForanea(graph,table,primaryKey_s[i]);
+                relacion_s.clavesForaneas.push(column);
+            }
+
             let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion_s,k_1,primaryKey_s,false);
+            editarRelacion(graph,e_1,relacion_s,table,table_s,false);
 
             let relacion_t=new Relacion("Relacion_t");
             relacion_t.startArrow='uno_o_mas';
             relacion_t.endArrow='solo_uno';
+            for(let i=0;i<primaryKey_t.length;i++){
+                let column=addClaveForanea(graph,table,primaryKey_t[i]);
+                relacion_t.clavesForaneas.push(column);
+            }
+
             let e_2=clone.clone();
-            editarRelacion(graph,e_2,relacion_t,k_2,primaryKey_t,false);
+            editarRelacion(graph,e_2,relacion_t,table,table_t,false);
         }else{
             console.log("Clave en source");
-            let column=addClaveForanea(graph,table_s,primaryKey_t);
-            
+            for(let i=0;i<primaryKey_t.length;i++){
+                let column=addClaveForanea(graph,table_s,primaryKey_t[i]);
+                relacion.clavesForaneas.push(column);
+            }
+
             let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,column,primaryKey_t,false);
+            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
         }
     }
 }
@@ -1264,10 +1280,10 @@ Table.prototype.clone=function(){
 //Objeto asociado a las relaciones
 function Relacion(name){
     this.name=name;
+    this.clavesForaneas=[];
 }
 Relacion.prototype.startArrow="solo_uno";
 Relacion.prototype.endArrow="solo_uno";
-Relacion.prototype.clavesForaneas=[];
 Relacion.prototype.clone=function(){
-    return mxUtils.clone(this);
+    return mxUtils.clone(this,['clavesForaneas']);//No clonamos el array, provoca error
 }
