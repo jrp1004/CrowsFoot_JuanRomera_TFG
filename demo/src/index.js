@@ -1208,6 +1208,11 @@ function createSql(graph){
             sql.push('CREATE TABLE IF NOT EXISTS '+child.value.name+' (');
             let columnCount=graph.model.getChildCount(child);
 
+            let pks=' PRIMARY KEY(';
+            let pks_num=0;
+            let fks=' FOREIGN KEY(';
+            let fks_num=0;
+
             if(columnCount>0){
                 for(let j=0;j<columnCount;j++){
                     let column=graph.model.getChildAt(child,j).value;
@@ -1216,7 +1221,12 @@ function createSql(graph){
                         sql.push(' NOT NULL');
                     }
                     if(column.primaryKey){
-                        sql.push(' PRIMARY KEY');
+                        pks+=column.name+', ';
+                        pks_num++;
+                    }
+                    if(column.foreignKey){
+                        fks+=column.name+', ';
+                        fks_num++;
                     }
                     if(column.autoIncrement){
                         sql.push(' AUTOINCREMENT');
@@ -1231,7 +1241,17 @@ function createSql(graph){
                     sql.push(',');
                 }
 
-                sql.splice(sql.length-1,1);
+                //Añadimos las claves
+                if(pks_num>0){
+                    sql.push('\n'+pks.substring(0,pks.length-2)+')');
+                    sql.push(',');
+                }
+                if(fks_num>0){
+                    sql.push('\n'+fks.substring(0,fks.length-2)+')');
+                }else{
+                    sql.splice(sql.length-1,1);
+                }
+
                 sql.push('\n);');
             }
             sql.push('\n');
