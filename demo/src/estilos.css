@@ -1,0 +1,57 @@
+/*Clase para los elementos añadidos en el html para que
+no se aplique a los elementos que se añaden en el js*/
+.div-html{
+    position: absolute;
+    overflow: hidden;
+}
+
+#toolbarContainer{
+    white-space: nowrap;
+    top: 0px;
+    left: 0px;
+    max-height: 24px;
+    height: 36px;
+    right: 0px;
+    padding: 6px;
+    background-image: url('../images/toolbar_bg.gif');
+}
+
+#sidebarContainer{
+    top: 36px;
+    left: 0px;
+    bottom: 36px;
+    max-width: 52px;
+    width: 56px;
+    padding-top: 10px;
+    padding-left: 4px;
+    background-image: url('../images/sidebar_bg.gif');
+}
+
+#graphContainer{
+    top: 36px;
+    left: 60px;
+    bottom: 36px;
+    right: 0px;
+}
+
+#outlineContainer{
+    top: 36px;
+    right: 0px;
+    width: 200px;
+    height: 140px;
+    background: transparent;
+    border-style: solid;
+    border-color: black;
+}
+
+#statusContainer{
+    text-align: right;
+    bottom: 0px;
+    left: 0px;
+    max-height: 24px;
+    height: 36px;
+    right: 0px;
+    color: white;
+    padding: 6px;
+    background-image: url('../images/toolbar_bg.gif');
+}
