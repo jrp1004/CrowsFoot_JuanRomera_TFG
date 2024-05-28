@@ -1,4 +1,4 @@
-function main(container,outline,toolbar,sidebar,status){
+function main(container,outline,toolbar,sidebar,status,properties){
     //Comprobamos si el navegador está soportado
     if(!mxClient.isBrowserSupported()){
         mxUtils.error("Navegador no soportado",200,false);
@@ -569,7 +569,7 @@ function main(container,outline,toolbar,sidebar,status){
 
             //Comprobamos si lo seleccionado es una columna para mostrar sus propiedades
             if(graph.isHtmlLabel(cell)||graph.model.isEdge(cell)){
-                showProperties(graph,cell);
+                showProperties(graph,cell,properties);
             }
         });
         
@@ -647,6 +647,17 @@ function main(container,outline,toolbar,sidebar,status){
                 splash.parentNode.removeChild(splash);
             }
         }
+
+        //Listener para cambiar el panel de propiedades
+        graph.getSelectionModel().addListener(mxEvent.CHANGE,function(sender,event){
+            properties.innerHTML='';
+            let cells=event.getProperty('removed');
+            if(cells!=null){
+                if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
+                    showProperties(graph,cells[0],properties);
+                }
+            }
+        });
     }
 }
 
@@ -926,7 +937,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
 }
 
 //Función que crea un formulario para editar los parámetros de las columnas
-function showProperties(graph,cell){
+function showProperties(graph,cell,properties){
     let form=new mxForm('properties');
 
     //Añadimos los campos al formulario
@@ -948,10 +959,10 @@ function showProperties(graph,cell){
         let titulo=form.addText('Titulo',cell.value.titulo);
         let descripcion=form.addTextarea('Descripcion',cell.value.desc,5);
 
-        let wnd=null;
-
-        //Si pulsamos el botón ok del formulario actualizamos los datos de la columna
-        const okFunction=function(){
+        let parent=graph.model.getParent(cell);
+        name=parent.value.name+'.'+cell.value.name;
+        
+        mxEvent.addListener(form.getTable(),'change',function(event){
             let clone=cell.value.clone();
     
             clone.name=nameField.value;
@@ -973,21 +984,8 @@ function showProperties(graph,cell){
             clone.desc=descripcion.value;
     
             graph.model.setValue(cell,clone);
-    
-            wnd.destroy();
-        }
-
-        
-        //Función que se ejecuta cuando se pulsa el botón cancelar
-        const cancelFunction=function(){
-            wnd.destroy();
-        }
-        form.addButtons(okFunction,cancelFunction);
-
-        let parent=graph.model.getParent(cell);
-        name=parent.value.name+'.'+cell.value.name;
-        //Mostramos el formualrio utilizando la función anterior
-        wnd=showModalWindow(name,form.table,240,340);
+        });
+        properties.appendChild(form.getTable());
     }else{
         let valor_actual_s=cell.value.startArrow;
         let valor_actual_e=cell.value.endArrow;
@@ -1008,9 +1006,7 @@ function showProperties(graph,cell){
         form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
         form.addOption(combo_e,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_e);
 
-        let wnd=null;
-
-        const okFunction=function(){
+        mxEvent.addListener(form.getTable(),'change',function(event){
             let newValue_s=combo_s.value || '';
             let oldValue_s=valor_actual_s;
             let newValue_e=combo_e.value || '';
@@ -1038,16 +1034,8 @@ function showProperties(graph,cell){
 
             clone.name=nameField.value;
             graph.model.setValue(cell,clone);
-
-            wnd.destroy();
-        }
-        const cancelFunction=function(){
-            wnd.destroy();
-        }
-        form.addButtons(okFunction,cancelFunction);
-
-        let name=cell.value.name;
-        wnd=showModalWindow(name,form.table,240,240);
+        });
+        properties.appendChild(form.getTable());
     }
 }
 

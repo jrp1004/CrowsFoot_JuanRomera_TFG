@@ -36,7 +36,7 @@ no se aplique a los elementos que se añaden en el js*/
 
 #outlineContainer{
     top: 36px;
-    right: 0px;
+    right: 265px;
     width: 200px;
     height: 140px;
     background: transparent;
@@ -54,4 +54,31 @@ no se aplique a los elementos que se añaden en el js*/
     color: white;
     padding: 6px;
     background-image: url('../images/toolbar_bg.gif');
+}
+
+#propertiesContainer{
+    top: 36px;
+    right: 0px;
+    bottom: 36px;
+    width: 260px;
+    max-width: 260px;
+    border-left: 3px solid;
+    background-color: white;
+}
+
+.tab{
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+}
+
+.tab:hover{
+    background-color: #ddd;
+}
+
+.tab:active{
+    background-color: #ccc;
 }
