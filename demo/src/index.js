@@ -1076,14 +1076,24 @@ function actualizarClaves(graph,cell){
             let e_1=clone.clone();
             editarRelacion(graph,e_1,relacion,table_t,table_s,true);
         }else{
-            console.log("Indiferente");
-            for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table_s,primaryKey_t[i]);
-                relacion.clavesForaneas.push(column);
+            if(relacion.endArrow==='cero_o_uno'){
+                for(let i=0;i<primaryKey_t.length;i++){
+                    let column=addClaveForanea(graph,table_t,primaryKey_s[i]);
+                    relacion.clavesForaneas.push(column);
+                }
+            }else{
+                //Si la parte opcional no está en el target asumimos que o está
+                //en source o es indiferente donde esté la clave
+                for(let i=0;i<primaryKey_t.length;i++){
+                    let column=addClaveForanea(graph,table_s,primaryKey_t[i]);
+                    relacion.clavesForaneas.push(column);
+                }
             }
+            console.log("Indiferente");
+            
 
             let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_s,table_t,true);
+            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
         }
     }else{
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
