@@ -12,6 +12,20 @@
         <div id="graphContainer" class="div-html"></div>
         <div id="outlineContainer" class="div-html"></div>
         <div id="statusContainer" class="div-html"></div>
-        <div id="propertiesContainer" class="div-html"></div>
+        <div id="propertiesContainer" class="div-html">
+            <div id="propertiesTabs">
+                <button id="propertiesEstilos" class="tab" onclick="openTabProperties(event,'estilos')">Estilos</button>
+                <button id="propertiesDatos" class="tab" onclick="openTabProperties(event,'datos')">Datos</button>
+            </div>
+            <div id="propertiesContent">
+                <div id="estilos" class="tabcontent">
+                    <p>Estilos</p>
+                    <br>
+                    Color:
+                    <input type="color" id="colorPicker">
+                </div>
+                <div id="datos" class="tabcontent"></div>
+            </div>
+        </div>
     </body>
 </html>

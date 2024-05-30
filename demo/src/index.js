@@ -648,16 +648,30 @@ function main(container,outline,toolbar,sidebar,status,properties){
             }
         }
 
+        let datosDiv=document.getElementById("datos");
         //Listener para cambiar el panel de propiedades
         graph.getSelectionModel().addListener(mxEvent.CHANGE,function(sender,event){
-            properties.innerHTML='';
+            datosDiv.innerHTML='';
             let cells=event.getProperty('removed');
             if(cells!=null){
+                let propertiesDatos=document.getElementById("propertiesDatos");
                 if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
-                    showProperties(graph,cells[0],properties);
+                    propertiesDatos.style.display="block";
+                    showProperties(graph,cells[0],datosDiv);
+                    configurarTabEstilos(graph,cells[0]);
+                }else{
+                    propertiesDatos.style.display="none";
+                    document.getElementById("propertiesEstilos").click();
+                    configurarTabEstilos(graph,cells[0]);
                 }
+            }else{
+                propertiesDatos.style.display="none";
+                document.getElementById("propertiesEstilos").click();
             }
         });
+
+        //Tab abierta por defecto
+        document.getElementById("propertiesEstilos").click();
     }
 }
 
@@ -1255,6 +1269,46 @@ function getTextWidth(text,font){
     context.font=font;
     const metrics=context.measureText(text);
     return metrics.width;
+}
+
+function openTabProperties(evt,prop){
+    //Manejo de las pestañas del apartado propiedades
+    let propertiesContent=document.getElementById("propertiesContent");
+
+    let tabs=document.getElementsByClassName("tab");
+    for(let i=0;i<tabs.length;i++){
+        tabs[i].className=tabs[i].className.replace(" active","");
+    }
+
+    let tabcontent=document.getElementsByClassName("tabcontent");
+    for(let i=0;i<tabcontent.length;i++){
+        tabcontent[i].style.display="none";
+    }
+    document.getElementById(prop).style.display="block";
+    evt.currentTarget.className+=" active";
+}
+
+function configurarTabEstilos(graph,cell){
+    //Establecemos los elementos del div estilos
+    let colorPicker=document.getElementById("colorPicker"); //Cambio de color
+    if(graph.getModel().isVertex(cell)){
+        let style=graph.getStylesheet().getCellStyle(cell.style);
+
+        mxEvent.removeAllListeners(colorPicker);
+        if(style!=null){
+            colorPicker.value=style[mxConstants.STYLE_FILLCOLOR];
+            colorPicker.select();
+
+            mxEvent.addListener(colorPicker,'change',function(evt){
+                graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
+            });
+        }else{
+            colorPicker.value="#ffffff";
+            mxEvent.addListener(colorPicker,'change',function(evt){
+                graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
+            });
+        }
+    }
 }
 
 

@@ -66,10 +66,18 @@ no se aplique a los elementos que se añaden en el js*/
     background-color: white;
 }
 
+#propertiesTabs{
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
 .tab{
     background-color: inherit;
     float: left;
     border: none;
+    border-left: 1px solid;
+    border-right: 1px solid;
     outline: none;
     cursor: pointer;
     padding: 14px 16px;
@@ -79,6 +87,14 @@ no se aplique a los elementos que se añaden en el js*/
     background-color: #ddd;
 }
 
-.tab:active{
+.tab.active{
     background-color: #ccc;
+}
+
+.tabcontent{
+    display: none;
+}
+
+#propertiesDatos{
+    display: none;
 }
