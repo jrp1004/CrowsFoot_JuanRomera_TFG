@@ -98,3 +98,7 @@ no se aplique a los elementos que se añaden en el js*/
 #propertiesDatos{
     display: none;
 }
+
+#propertiesContent{
+    padding-left: 10px;
+}

@@ -654,6 +654,8 @@ function main(container,outline,toolbar,sidebar,status,properties){
             datosDiv.innerHTML='';
             let cells=event.getProperty('removed');
             mxEvent.removeAllListeners(document.getElementById('colorPicker'));
+            mxEvent.removeAllListeners(document.getElementById('gradientPicker'));
+            mxEvent.removeAllListeners(document.getElementById('gradientCheck'));
             if(cells!=null){
                 let propertiesDatos=document.getElementById("propertiesDatos");
                 if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
@@ -1304,22 +1306,43 @@ function openTabProperties(evt,prop){
 function configurarTabEstilos(graph,cell){
     //Establecemos los elementos del div estilos
     let colorPicker=document.getElementById("colorPicker"); //Cambio de color
+    let gradientPicker=document.getElementById("gradientPicker"); //Cambio degradado
+    let gradientCheck=document.getElementById("gradientCheck");
+    gradientCheck.checked=cell.value.gradient;
+
+    if(!gradientCheck.checked){
+        gradientPicker.style.display="none";
+    }
+
     if(graph.getModel().isVertex(cell)){
         let style=graph.getStylesheet().getCellStyle(cell.style);
 
         if(style!=null){
             colorPicker.value=style[mxConstants.STYLE_FILLCOLOR];
             colorPicker.select();
-
-            mxEvent.addListener(colorPicker,'change',function(evt){
-                graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
-            });
+            gradientPicker.value=style[mxConstants.STYLE_GRADIENTCOLOR];
+            gradientPicker.select();
         }else{
             colorPicker.value="#ffffff";
-            mxEvent.addListener(colorPicker,'change',function(evt){
-                graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
-            });
+            gradientPicker.value="#ffffff";
         }
+
+        mxEvent.addListener(colorPicker,'change',function(evt){
+            graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
+        });
+        mxEvent.addListener(gradientPicker,'change',function(evt){
+            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
+        });
+        mxEvent.addListener(gradientCheck,'change',function(evt){
+            cell.value.gradient=gradientCheck.checked;
+            if(!gradientCheck.checked){
+                gradientPicker.style.display="none";
+                graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
+            }else{
+                gradientPicker.style.display="inline";
+                graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
+            }
+        });
     }
 }
 
@@ -1341,6 +1364,7 @@ Column.prototype.clone=function(){
 }
 Column.prototype.desc='DESCRIPCION';
 Column.prototype.titulo='TITULO';
+Column.prototype.gradient=false;
 
 
 //Definición del objeto de usuario tabla
@@ -1350,6 +1374,7 @@ function Table(name){
 Table.prototype.clone=function(){
     return mxUtils.clone(this);
 }
+Table.prototype.gradient=true;
 
 //Objeto asociado a las relaciones
 function Relacion(name){
