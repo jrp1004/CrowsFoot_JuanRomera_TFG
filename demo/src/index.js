@@ -653,6 +653,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         graph.getSelectionModel().addListener(mxEvent.CHANGE,function(sender,event){
             datosDiv.innerHTML='';
             let cells=event.getProperty('removed');
+            mxEvent.removeAllListeners(document.getElementById('colorPicker'));
             if(cells!=null){
                 let propertiesDatos=document.getElementById("propertiesDatos");
                 if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
@@ -866,6 +867,8 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_SPACING_LEFT] = 4; //Modificado para evitar error con getPreferredSizeForCell
     style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
     style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
+    style[mxConstants.STYLE_STROKEWIDTH] = '2';
+    style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
     graph.getStylesheet().putDefaultVertexStyle(style);
 
     style = new Object();
@@ -876,9 +879,9 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_GRADIENTCOLOR] = '#41B9F5';
     style[mxConstants.STYLE_FILLCOLOR] = '#8CCDF5';
     style[mxConstants.STYLE_SWIMLANE_FILLCOLOR] = '#ffffff';
-    style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
+    //style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
     style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-    style[mxConstants.STYLE_STROKEWIDTH] = '2';
+    //style[mxConstants.STYLE_STROKEWIDTH] = '2';
     style[mxConstants.STYLE_STARTSIZE] = '28';
     style[mxConstants.STYLE_VERTICAL_ALIGN] = 'middle';
     style[mxConstants.STYLE_FONTSIZE] = '12';
@@ -1304,7 +1307,6 @@ function configurarTabEstilos(graph,cell){
     if(graph.getModel().isVertex(cell)){
         let style=graph.getStylesheet().getCellStyle(cell.style);
 
-        mxEvent.removeAllListeners(colorPicker);
         if(style!=null){
             colorPicker.value=style[mxConstants.STYLE_FILLCOLOR];
             colorPicker.select();
