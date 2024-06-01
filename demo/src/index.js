@@ -656,6 +656,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             mxEvent.removeAllListeners(document.getElementById('colorPicker'));
             mxEvent.removeAllListeners(document.getElementById('gradientPicker'));
             mxEvent.removeAllListeners(document.getElementById('gradientCheck'));
+            mxEvent.removeAllListeners(document.getElementById('selectFont'));
             if(cells!=null){
                 let propertiesDatos=document.getElementById("propertiesDatos");
                 if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
@@ -1309,9 +1310,12 @@ function configurarTabEstilos(graph,cell){
     let gradientPicker=document.getElementById("gradientPicker"); //Cambio degradado
     let gradientCheck=document.getElementById("gradientCheck");
     gradientCheck.checked=cell.value.gradient;
+    let selectFont=document.getElementById("selectFont");
 
     if(!gradientCheck.checked){
         gradientPicker.style.display="none";
+    }else{
+        gradientPicker.style.display="inline";
     }
 
     if(graph.getModel().isVertex(cell)){
@@ -1322,9 +1326,11 @@ function configurarTabEstilos(graph,cell){
             colorPicker.select();
             gradientPicker.value=style[mxConstants.STYLE_GRADIENTCOLOR];
             gradientPicker.select();
+            selectFont.options.selectedIndex=getFontIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
         }else{
             colorPicker.value="#ffffff";
             gradientPicker.value="#ffffff";
+            selectFont.options.selectedIndex=0;
         }
 
         mxEvent.addListener(colorPicker,'change',function(evt){
@@ -1343,7 +1349,19 @@ function configurarTabEstilos(graph,cell){
                 graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
             }
         });
+        mxEvent.addListener(selectFont,'change',function(evt){
+            graph.setCellStyles(mxConstants.STYLE_FONTFAMILY,selectFont.value,[cell]);
+        });
     }
+}
+
+function getFontIndex(options,fuente){
+    for(let i=0;i<options.length;i++){
+        if(options[i].value===fuente){
+            return i;
+        }
+    }
+    return 0;
 }
 
 
