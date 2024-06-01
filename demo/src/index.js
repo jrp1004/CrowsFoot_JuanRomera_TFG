@@ -657,6 +657,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             mxEvent.removeAllListeners(document.getElementById('gradientPicker'));
             mxEvent.removeAllListeners(document.getElementById('gradientCheck'));
             mxEvent.removeAllListeners(document.getElementById('selectFont'));
+            mxEvent.removeAllListeners(document.getElementById('gradientDirection'));
             if(cells!=null){
                 let propertiesDatos=document.getElementById("propertiesDatos");
                 if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
@@ -1310,6 +1311,8 @@ function configurarTabEstilos(graph,cell){
     let gradientPicker=document.getElementById("gradientPicker"); //Cambio degradado
     let gradientCheck=document.getElementById("gradientCheck");
     gradientCheck.checked=cell.value.gradient;
+    let selectGradientDirection=document.getElementById("gradientDirection")
+
     let selectFont=document.getElementById("selectFont");
 
     if(!gradientCheck.checked){
@@ -1326,11 +1329,14 @@ function configurarTabEstilos(graph,cell){
             colorPicker.select();
             gradientPicker.value=style[mxConstants.STYLE_GRADIENTCOLOR];
             gradientPicker.select();
-            selectFont.options.selectedIndex=getFontIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
+            selectGradientDirection.options.selectedIndex=getSelectIndex(selectGradientDirection.options,style[mxConstants.STYLE_GRADIENT_DIRECTION]);
+
+            selectFont.options.selectedIndex=getSelectIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
         }else{
             colorPicker.value="#ffffff";
             gradientPicker.value="#ffffff";
             selectFont.options.selectedIndex=0;
+            selectGradientDirection.options.selectedIndex=0;
         }
 
         mxEvent.addListener(colorPicker,'change',function(evt){
@@ -1352,12 +1358,15 @@ function configurarTabEstilos(graph,cell){
         mxEvent.addListener(selectFont,'change',function(evt){
             graph.setCellStyles(mxConstants.STYLE_FONTFAMILY,selectFont.value,[cell]);
         });
+        mxEvent.addListener(selectGradientDirection,'change',function(evt){
+            graph.setCellStyles(mxConstants.STYLE_GRADIENT_DIRECTION,selectGradientDirection.value,[cell]);
+        });
     }
 }
 
-function getFontIndex(options,fuente){
+function getSelectIndex(options,value){
     for(let i=0;i<options.length;i++){
-        if(options[i].value===fuente){
+        if(options[i].value===value){
             return i;
         }
     }
