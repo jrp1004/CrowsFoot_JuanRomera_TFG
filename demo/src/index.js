@@ -1374,7 +1374,7 @@ function configurarTabEstilos(graph,cell){
             }else if(tam<1){
                 tam=1;
             }
-            graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tam);
+            graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tam,[cell]);
         });
     }
 }
