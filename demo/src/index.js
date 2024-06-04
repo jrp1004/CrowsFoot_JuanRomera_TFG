@@ -659,6 +659,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             mxEvent.removeAllListeners(document.getElementById('selectFont'));
             mxEvent.removeAllListeners(document.getElementById('gradientDirection'));
             mxEvent.removeAllListeners(document.getElementById('tamFont'));
+            mxEvent.removeAllListeners(document.getElementById('colorFontPicker'));
             if(cells!=null){
                 let propertiesDatos=document.getElementById("propertiesDatos");
                 if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
@@ -874,6 +875,7 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
     style[mxConstants.STYLE_STROKEWIDTH] = '2';
     style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
+    style[mxConstants.STYLE_FILLCOLOR]='#FFFFFF';
     graph.getStylesheet().putDefaultVertexStyle(style);
 
     style = new Object();
@@ -1316,6 +1318,7 @@ function configurarTabEstilos(graph,cell){
 
     let selectFont=document.getElementById("selectFont");
     let tamFont=document.getElementById("tamFont");
+    let colorFontPicker=document.getElementById('colorFontPicker');
 
     if(!gradientCheck.checked){
         gradientPicker.style.display="none";
@@ -1329,20 +1332,40 @@ function configurarTabEstilos(graph,cell){
         let style=graph.getStylesheet().getCellStyle(cell.style);
 
         if(style!=null){
-            colorPicker.value=style[mxConstants.STYLE_FILLCOLOR];
-            colorPicker.select();
-            gradientPicker.value=style[mxConstants.STYLE_GRADIENTCOLOR];
-            gradientPicker.select();
+            let fillColor=style[mxConstants.STYLE_FILLCOLOR];
+            if(fillColor===undefined||fillColor===null){
+                colorPicker.value='#ffffff'
+            }else{
+                colorPicker.value=fillColor;
+            }
+            let gradientColor=style[mxConstants.STYLE_GRADIENTCOLOR];
+            if(gradientColor===undefined||gradientColor===null){
+                gradientPicker.value='#ffffff';
+            }else{
+                gradientPicker.value=gradientColor;
+            }
             selectGradientDirection.options.selectedIndex=getSelectIndex(selectGradientDirection.options,style[mxConstants.STYLE_GRADIENT_DIRECTION]);
 
             selectFont.options.selectedIndex=getSelectIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
-            tamFont.value=style[mxConstants.STYLE_FONTSIZE];
+            let tam=style[mxConstants.STYLE_FONTSIZE];
+            if(tam===undefined||tam===null){
+                tam='11';
+            }else{
+                tamFont.value=tam;
+            }
+            let fontColor=style[mxConstants.STYLE_FONTCOLOR];
+            if(fontColor===undefined||fontColor===null){
+                colorFontPicker.value='#000000';
+            }else{
+                colorFontPicker.value=fontColor;
+            }
         }else{
             colorPicker.value="#ffffff";
             gradientPicker.value="#ffffff";
             selectFont.options.selectedIndex=0;
             selectGradientDirection.options.selectedIndex=0;
             tamFont.value='11';
+            colorFontPicker.value='#000000'
         }
 
         mxEvent.addListener(colorPicker,'change',function(evt){
@@ -1355,9 +1378,11 @@ function configurarTabEstilos(graph,cell){
             cell.value.gradient=gradientCheck.checked;
             if(!gradientCheck.checked){
                 gradientPicker.style.display="none";
+                selectGradientDirection.style.display="none";
                 graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
             }else{
                 gradientPicker.style.display="inline";
+                selectGradientDirection.style.display="inline";
                 graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
             }
         });
@@ -1375,6 +1400,9 @@ function configurarTabEstilos(graph,cell){
                 tam=1;
             }
             graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tam,[cell]);
+        });
+        mxEvent.addListener(colorFontPicker,'change',function(evt){
+            graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,colorFontPicker.value,[cell]);
         });
     }
 }
