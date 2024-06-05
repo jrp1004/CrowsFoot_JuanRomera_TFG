@@ -664,18 +664,11 @@ function main(container,outline,toolbar,sidebar,status,properties){
             mxEvent.removeAllListeners(document.getElementById('cursiva'));
             mxEvent.removeAllListeners(document.getElementById('shadowCheck'));
             if(cells!=null){
-                let propertiesDatos=document.getElementById("propertiesDatos");
-                if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
-                    propertiesDatos.style.display="block";
-                    showProperties(graph,cells[0],datosDiv);
-                    configurarTabEstilos(graph,cells[0]);
-                }else{
-                    propertiesDatos.style.display="none";
-                    document.getElementById("propertiesEstilos").click();
-                    configurarTabEstilos(graph,cells[0]);
-                }
+                properties.style.display="inline";
+                showProperties(graph,cells[0],datosDiv);
+                configurarTabEstilos(graph,cells[0]);
             }else{
-                propertiesDatos.style.display="none";
+                properties.style.display="none";
                 document.getElementById("propertiesEstilos").click();
             }
         });
@@ -971,6 +964,7 @@ function showProperties(graph,cell,properties){
     let name;
 
     if(graph.isHtmlLabel(cell)){
+        //COLUMNA
         let typeField=form.addText('Tipo',cell.value.type);
 
         let primaryKeyField=form.addCheckbox('Clave primaria',cell.value.primaryKey);
@@ -1013,55 +1007,68 @@ function showProperties(graph,cell,properties){
         });
         properties.appendChild(form.getTable());
     }else{
-        let valor_actual_s=cell.value.startArrow;
-        let valor_actual_e=cell.value.endArrow;
+        //ENLACE
+        if(graph.model.isEdge(cell)){
+            let valor_actual_s=cell.value.startArrow;
+            let valor_actual_e=cell.value.endArrow;
 
-        let table_s=cell.getTerminal(true);//Tabla source
-        let table_t=cell.getTerminal(false);//Tabla target
+            let table_s=cell.getTerminal(true);//Tabla source
+            let table_t=cell.getTerminal(false);//Tabla target
 
-        let combo_s=form.addCombo(table_s.value.name,false,4);
-        //Marcamos como seleccionado el que coincida con valor_actual
-        form.addOption(combo_s,"solo uno","solo_uno","solo_uno"==valor_actual_s);
-        form.addOption(combo_s,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_s);
-        form.addOption(combo_s,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_s);
-        form.addOption(combo_s,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_s);
+            let combo_s=form.addCombo(table_s.value.name,false,4);
+            //Marcamos como seleccionado el que coincida con valor_actual
+            form.addOption(combo_s,"solo uno","solo_uno","solo_uno"==valor_actual_s);
+            form.addOption(combo_s,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_s);
+            form.addOption(combo_s,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_s);
+            form.addOption(combo_s,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_s);
 
-        let combo_e=form.addCombo(table_t.value.name,false,4);
-        form.addOption(combo_e,"solo uno","solo_uno","solo_uno"==valor_actual_e);
-        form.addOption(combo_e,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_e);
-        form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
-        form.addOption(combo_e,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_e);
+            let combo_e=form.addCombo(table_t.value.name,false,4);
+            form.addOption(combo_e,"solo uno","solo_uno","solo_uno"==valor_actual_e);
+            form.addOption(combo_e,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_e);
+            form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
+            form.addOption(combo_e,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_e);
 
-        mxEvent.addListener(form.getTable(),'change',function(event){
-            let newValue_s=combo_s.value || '';
-            let oldValue_s=valor_actual_s;
-            let newValue_e=combo_e.value || '';
-            let oldValue_e=valor_actual_e;
+            mxEvent.addListener(form.getTable(),'change',function(event){
+                let newValue_s=combo_s.value || '';
+                let oldValue_s=valor_actual_s;
+                let newValue_e=combo_e.value || '';
+                let oldValue_e=valor_actual_e;
 
-            if(newValue_s!=oldValue_s||newValue_e!=oldValue_e){
-                graph.getModel().beginUpdate();
-                try {
-                    let clone=cell.value.clone();
-                    clone.startArrow=newValue_s;
-                    clone.endArrow=newValue_e;
-                    clone.clavesForaneas=cell.value.clavesForaneas;
+                if(newValue_s!=oldValue_s||newValue_e!=oldValue_e){
+                    graph.getModel().beginUpdate();
+                    try {
+                        let clone=cell.value.clone();
+                        clone.startArrow=newValue_s;
+                        clone.endArrow=newValue_e;
+                        clone.clavesForaneas=cell.value.clavesForaneas;
 
-                    graph.model.setValue(cell,clone);
-                    actualizarClaves(graph,cell);
-                } catch (error) {
-                    console.log("ERROR update");
-                    console.log(error);
-                }finally{
-                    graph.getModel().endUpdate();
+                        graph.model.setValue(cell,clone);
+                        actualizarClaves(graph,cell);
+                    } catch (error) {
+                        console.log("ERROR update");
+                        console.log(error);
+                    }finally{
+                        graph.getModel().endUpdate();
+                    }
                 }
-            }
 
-            let clone=cell.value.clone();
+                let clone=cell.value.clone();
 
-            clone.name=nameField.value;
-            graph.model.setValue(cell,clone);
-        });
-        properties.appendChild(form.getTable());
+                clone.name=nameField.value;
+                graph.model.setValue(cell,clone);
+            });
+            properties.appendChild(form.getTable());
+        }else{
+            //TABLA
+            mxEvent.addListener(form.getTable(),'change',function(evt){
+                let clone=cell.value.clone();
+    
+                clone.name=nameField.value;
+        
+                graph.model.setValue(cell,clone);
+            });
+            properties.appendChild(form.getTable());
+        }
     }
 }
 
