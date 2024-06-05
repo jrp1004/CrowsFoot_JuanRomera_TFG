@@ -103,3 +103,14 @@ no se aplique a los elementos que se añaden en el js*/
     padding-left: 10px;
     padding-right: 10px;
 }
+
+.tabcontent button:hover{
+    background-color: #ddd;
+}
+.tabcontent button.active{
+    background-color: #ccc;
+}
+
+.tabcontent button{
+    background-color: "#fcfcfc";
+}

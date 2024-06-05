@@ -660,6 +660,8 @@ function main(container,outline,toolbar,sidebar,status,properties){
             mxEvent.removeAllListeners(document.getElementById('gradientDirection'));
             mxEvent.removeAllListeners(document.getElementById('tamFont'));
             mxEvent.removeAllListeners(document.getElementById('colorFontPicker'));
+            mxEvent.removeAllListeners(document.getElementById('negrita'));
+            mxEvent.removeAllListeners(document.getElementById('cursiva'));
             if(cells!=null){
                 let propertiesDatos=document.getElementById("propertiesDatos");
                 if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
@@ -892,7 +894,6 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_STARTSIZE] = '28';
     style[mxConstants.STYLE_VERTICAL_ALIGN] = 'middle';
     style[mxConstants.STYLE_FONTSIZE] = '12';
-    style[mxConstants.STYLE_FONTSTYLE] = 1;
     style[mxConstants.STYLE_IMAGE] = '../images/icons48/table.png';
     // Looks better without opacity if shadow is enabled
     //style[mxConstants.STYLE_OPACITY] = '80';
@@ -1319,6 +1320,8 @@ function configurarTabEstilos(graph,cell){
     let selectFont=document.getElementById("selectFont");
     let tamFont=document.getElementById("tamFont");
     let colorFontPicker=document.getElementById('colorFontPicker');
+    let negritaButton=document.getElementById('negrita');
+    let cursivaButton=document.getElementById('cursiva');
 
     if(!gradientCheck.checked){
         gradientPicker.style.display="none";
@@ -1358,6 +1361,23 @@ function configurarTabEstilos(graph,cell){
                 colorFontPicker.value='#000000';
             }else{
                 colorFontPicker.value=fontColor;
+            }
+
+            let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
+            if(fontStyle===undefined||fontStyle===null){
+                negritaButton.className=negritaButton.className.replace(" active","");
+                cursivaButton.className=cursivaButton.className.replace(" active","");
+            }else{
+                if(fontStyle&mxConstants.FONT_BOLD){
+                    negritaButton.className+=" active";
+                }else{
+                    negritaButton.className=negritaButton.className.replace(" active","");
+                }
+                if(fontStyle&mxConstants.FONT_ITALIC){
+                    cursivaButton.className+=" active";
+                }else{
+                    cursivaButton.className=cursivaButton.className.replace(" active","");
+                }
             }
         }else{
             colorPicker.value="#ffffff";
@@ -1403,6 +1423,24 @@ function configurarTabEstilos(graph,cell){
         });
         mxEvent.addListener(colorFontPicker,'change',function(evt){
             graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,colorFontPicker.value,[cell]);
+        });
+        mxEvent.addListener(negritaButton,'click',function(evt){
+            graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_BOLD,[cell]);
+            let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
+            if(fontStyle&mxConstants.FONT_BOLD){
+                negritaButton.className+=" active";
+            }else{
+                negritaButton.className=negritaButton.className.replace(" active","");
+            }
+        });
+        mxEvent.addListener(cursivaButton,'click',function(evt){
+            graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_ITALIC,[cell]);
+            let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
+            if(fontStyle&mxConstants.FONT_ITALIC){
+                cursivaButton.className+=" active";
+            }else{
+                cursivaButton.className=cursivaButton.className.replace(" active","");
+            }
         });
     }
 }
