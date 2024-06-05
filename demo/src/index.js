@@ -662,6 +662,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             mxEvent.removeAllListeners(document.getElementById('colorFontPicker'));
             mxEvent.removeAllListeners(document.getElementById('negrita'));
             mxEvent.removeAllListeners(document.getElementById('cursiva'));
+            mxEvent.removeAllListeners(document.getElementById('shadowCheck'));
             if(cells!=null){
                 let propertiesDatos=document.getElementById("propertiesDatos");
                 if(graph.isHtmlLabel(cells[0])||graph.model.isEdge(cells[0])){      //TEMPORAL
@@ -1323,12 +1324,22 @@ function configurarTabEstilos(graph,cell){
     let negritaButton=document.getElementById('negrita');
     let cursivaButton=document.getElementById('cursiva');
 
+    let shadowCheck=document.getElementById('shadowCheck');
+
     if(!gradientCheck.checked){
         gradientPicker.style.display="none";
         selectGradientDirection.style.display="none";
     }else{
         gradientPicker.style.display="inline";
         selectGradientDirection.style.display="inline";
+    }
+
+    if(graph.isSwimlane(cell)){
+        shadowCheck.style.display="inline";
+        document.getElementById('sombra').style.display="inline";
+    }else{
+        shadowCheck.style.display="none";
+        document.getElementById('sombra').style.display="none";
     }
 
     if(graph.getModel().isVertex(cell)){
@@ -1379,6 +1390,7 @@ function configurarTabEstilos(graph,cell){
                     cursivaButton.className=cursivaButton.className.replace(" active","");
                 }
             }
+            shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
         }else{
             colorPicker.value="#ffffff";
             gradientPicker.value="#ffffff";
@@ -1386,6 +1398,7 @@ function configurarTabEstilos(graph,cell){
             selectGradientDirection.options.selectedIndex=0;
             tamFont.value='11';
             colorFontPicker.value='#000000'
+            shadowCheck.checked=false;
         }
 
         mxEvent.addListener(colorPicker,'change',function(evt){
@@ -1441,6 +1454,9 @@ function configurarTabEstilos(graph,cell){
             }else{
                 cursivaButton.className=cursivaButton.className.replace(" active","");
             }
+        });
+        mxEvent.addListener(shadowCheck,'change',function(evt){
+            graph.toggleCellStyle(mxConstants.STYLE_SHADOW,cell);
         });
     }
 }
