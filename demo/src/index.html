@@ -7,8 +7,20 @@
         <script type="text/javascript" src="../mxgraph/javascript/mxClient.js"></script>
     </head>
     <body onload="main(document.getElementById('graphContainer'),document.getElementById('outlineContainer'),document.getElementById('toolbarContainer'),document.getElementById('sidebarContainer'),document.getElementById('statusContainer'),document.getElementById('propertiesContainer'))">
+        <div id="iconoContainer" class="div-html">
+            <img src="../images/crow-logo.png" height="128px">
+        </div>
         <div id="toolbarContainer" class="div-html"></div>
-        <div id="sidebarContainer" class="div-html"></div>
+        <div id="sidebarContainer" class="div-html">
+            <div id="containerTabla" style="background-color: #ddd;">
+                <p class="titulo">TABLA</p>
+            </div>
+            <div id="containerColumna" style="background-color: #ddd;">
+                <p class="titulo">COLUMNA</p>
+            </div>
+            <br>
+            <hr>
+        </div>
         <div id="graphContainer" class="div-html"></div>
         <div id="outlineContainer" class="div-html"></div>
         <div id="statusContainer" class="div-html"></div>
@@ -19,40 +31,75 @@
             </div>
             <div id="propertiesContent">
                 <div id="estilos" class="tabcontent">
-                    <p>Estilos</p>
                     <br>
-                    Color:
-                    <input type="color" id="colorPicker">
-                    <br>
-                    <br>
-                    <input type="checkbox" id="gradientCheck">Degradado:
-                    <input type="color" id="gradientPicker">
-                    <select id="gradientDirection">
-                        <option value="south">Sur</option>
-                        <option value="north">Norte</option>
-                        <option value="east">Este</option>
-                        <option value="west">Oeste</option>
-                    </select>
+                    <div>
+                        <table  style="table-layout: fixed;">
+                            <thead>
+                                <tr>
+                                    <th>Relleno</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Color</td>
+                                    <td><input type="color" id="colorPicker"></td>
+                                </tr>
+                                <tr id="degradado">
+                                    <td><input type="checkbox" id="gradientCheck">Degradado</td>
+                                    <td><input type="color" id="gradientPicker">
+                                        <select id="gradientDirection">
+                                            <option value="south">Sur</option>
+                                            <option value="north">Norte</option>
+                                            <option value="east">Este</option>
+                                            <option value="west">Oeste</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <hr>
-                    Fuente
-                    <br>
-                    <select id="selectFont">
-                        <option value="arial">Arial</option>
-                        <option value="serif">Serif</option>
-                        <option value="sans-serif">Sans-Serif</option>
-                        <option value="tahoma">Tahoma</option>
-                        <option value="verdana">Verdana</option>
-                        <option value="dialog">Dialog</option>
-                        <option value="times new roman">Times New Roman</option>
-                    </select>
-                    <input id="tamFont" type="number" min="1" max="999" style="width: 50px;">
-                    <br>
-                    <input type="color" id="colorFontPicker">
-                    <button id="negrita">N</button>
-                    <button id="cursiva">K</button>
-                    <br>
-                    <br>
-                    <label id="sombra">Sombra:</label> <input type="checkbox" id="shadowCheck">
+                    <div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Texto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Fuente</td>
+                                    <td>
+                                        <select id="selectFont">
+                                            <option value="arial">Arial</option>
+                                            <option value="serif">Serif</option>
+                                            <option value="sans-serif">Sans-Serif</option>
+                                            <option value="tahoma">Tahoma</option>
+                                            <option value="verdana">Verdana</option>
+                                            <option value="dialog">Dialog</option>
+                                            <option value="times new roman">Times New Roman</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Tamaño</td>
+                                    <td><input id="tamFont" type="number" min="1" max="999" style="width: 50px;"></td>
+                                </tr>
+                                <tr>
+                                    <td>Color</td>
+                                    <td><input type="color" id="colorFontPicker"></td>
+                                </tr>
+                                <tr>
+                                    <td>Estilo</td>
+                                    <td style="margin: 8px;"><button id="negrita">N</button>&emsp;<button id="cursiva">K</button></td>
+                                </tr>
+                                <tr id="sombra">
+                                    <td>Sombra</td>
+                                    <td><input type="checkbox" id="shadowCheck"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div id="datos" class="tabcontent"></div>
             </div>

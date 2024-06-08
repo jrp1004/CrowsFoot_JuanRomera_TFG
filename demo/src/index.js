@@ -452,7 +452,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         let table=new mxCell(tableObject,new mxGeometry(0,0,200,28),'table');
 
         table.setVertex(true);
-        addSidebarIcon(graph,sidebar,table,'../images/icons48/table.png');
+        addSidebarIcon(graph,document.getElementById('containerTabla'),table,'../images/icons128/table.png');
 
         //Icono de columna
         let columnObject=new Column('COLUMNNAME');
@@ -460,7 +460,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
         column.setVertex(true);
         column.setConnectable(false);
-        addSidebarIcon(graph,sidebar,column,'../images/icons48/column.png');
+        addSidebarIcon(graph,document.getElementById('containerColumna'),column,'../images/icons128/column.png');
 
         //Creamos la columna que actuará como clave primaria de la tabla
         let firstColumn=column.clone();
@@ -511,10 +511,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 let style=previous.apply(this,arguments);
 
                 if(this.isEdge(cell)){
-                    if(style!=null){
-                        style[mxConstants.STYLE_STARTARROW]=cell.value.startArrow;
-                        style[mxConstants.STYLE_ENDARROW]=cell.value.endArrow;
-                    }else{
+                    if(style===null||style===undefined){
                         style="startArrow="+cell.value.startArrow+";endArrow="+cell.value.endArrow+";";
                     }
                 }
@@ -524,31 +521,6 @@ function main(container,outline,toolbar,sidebar,status,properties){
             }
             return null;
         };
-
-        //Texto que se muestra abajo a la derecha
-        let hints = document.createElement('div');
-        hints.style.position = 'absolute';
-        hints.style.overflow = 'hidden';
-        hints.style.width = '230px';
-        hints.style.bottom = '56px';
-        hints.style.height = '86px';
-        hints.style.right = '20px';
-        
-        hints.style.background = 'black';
-        hints.style.color = 'white';
-        hints.style.fontFamily = 'Arial';
-        hints.style.fontSize = '10px';
-        hints.style.padding = '4px';
-
-        mxUtils.setOpacity(hints, 50);
-        
-        mxUtils.writeln(hints, '- Drag an image from the sidebar to the graph');
-        mxUtils.writeln(hints, '- Doubleclick on a table or column to edit');
-        mxUtils.writeln(hints, '- Shift- or Rightclick and drag for panning');
-        mxUtils.writeln(hints, '- Move the mouse over a cell to see a tooltip');
-        mxUtils.writeln(hints, '- Click and drag a table to move and connect');
-        mxUtils.writeln(hints, '- Shift- or Rightclick to show a popup menu');
-        document.body.appendChild(hints);
 
         //Elemento que añadiremos en las toolbar para generar un espacio entre botones
         let spacer=document.createElement('div');
@@ -651,7 +623,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         let datosDiv=document.getElementById("datos");
         //Listener para cambiar el panel de propiedades
         graph.getSelectionModel().addListener(mxEvent.CHANGE,function(sender,event){
-            datosDiv.innerHTML='';
+            datosDiv.innerHTML='<br>';
             let cells=event.getProperty('removed');
             mxEvent.removeAllListeners(document.getElementById('colorPicker'));
             mxEvent.removeAllListeners(document.getElementById('gradientPicker'));
@@ -825,9 +797,13 @@ function addSidebarIcon(graph,sidebar,prototype,image){
     //Añadimos imagen para el icono de la toolbar
     let img=document.createElement('img');
     img.setAttribute('src',image);
-    img.style.width='48px';
-    img.style.height='48px';
-    img.title='Suelta esto en el diagrama para crear un vértice nuevo';
+    img.style.width='128px';
+    img.style.height='128px';
+    if(graph.isSwimlane(prototype)){
+        img.title='Arrastra este icono para crear una tabla';
+    }else{
+        img.title='Arrastra este icono sobre una tabla para añadir una columna';
+    }
     sidebar.appendChild(img);
 
     //Imagen que se muestra mientras arrastramos el icono por el grafo
@@ -1005,7 +981,6 @@ function showProperties(graph,cell,properties){
     
             graph.model.setValue(cell,clone);
         });
-        properties.appendChild(form.getTable());
     }else{
         //ENLACE
         if(graph.model.isEdge(cell)){
@@ -1057,7 +1032,6 @@ function showProperties(graph,cell,properties){
                 clone.name=nameField.value;
                 graph.model.setValue(cell,clone);
             });
-            properties.appendChild(form.getTable());
         }else{
             //TABLA
             mxEvent.addListener(form.getTable(),'change',function(evt){
@@ -1067,9 +1041,17 @@ function showProperties(graph,cell,properties){
         
                 graph.model.setValue(cell,clone);
             });
-            properties.appendChild(form.getTable());
         }
     }
+    let tabla=form.getTable();
+    properties.appendChild(tabla);
+    //Cabeceras de la tabla de propiedades
+    let cabecera=tabla.createTHead();
+    let fila=cabecera.insertRow(0);
+    let c_propiedad=fila.insertCell(0);
+    c_propiedad.outerHTML='<th>Propiedad</th>';
+    let c_valor=fila.insertCell(1);
+    c_valor.outerHTML='<th>Valor</th>';
 }
 
 function actualizarClaves(graph,cell){
@@ -1209,6 +1191,9 @@ function editarRelacion(graph,edge,relacion,source,target,invertir){
     edge.setTerminal(target,false);
     
     graph.addCell(edge);
+
+    graph.setCellStyles(mxConstants.STYLE_STARTARROW,relacion.startArrow,[edge]);
+    graph.setCellStyles(mxConstants.STYLE_ENDARROW,relacion.endArrow,[edge]);
 }
 
 //Devuelve la celda correspondiente a la clave primaria de la tabla indicada
@@ -1343,129 +1328,157 @@ function configurarTabEstilos(graph,cell){
 
     if(graph.isSwimlane(cell)){
         shadowCheck.style.display="inline";
-        document.getElementById('sombra').style.display="inline";
+        document.getElementById('sombra').style.display="table-row";
     }else{
         shadowCheck.style.display="none";
         document.getElementById('sombra').style.display="none";
     }
 
-    if(graph.getModel().isVertex(cell)){
-        let style=graph.getStylesheet().getCellStyle(cell.style);
+    if(graph.model.isEdge(cell)){
+        document.getElementById('degradado').style.display="none";
+    }else{
+        document.getElementById('degradado').style.display="table-row";
+    }
 
-        if(style!=null){
-            let fillColor=style[mxConstants.STYLE_FILLCOLOR];
-            if(fillColor===undefined||fillColor===null){
-                colorPicker.value='#ffffff'
-            }else{
-                colorPicker.value=fillColor;
-            }
-            let gradientColor=style[mxConstants.STYLE_GRADIENTCOLOR];
-            if(gradientColor===undefined||gradientColor===null){
-                gradientPicker.value='#ffffff';
-            }else{
-                gradientPicker.value=gradientColor;
-            }
-            selectGradientDirection.options.selectedIndex=getSelectIndex(selectGradientDirection.options,style[mxConstants.STYLE_GRADIENT_DIRECTION]);
+    let style=graph.getStylesheet().getCellStyle(cell.style);
 
-            selectFont.options.selectedIndex=getSelectIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
-            let tam=style[mxConstants.STYLE_FONTSIZE];
-            if(tam===undefined||tam===null){
-                tam='11';
-            }else{
-                tamFont.value=tam;
-            }
-            let fontColor=style[mxConstants.STYLE_FONTCOLOR];
-            if(fontColor===undefined||fontColor===null){
-                colorFontPicker.value='#000000';
-            }else{
-                colorFontPicker.value=fontColor;
-            }
-
-            let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
-            if(fontStyle===undefined||fontStyle===null){
-                negritaButton.className=negritaButton.className.replace(" active","");
-                cursivaButton.className=cursivaButton.className.replace(" active","");
-            }else{
-                if(fontStyle&mxConstants.FONT_BOLD){
-                    negritaButton.className+=" active";
-                }else{
-                    negritaButton.className=negritaButton.className.replace(" active","");
-                }
-                if(fontStyle&mxConstants.FONT_ITALIC){
-                    cursivaButton.className+=" active";
-                }else{
-                    cursivaButton.className=cursivaButton.className.replace(" active","");
-                }
-            }
-            shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
+    if(style!=null){
+        let fillColor;
+        if(graph.model.isEdge(cell)){
+            fillColor=style[mxConstants.STYLE_STROKECOLOR];
         }else{
-            colorPicker.value="#ffffff";
-            gradientPicker.value="#ffffff";
-            selectFont.options.selectedIndex=0;
-            selectGradientDirection.options.selectedIndex=0;
-            tamFont.value='11';
-            colorFontPicker.value='#000000'
-            shadowCheck.checked=false;
+            fillColor=style[mxConstants.STYLE_FILLCOLOR];
+        }
+        if(fillColor===undefined||fillColor===null){
+            if(graph.model.isEdge(cell)){
+                colorPicker.value='#6482B9';
+            }else{
+                colorPicker.value='#ffffff';
+            }
+        }else{
+            colorPicker.value=fillColor;
         }
 
-        mxEvent.addListener(colorPicker,'change',function(evt){
-            graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
-        });
-        mxEvent.addListener(gradientPicker,'change',function(evt){
-            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
-        });
-        mxEvent.addListener(gradientCheck,'change',function(evt){
-            cell.value.gradient=gradientCheck.checked;
-            if(!gradientCheck.checked){
-                gradientPicker.style.display="none";
-                selectGradientDirection.style.display="none";
-                graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
+        let gradientColor=style[mxConstants.STYLE_GRADIENTCOLOR];
+        if(gradientColor===undefined||gradientColor===null){
+            gradientPicker.value='#ffffff';
+        }else{
+            gradientPicker.value=gradientColor;
+        }
+        selectGradientDirection.options.selectedIndex=getSelectIndex(selectGradientDirection.options,style[mxConstants.STYLE_GRADIENT_DIRECTION]);
+
+        selectFont.options.selectedIndex=getSelectIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
+        let tam=style[mxConstants.STYLE_FONTSIZE];
+        if(tam===undefined||tam===null){
+            tam='11';
+        }else{
+            tamFont.value=tam;
+        }
+
+        let fontColor=style[mxConstants.STYLE_FONTCOLOR];
+        if(fontColor===undefined||fontColor===null){
+            if(graph.model.isEdge(cell)){
+                colorFontPicker.value='#446299';
             }else{
-                gradientPicker.style.display="inline";
-                selectGradientDirection.style.display="inline";
-                graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
+                colorFontPicker.value='#000000';
             }
-        });
-        mxEvent.addListener(selectFont,'change',function(evt){
-            graph.setCellStyles(mxConstants.STYLE_FONTFAMILY,selectFont.value,[cell]);
-        });
-        mxEvent.addListener(selectGradientDirection,'change',function(evt){
-            graph.setCellStyles(mxConstants.STYLE_GRADIENT_DIRECTION,selectGradientDirection.value,[cell]);
-        });
-        mxEvent.addListener(tamFont,'change',function(evt){
-            let tam=tamFont.value;
-            if(tam>1000){
-                tam=999;
-            }else if(tam<1){
-                tam=1;
-            }
-            graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tam,[cell]);
-        });
-        mxEvent.addListener(colorFontPicker,'change',function(evt){
-            graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,colorFontPicker.value,[cell]);
-        });
-        mxEvent.addListener(negritaButton,'click',function(evt){
-            graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_BOLD,[cell]);
-            let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
+        }else{
+            colorFontPicker.value=fontColor;
+        }
+
+        let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
+        if(fontStyle===undefined||fontStyle===null){
+            negritaButton.className=negritaButton.className.replace(" active","");
+            cursivaButton.className=cursivaButton.className.replace(" active","");
+        }else{
             if(fontStyle&mxConstants.FONT_BOLD){
                 negritaButton.className+=" active";
             }else{
                 negritaButton.className=negritaButton.className.replace(" active","");
             }
-        });
-        mxEvent.addListener(cursivaButton,'click',function(evt){
-            graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_ITALIC,[cell]);
-            let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
             if(fontStyle&mxConstants.FONT_ITALIC){
                 cursivaButton.className+=" active";
             }else{
                 cursivaButton.className=cursivaButton.className.replace(" active","");
             }
-        });
-        mxEvent.addListener(shadowCheck,'change',function(evt){
-            graph.toggleCellStyle(mxConstants.STYLE_SHADOW,cell);
-        });
+        }
+        shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
+    }else{
+        if(graph.model.isEdge(cell)){
+            colorFontPicker.value='#446299';
+            colorPicker.value='#6482B9';
+        }else{
+            colorPicker.value="#ffffff";
+            colorFontPicker.value='#000000'
+        }
+        gradientPicker.value="#ffffff";
+        selectFont.options.selectedIndex=0;
+        selectGradientDirection.options.selectedIndex=0;
+        tamFont.value='11';
+        shadowCheck.checked=false;
     }
+
+    mxEvent.addListener(colorPicker,'change',function(evt){
+        if(graph.model.isEdge(cell)){
+            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,colorPicker.value,[cell]);
+        }else{
+            graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
+        }
+    });
+    mxEvent.addListener(gradientPicker,'change',function(evt){
+        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
+    });
+    mxEvent.addListener(gradientCheck,'change',function(evt){
+        cell.value.gradient=gradientCheck.checked;
+        if(!gradientCheck.checked){
+            gradientPicker.style.display="none";
+            selectGradientDirection.style.display="none";
+            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
+        }else{
+            gradientPicker.style.display="inline";
+            selectGradientDirection.style.display="inline";
+            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
+        }
+    });
+    mxEvent.addListener(selectFont,'change',function(evt){
+        graph.setCellStyles(mxConstants.STYLE_FONTFAMILY,selectFont.value,[cell]);
+    });
+    mxEvent.addListener(selectGradientDirection,'change',function(evt){
+        graph.setCellStyles(mxConstants.STYLE_GRADIENT_DIRECTION,selectGradientDirection.value,[cell]);
+    });
+    mxEvent.addListener(tamFont,'change',function(evt){
+        let tam=tamFont.value;
+        if(tam>1000){
+            tam=999;
+        }else if(tam<1){
+            tam=1;
+        }
+        graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tam,[cell]);
+    });
+    mxEvent.addListener(colorFontPicker,'change',function(evt){
+        graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,colorFontPicker.value,[cell]);
+    });
+    mxEvent.addListener(negritaButton,'click',function(evt){
+        graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_BOLD,[cell]);
+        let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
+        if(fontStyle&mxConstants.FONT_BOLD){
+            negritaButton.className+=" active";
+        }else{
+            negritaButton.className=negritaButton.className.replace(" active","");
+        }
+    });
+    mxEvent.addListener(cursivaButton,'click',function(evt){
+        graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_ITALIC,[cell]);
+        let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
+        if(fontStyle&mxConstants.FONT_ITALIC){
+            cursivaButton.className+=" active";
+        }else{
+            cursivaButton.className=cursivaButton.className.replace(" active","");
+        }
+    });
+    mxEvent.addListener(shadowCheck,'change',function(evt){
+        graph.toggleCellStyle(mxConstants.STYLE_SHADOW,cell);
+    });
 }
 
 function getSelectIndex(options,value){

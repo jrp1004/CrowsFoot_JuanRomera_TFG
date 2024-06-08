@@ -3,12 +3,14 @@ no se aplique a los elementos que se añaden en el js*/
 .div-html{
     position: absolute;
     overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
 }
 
 #toolbarContainer{
     white-space: nowrap;
     top: 0px;
-    left: 0px;
+    left: 269px;
     max-height: 24px;
     height: 36px;
     right: 0px;
@@ -17,21 +19,25 @@ no se aplique a los elementos que se añaden en el js*/
 }
 
 #sidebarContainer{
-    top: 36px;
+    top: 140px;
     left: 0px;
     bottom: 36px;
-    max-width: 52px;
-    width: 56px;
+    width: 260px;
+    max-width: 260px;
     padding-top: 10px;
     padding-left: 4px;
-    background-image: url('../images/sidebar_bg.gif');
+    background-color: #ccc;
+    border-right: 1px solid #AAAAAA;
+    text-align: center;
+    padding-right: 4px;
 }
 
 #graphContainer{
     top: 36px;
-    left: 60px;
+    left: 269px;
     bottom: 36px;
-    right: 0px;
+    right: 260px;
+    background:url('../editors/images/grid.gif');
 }
 
 #outlineContainer{
@@ -62,13 +68,12 @@ no se aplique a los elementos que se añaden en el js*/
     bottom: 36px;
     width: 260px;
     max-width: 260px;
-    border-left: 3px solid;
-    background-color: white;
+    border-left: 1px solid #AAAAAA;
+    background-color: #ccc;
 }
 
 #propertiesTabs{
     overflow: hidden;
-    border: 1px solid #ccc;
     background-color: #f1f1f1;
 }
 
@@ -76,8 +81,7 @@ no se aplique a los elementos que se añaden en el js*/
     background-color: inherit;
     float: left;
     border: none;
-    border-left: 1px solid;
-    border-right: 1px solid;
+    border-right: 1px solid #c6c6c6;
     outline: none;
     cursor: pointer;
     padding: 14px 16px;
@@ -109,4 +113,65 @@ no se aplique a los elementos que se añaden en el js*/
 
 .tabcontent button{
     background-color: "#fcfcfc";
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    text-align: left;
+    table-layout: auto;
+}
+  
+table thead th {
+    background-color: #f2f2f2;
+    border: 1px solid #dddddd;
+    padding: 10px;
+    text-transform: uppercase;
+}
+
+table tbody td {
+    border: 1px solid #dddddd;
+    padding: 6px;
+    vertical-align: middle;
+}
+
+
+input[type="text"], textarea {
+    width: calc(100% - 20px);
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 12px;
+}
+
+textarea {
+    resize: none;
+    min-height: 80px;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.titulo{
+    padding: 8px;
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+#iconoContainer{
+    top: 0px;
+    left: 0px;
+    height: 140px;
+    width: 269px;
+    background-color: #bbb;
+    text-align: center;
 }
