@@ -579,6 +579,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
         //Añadimos la función que exporta el grafo a XML
         editor.addAction('export',function(editor,cell){
+            let div=document.createElement('div');
             let textarea=document.createElement('textarea');
             textarea.style.width = '400px';
             textarea.style.height = '400px';
@@ -589,7 +590,21 @@ function main(container,outline,toolbar,sidebar,status,properties){
             let node = enc.encode(editor.graph.getModel());
             //Escribimos el código XML en el textarea
             textarea.value = mxUtils.getPrettyXml(node);
-            showModalWindow('XML', textarea, 410, 440);
+            div.appendChild(textarea);
+            //Botón de descarga
+            let button=document.createElement('button');
+            button.style.fontSize='10';
+            button.innerHTML='Descargar';
+            div.appendChild(button);
+            mxEvent.addListener(button,'click',function(evt){
+                let nombre=null;
+                nombre=mxUtils.prompt('Nombre para el fichero:');
+                if(nombre!=null){
+                    descarga(mxUtils.getPrettyXml(node),nombre);
+                }
+            });
+
+            showModalWindow('XML', div, 410, 480);
         });
         addToolbarButton(editor,toolbar,'export','Export XML','../images/export1.png');
 
@@ -1574,6 +1589,25 @@ function getSelectIndex(options,value){
         }
     }
     return 0;
+}
+
+//Función para descargar el fichero xml
+function descarga(texto,nombre){
+    let file=new Blob([texto],{type:'text/xml'});
+    if(window.navigator.msSaveOrOpenBlob){//Soporte IE
+        window.navigator.msSaveOrOpenBlob(file,nombre);
+    }else{
+        let a=document.createElement("a"),url=URL.createObjectURL(file);
+        a.href=url;
+        a.download=nombre;
+        document.body.appendChild(a);
+
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a)
+            window.URL.revokeObjectURL(url);
+        }, 0);
+    }
 }
 
 
