@@ -929,7 +929,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         col_encima.setStyle(cell.getStyle());
                         cell.setStyle(temp_style);
 
-                        graph.refresh();
+                        graph.setSelectionCell(col_encima);
                     }
 
                 });
@@ -966,6 +966,8 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         graph.model.setValue(cell,value_debajo);
                         col_debajo.setStyle(cell.getStyle());
                         cell.setStyle(temp_style);
+
+                        graph.setSelectionCell(col_debajo);
                     }
                 });
             }
