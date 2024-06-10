@@ -489,6 +489,9 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 for(let i=0;i<primaryKey.length;i++){
                     let columna=addClaveForanea(this,source,primaryKey[i]);
                     relacion.clavesForaneas.push(columna);
+                    let clone=columna.value.clone();
+                    clone.relacionAsociada=relacion;
+                    this.model.setValue(columna,clone);
                 }
                 edge.setValue(relacion);
 
@@ -539,10 +542,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 cell=graph.getSelectionCell();
             }
 
-            //Comprobamos si lo seleccionado es una columna para mostrar sus propiedades
-            if(graph.isHtmlLabel(cell)||graph.model.isEdge(cell)){
-                showProperties(graph,cell,properties);
-            }
+            document.getElementById('propertiesDatos').click();
         });
         
         //Añadimos el resto de botones
@@ -575,7 +575,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 mxUtils.alert('Esquema vacío');
             }
         });
-        addToolbarButton(editor,toolbar,'showSql','Mostrar SQL','../images/export1.png');
+        addToolbarButton(editor,toolbar,'showSql','Mostrar SQL','../images/sql.png');
 
         //Añadimos la función que exporta el grafo a XML
         editor.addAction('export',function(editor,cell){
@@ -654,6 +654,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 function addToolbarButton(editor,toolbar,action,label,image,isTransparent){
     //Creamos le botón HTML
     let button=document.createElement('button');
+    button.classList.add('buttonToolbar');
     button.style.fontSize='10';
     //Añadimos la imagen que hemos especificado por parámetro al botón 
     if(image!=null){
@@ -891,6 +892,83 @@ function createPopupMenu(editor,graph,menu,cell,evt){
             });
 
             menu.addSeparator();
+
+            if(graph.isHtmlLabel(cell)){
+                menu.addItem('Subir posición',null,function(){
+                    let posicion=(cell.geometry.y-28)/26;
+                    let parent=cell.getParent();
+
+                    if(posicion>0){
+                        let col_encima=graph.model.getChildAt(parent,posicion-1);
+                        let value_encima=col_encima.value.clone();
+                        let value_cell=cell.value.clone();
+                        let temp_style=col_encima.getStyle();
+
+                        if(col_encima.value.relacionAsociada!=null||cell.value.relacionAsociada!=null){
+                            value_encima.relacionAsociada=col_encima.value.relacionAsociada;
+                            value_cell.relacionAsociada=cell.value.relacionAsociada;
+                            if(col_encima.value.relacionAsociada!=null){
+                                for(let i=0;i<col_encima.value.relacionAsociada.clavesForaneas.length;i++){
+                                    if(col_encima.value.relacionAsociada.clavesForaneas[i]==col_encima){
+                                        col_encima.value.relacionAsociada.clavesForaneas[i]=cell;
+                                    }
+                                }
+                            }else{
+                                for(let i=0;i<cell.value.relacionAsociada.clavesForaneas.length;i++){
+                                    if(cell.value.relacionAsociada.clavesForaneas[i]==cell){
+                                        cell.value.relacionAsociada.clavesForaneas[i]=col_encima;
+                                    }
+                                }
+                            }
+                        }
+
+                        graph.model.setValue(col_encima,value_cell);
+                        graph.model.setValue(cell,value_encima);
+                        col_encima.setStyle(cell.getStyle());
+                        cell.setStyle(temp_style);
+
+                        graph.refresh();
+                    }
+
+                });
+                menu.addItem('Bajar posición',null,function(){
+                    let posicion=(cell.geometry.y-28)/26;
+                    let parent=cell.getParent();
+                    let hijos=graph.model.getChildCount(parent);
+
+                    if(posicion<hijos-1){
+                        let col_debajo=graph.model.getChildAt(parent,posicion+1);
+                        let value_debajo=col_debajo.value.clone();
+                        let value_cell=cell.value.clone();
+                        let temp_style=col_debajo.getStyle();
+
+                        if(col_debajo.value.relacionAsociada!=null||cell.value.relacionAsociada!=null){
+                            value_debajo.relacionAsociada=col_debajo.value.relacionAsociada;
+                            value_cell.relacionAsociada=cell.value.relacionAsociada;
+                            if(col_debajo.value.relacionAsociada!=null){
+                                for(let i=0;i<col_debajo.relacionAsociada.clavesForaneas.length;i++){
+                                    if(col_debajo.value.relacionAsociada.clavesForaneas[i]==col_debajo){
+                                        col_debajo.value.relacionAsociada.clavesForaneas[i]=cell;
+                                    }
+                                }
+                            }else{
+                                for(let i=0;i<cell.value.relacionAsociada.clavesForaneas.length;i++){
+                                    if(cell.value.relacionAsociada.clavesForaneas[i]==cell){
+                                        cell.value.relacionAsociada.clavesForaneas[i]=col_debajo;                                    
+                                    }
+                                }
+                            }
+                        }
+
+                        graph.model.setValue(col_debajo,value_cell);
+                        graph.model.setValue(cell,value_debajo);
+                        col_debajo.setStyle(cell.getStyle());
+                        cell.setStyle(temp_style);
+                    }
+                });
+            }
+
+            menu.addSeparator();
         }else{
             menu.addItem('Anadir columna','../images/plus.png',function(){
                 //Nueva columna
@@ -1070,7 +1148,7 @@ function actualizarClaves(graph,cell){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
             for(let i=0;i<primaryKey_s.length;i++){
-                let column=addClaveForanea(graph,table_t,primaryKey_s[i]);
+                let column=addClaveForanea(graph,table_t,primaryKey_s[i],relacion);
                 relacion.clavesForaneas.push(column);
             }
 
@@ -1079,14 +1157,14 @@ function actualizarClaves(graph,cell){
         }else{
             if(relacion.endArrow==='cero_o_uno'){
                 for(let i=0;i<primaryKey_t.length;i++){
-                    let column=addClaveForanea(graph,table_t,primaryKey_s[i]);
+                    let column=addClaveForanea(graph,table_t,primaryKey_s[i],relacion);
                     relacion.clavesForaneas.push(column);
                 }
             }else{
                 //Si la parte opcional no está en el target asumimos que o está
                 //en source o es indiferente donde esté la clave
                 for(let i=0;i<primaryKey_t.length;i++){
-                    let column=addClaveForanea(graph,table_s,primaryKey_t[i]);
+                    let column=addClaveForanea(graph,table_s,primaryKey_t[i],relacion);
                     relacion.clavesForaneas.push(column);
                 }
             }
@@ -1131,7 +1209,7 @@ function actualizarClaves(graph,cell){
             relacion_s.startArrow='uno_o_mas';
             relacion_s.endArrow='solo_uno';
             for(let i=0;i<primaryKey_s.length;i++){
-                let column=addClaveForanea(graph,table,primaryKey_s[i]);
+                let column=addClaveForanea(graph,table,primaryKey_s[i],relacion_s);
                 relacion_s.clavesForaneas.push(column);
             }
 
@@ -1142,7 +1220,7 @@ function actualizarClaves(graph,cell){
             relacion_t.startArrow='uno_o_mas';
             relacion_t.endArrow='solo_uno';
             for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table,primaryKey_t[i]);
+                let column=addClaveForanea(graph,table,primaryKey_t[i],relacion_t);
                 relacion_t.clavesForaneas.push(column);
             }
 
@@ -1151,7 +1229,7 @@ function actualizarClaves(graph,cell){
         }else{
             console.log("Clave en source");
             for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table_s,primaryKey_t[i]);
+                let column=addClaveForanea(graph,table_s,primaryKey_t[i],relacion);
                 relacion.clavesForaneas.push(column);
             }
 
@@ -1161,7 +1239,7 @@ function actualizarClaves(graph,cell){
     }
 }
 
-function addClaveForanea(graph,table,key){
+function addClaveForanea(graph,table,key,relacionAsociada){
     let columnObject=new Column("COLUMNA");
     let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
 
@@ -1171,6 +1249,7 @@ function addClaveForanea(graph,table,key){
     column.value.name=key.value.name;
     column.value.type=key.value.type;
     column.value.foreignKey=true;
+    column.value.relacionAsociada=relacionAsociada;
 
     column.geometry.y=table.geometry.y; //Ajuste para corregir error con la tabla intermedia
 
@@ -1504,11 +1583,12 @@ Column.prototype.autoIncrement=false;
 Column.prototype.notNull=false;
 Column.prototype.unique=false;
 Column.prototype.clone=function(){
-    return mxUtils.clone(this);
+    return mxUtils.clone(this,['relacionAsociada']);
 }
 Column.prototype.desc='DESCRIPCION';
 Column.prototype.titulo='TITULO';
 Column.prototype.gradient=false;
+Column.prototype.relacionAsociada=null;
 
 
 //Definición del objeto de usuario tabla
