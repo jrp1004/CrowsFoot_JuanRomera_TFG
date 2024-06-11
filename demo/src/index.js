@@ -485,13 +485,11 @@ function main(container,outline,toolbar,sidebar,status,properties){
             //Actualizamos el grafo con la nueva columna
             this.model.beginUpdate();
             try {
+                this.addCell(edge);//Añadimos el edge para poder obtener el id
                 let relacion=new Relacion("Relacion");
                 for(let i=0;i<primaryKey.length;i++){
-                    let columna=addClaveForanea(this,source,primaryKey[i]);
+                    let columna=addClaveForanea(this,source,primaryKey[i],edge.getId());
                     relacion.clavesForaneas.push(columna.getId());
-                    let clone=columna.value.clone();
-                    clone.relacionAsociada=relacion;
-                    this.model.setValue(columna,clone);
                 }
                 edge.setValue(relacion);
 
@@ -921,20 +919,15 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         let value_cell=cell.value.clone();
                         let temp_style=col_encima.getStyle();
 
-                        if(col_encima.value.relacionAsociada!=null||cell.value.relacionAsociada!=null){
-                            value_encima.relacionAsociada=col_encima.value.relacionAsociada;
-                            value_cell.relacionAsociada=cell.value.relacionAsociada;
+                        if(col_encima.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
+                            intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
+                            intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
+                        }else{
                             if(col_encima.value.relacionAsociada!=null){
-                                for(let i=0;i<col_encima.value.relacionAsociada.clavesForaneas.length;i++){
-                                    if(col_encima.value.relacionAsociada.clavesForaneas[i]==col_encima.getId()){
-                                        col_encima.value.relacionAsociada.clavesForaneas[i]=cell.getId();
-                                    }
-                                }
+                                intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
                             }else{
-                                for(let i=0;i<cell.value.relacionAsociada.clavesForaneas.length;i++){
-                                    if(cell.value.relacionAsociada.clavesForaneas[i]==cell.getId()){
-                                        cell.value.relacionAsociada.clavesForaneas[i]=col_encima.getId();
-                                    }
+                                if(cell.value.relacionAsociada!=null){
+                                    intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
                                 }
                             }
                         }
@@ -959,20 +952,15 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         let value_cell=cell.value.clone();
                         let temp_style=col_debajo.getStyle();
 
-                        if(col_debajo.value.relacionAsociada!=null||cell.value.relacionAsociada!=null){
-                            value_debajo.relacionAsociada=col_debajo.value.relacionAsociada;
-                            value_cell.relacionAsociada=cell.value.relacionAsociada;
+                        if(col_debajo.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
+                            intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
+                            intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
+                        }else{
                             if(col_debajo.value.relacionAsociada!=null){
-                                for(let i=0;i<col_debajo.relacionAsociada.clavesForaneas.length;i++){
-                                    if(col_debajo.value.relacionAsociada.clavesForaneas[i]==col_debajo.getId()){
-                                        col_debajo.value.relacionAsociada.clavesForaneas[i]=cell.getId();
-                                    }
-                                }
+                                intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
                             }else{
-                                for(let i=0;i<cell.value.relacionAsociada.clavesForaneas.length;i++){
-                                    if(cell.value.relacionAsociada.clavesForaneas[i]==cell.getId()){
-                                        cell.value.relacionAsociada.clavesForaneas[i]=col_debajo.getId();                                    
-                                    }
+                                if(cell.value.relacionAsociada!=null){
+                                    intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
                                 }
                             }
                         }
@@ -1026,6 +1014,16 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     menu.addItem('Mostrar SQL','../images/export1.png',function(){
         editor.execute('showSql',cell);
     })
+}
+
+function intercambioIds(graph,relacionId,nuevo,actual){
+    let relacion=graph.model.getCell(relacionId);
+    let clavesForaneas=relacion.value.clavesForaneas;
+    for(let i=0;i<clavesForaneas.length;i++){
+        if(clavesForaneas[i]==actual){
+            clavesForaneas[i]=nuevo;
+        }
+    }
 }
 
 //Función que crea un formulario para editar los parámetros de las columnas
@@ -1166,33 +1164,33 @@ function actualizarClaves(graph,cell){
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
+            let e_1=clone.clone();
+            editarRelacion(graph,e_1,relacion,table_t,table_s,true);
+
             for(let i=0;i<primaryKey_s.length;i++){
-                let column=addClaveForanea(graph,table_t,primaryKey_s[i],relacion);
+                let column=addClaveForanea(graph,table_t,primaryKey_s[i],e_1.getId());
                 relacion.clavesForaneas.push(column.getId());
             }
 
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_t,table_s,true);
             graph.setSelectionCell(e_1);
         }else{
+            let e_1=clone.clone();
+            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
             if(relacion.endArrow==='cero_o_uno'){
                 for(let i=0;i<primaryKey_t.length;i++){
-                    let column=addClaveForanea(graph,table_t,primaryKey_s[i],relacion);
+                    let column=addClaveForanea(graph,table_t,primaryKey_s[i],e_1.getId());
                     relacion.clavesForaneas.push(column.getId());
                 }
             }else{
                 //Si la parte opcional no está en el target asumimos que o está
                 //en source o es indiferente donde esté la clave
                 for(let i=0;i<primaryKey_t.length;i++){
-                    let column=addClaveForanea(graph,table_s,primaryKey_t[i],relacion);
+                    let column=addClaveForanea(graph,table_s,primaryKey_t[i],e_1.getId());
                     relacion.clavesForaneas.push(column.getId());
                 }
             }
             console.log("Indiferente");
             
-
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
             graph.setSelectionCell(e_1);
         }
     }else{
@@ -1229,33 +1227,31 @@ function actualizarClaves(graph,cell){
             let relacion_s=new Relacion("Relacion_s");
             relacion_s.startArrow='uno_o_mas';
             relacion_s.endArrow='solo_uno';
-            for(let i=0;i<primaryKey_s.length;i++){
-                let column=addClaveForanea(graph,table,primaryKey_s[i],relacion_s);
-                relacion_s.clavesForaneas.push(column.getId());
-            }
-
             let e_1=clone.clone();
             editarRelacion(graph,e_1,relacion_s,table,table_s,false);
+            for(let i=0;i<primaryKey_s.length;i++){
+                let column=addClaveForanea(graph,table,primaryKey_s[i],e_1.getId());
+                relacion_s.clavesForaneas.push(column.getId());
+            }
 
             let relacion_t=new Relacion("Relacion_t");
             relacion_t.startArrow='uno_o_mas';
             relacion_t.endArrow='solo_uno';
-            for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table,primaryKey_t[i],relacion_t);
-                relacion_t.clavesForaneas.push(column.getId());
-            }
-
             let e_2=clone.clone();
             editarRelacion(graph,e_2,relacion_t,table,table_t,false);
+            for(let i=0;i<primaryKey_t.length;i++){
+                let column=addClaveForanea(graph,table,primaryKey_t[i],e_2.getId());
+                relacion_t.clavesForaneas.push(column.getId());
+            }
         }else{
             console.log("Clave en source");
+            let e_1=clone.clone();
+            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
             for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table_s,primaryKey_t[i],relacion);
+                let column=addClaveForanea(graph,table_s,primaryKey_t[i],e_1.getId());
                 relacion.clavesForaneas.push(column.getId());
             }
 
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
             graph.setSelectionCell(e_1);
         }
     }
@@ -1286,6 +1282,8 @@ function editarRelacion(graph,edge,relacion,source,target,invertir){
         relacion.startArrow=relacion.endArrow;
         relacion.endArrow=temp;
     }
+
+    relacion.clavesForaneas=[];
 
     edge.setValue(relacion);
     edge.setTerminal(source,true);
@@ -1624,7 +1622,7 @@ Column.prototype.autoIncrement=false;
 Column.prototype.notNull=false;
 Column.prototype.unique=false;
 Column.prototype.clone=function(){
-    return mxUtils.clone(this,['relacionAsociada']);
+    return mxUtils.clone(this);
 }
 Column.prototype.desc='DESCRIPCION';
 Column.prototype.titulo='TITULO';
