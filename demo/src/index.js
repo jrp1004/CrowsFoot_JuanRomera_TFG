@@ -1572,6 +1572,9 @@ function configurarTabEstilos(graph,cell){
             graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,colorPicker.value,[cell]);
         }else{
             graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
+            if(!gradientCheck.checked){
+                graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
+            }
         }
     });
     mxEvent.addListener(gradientPicker,'change',function(evt){
