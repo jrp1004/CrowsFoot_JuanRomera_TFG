@@ -581,6 +581,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             let textarea=document.createElement('textarea');
             textarea.style.width = '400px';
             textarea.style.height = '400px';
+            textarea.readOnly=true;
             //Obtenemos el encoder para un documento XML vacío
             //Con createXmlDocument obtenemos el docuemnto XML vacío
             let enc = new mxCodec(mxUtils.createXmlDocument());
@@ -606,6 +607,55 @@ function main(container,outline,toolbar,sidebar,status,properties){
         });
         addToolbarButton(editor,toolbar,'export','Export XML','../images/export1.png');
 
+        editor.addAction('import',function(editor,cell){
+            let div=document.createElement('div');
+            let textarea=document.createElement('textarea');
+            textarea.style.width = '400px';
+            textarea.style.height = '400px';
+            textarea.readOnly=true;
+            div.appendChild(textarea);
+            
+            let input=document.createElement('input');
+            input.type='file';
+            input.accept='text/xml';
+            div.appendChild(input);
+
+            mxEvent.addListener(input,'change',function(evt){
+                let nombre=input.value;
+                if(nombre.substring(nombre.lastIndexOf('.'))!='.xml'){
+                    input.value='';
+                    window.alert('Selecciona un fichero .xml');
+                    button.disabled=true;
+                }else{
+                    button.disabled=false;
+                    let file=evt.srcElement.files[0];
+
+                    let reader=new FileReader();
+                    reader.onload=function(e){
+                        let content=e.target.result;
+                        textarea.value=content;
+                    }
+                    reader.readAsText(file);
+                }
+            });
+
+            let button=document.createElement('button');
+            button.style.fontSize='10';
+            button.innerHTML='Importar';
+            button.disabled=true;
+            div.appendChild(button);
+            mxEvent.addListener(button,'click',function(evt){
+                if(confirm('¿Importar el grafo?')){
+                    let doc=mxUtils.parseXml(textarea.value);
+                    let dec=new mxCodec(doc);
+
+                    dec.decode(doc.documentElement,graph.getModel());
+                }
+            });
+
+            showModalWindow('IMPORTAR',div,410,480);
+        });
+        addToolbarButton(editor,toolbar,'import','Importar XML',null);
 
         addToolbarButton(editor,status,'collapseAll','Collapse All','../images/navigate_minus.png');
         addToolbarButton(editor,status,'expandAll','Expand All','../images/navigate_plus.png');
@@ -779,7 +829,7 @@ function addSidebarIcon(graph,sidebar,prototype,image){
                 }
             }
 
-            name=mxUtils.prompt('Introduce el nomrbe para la tabla nueva','TABLE'+(tableCount+1));
+            name=mxUtils.prompt('Introduce el nombre para la tabla nueva','TABLE'+(tableCount+1));
         }
 
         if(name!=null){
