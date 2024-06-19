@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./estilos.css" type="text/css">
+        <link rel="icon" type="image/x-icon" href="../images/crow-logo.png">
+        <script src="./index.js"></script>
+        <script type="text/javascript">mxBasePath="../mxgraph/javascript/src"</script>
+        <script type="text/javascript" src="../mxgraph/javascript/mxClient.js"></script>
+    </head>
+    <body onload="main(document.getElementById('graphContainer'),document.getElementById('outlineContainer'),document.getElementById('toolbarContainer'),document.getElementById('sidebarContainer'),document.getElementById('statusContainer'),document.getElementById('propertiesContainer'))">
+        <div id="iconoContainer" class="div-html">
+            <img src="../images/crow-logo.png" height="128px">
+        </div>
+        <div id="toolbarContainer" class="div-html"></div>
+        <div id="sidebarContainer" class="div-html">
+            <p class="titulo" style="font-size: 16px;">ELEMENTOS</p>
+            <div id="containerTabla" style="background-color: #ddd;">
+                <p class="titulo">TABLA</p>
+            </div>
+            <div id="containerColumna" style="background-color: #ddd;">
+                <p class="titulo">COLUMNA</p>
+            </div>
+            <br>
+            <hr>
+        </div>
+        <div id="graphContainer" class="div-html"></div>
+        <div id="outlineContainer" class="div-html"></div>
+        <div id="statusContainer" class="div-html"></div>
+        <div id="envoltorioProperties" class="div-html" style="background-color: #ccc;">
+            <div id="propertiesContainer" class="div-html" style="display: none;overflow-y: auto;">
+                <div id="propertiesTabs">
+                    <button id="propertiesEstilos" class="tab" onclick="openTabProperties(event,'estilos')">Estilos</button>
+                    <button id="propertiesDatos" class="tab" onclick="openTabProperties(event,'datos')">Datos</button>
+                </div>
+                <div id="propertiesContent">
+                    <div id="estilos" class="tabcontent">
+                        <br>
+                        <div>
+                            <p class="titulo">RELLENO</p>
+                            <table  style="table-layout: fixed;">
+                                <thead>
+                                    <tr>
+                                        <th>Propiedad</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Color</td>
+                                        <td><input type="color" id="colorPicker"></td>
+                                    </tr>
+                                    <tr id="degradado">
+                                        <td><input type="checkbox" id="gradientCheck">Degradado</td>
+                                        <td><input type="color" id="gradientPicker">
+                                            <select id="gradientDirection">
+                                                <option value="south">Sur</option>
+                                                <option value="north">Norte</option>
+                                                <option value="east">Este</option>
+                                                <option value="west">Oeste</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        <div>
+                            <p class="titulo">TEXTO</p>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Propiedad</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Fuente</td>
+                                        <td>
+                                            <select id="selectFont">
+                                                <option value="arial">Arial</option>
+                                                <option value="serif">Serif</option>
+                                                <option value="sans-serif">Sans-Serif</option>
+                                                <option value="tahoma">Tahoma</option>
+                                                <option value="verdana">Verdana</option>
+                                                <option value="dialog">Dialog</option>
+                                                <option value="times new roman">Times New Roman</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tamaño</td>
+                                        <td><input id="tamFont" type="number" min="1" max="999" style="width: 50px;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Color</td>
+                                        <td><input type="color" id="colorFontPicker"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Estilo</td>
+                                        <td style="margin: 8px;"><button class="buttonToolbar" id="negrita">N</button>&emsp;<button class="buttonToolbar" id="cursiva">K</button></td>
+                                    </tr>
+                                    <tr id="sombra">
+                                        <td>Sombra</td>
+                                        <td><input type="checkbox" id="shadowCheck"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="datos" class="tabcontent"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,209 @@
+/*Clase para los elementos añadidos en el html para que
+no se aplique a los elementos que se añaden en el js*/
+.div-html{
+    position: absolute;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+#toolbarContainer{
+    white-space: nowrap;
+    top: 0px;
+    left: 226px;
+    height: 48px;
+    right: 0px;
+    padding: 6px;
+    background-color: #ccc;
+    border-bottom: 2px solid #AAAAAA;
+}
+
+#sidebarContainer{
+    top: 142px;
+    left: 0px;
+    bottom: 62px;
+    width: 216px;
+    padding-top: 10px;
+    padding-left: 4px;
+    background-color: #ccc;
+    border-right: 2px solid #AAAAAA;
+    text-align: center;
+    padding-right: 4px;
+}
+
+#graphContainer{
+    top: 62px;
+    left: 226px;
+    bottom: 62px;
+    right: 260px;
+    background:url('../editors/images/grid.gif');
+}
+
+#outlineContainer{
+    top: 79px;
+    right: 265px;
+    width: 200px;
+    height: 140px;
+    background: transparent;
+    border-style: solid;
+    border-color: black;
+}
+
+#statusContainer{
+    text-align: right;
+    bottom: 0px;
+    left: 0px;
+    height: 48px;
+    right: 0px;
+    color: white;
+    padding: 6px;
+    background-color: #ccc;
+    border-top: 2px solid #AAAAAA;
+}
+
+#propertiesContainer{
+    top: 0px;
+    right: 0px;
+    bottom: 62px;
+    width: 260px;
+    max-width: 260px;
+    border-left: 1px solid #AAAAAA;
+    background-color: #ccc;
+}
+
+#envoltorioProperties{
+    top: 62px;
+    right: 0px;
+    bottom: 62px;
+    width: 260px;
+    max-width: 260px;
+    border-left: 2px solid #AAAAAA;
+    background-color: #ccc;
+}
+
+#propertiesTabs{
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
+.buttonToolbar {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #777777;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.buttonToolbar:hover {
+    background-color: #999999;
+    transform: translateY(-2px);
+}
+
+.buttonToolbar.active {
+    background-color: #242424;
+    transform: translateY(0);
+}
+
+.buttonToolbar:active {
+    background-color: #242424;
+    transform: translateY(0);
+}
+
+.tab{
+    background-color: inherit;
+    float: left;
+    border: none;
+    border-right: 1px solid #c6c6c6;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+}
+
+.tab:hover{
+    background-color: #ddd;
+}
+
+.tab.active{
+    background-color: #ccc;
+}
+
+.tabcontent{
+    display: none;
+}
+
+#propertiesContent{
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    text-align: left;
+    table-layout: auto;
+}
+  
+table thead th {
+    background-color: #f2f2f2;
+    border: 1px solid #dddddd;
+    padding: 10px;
+    text-transform: uppercase;
+}
+
+table tbody td {
+    border: 1px solid #dddddd;
+    padding: 6px;
+    vertical-align: middle;
+}
+
+
+input[type="text"], textarea {
+    width: calc(100% - 20px);
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 12px;
+}
+
+textarea {
+    resize: none;
+    min-height: 80px;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.titulo{
+    padding: 8px;
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: center;
+}
+
+#iconoContainer{
+    top: 0px;
+    left: 0px;
+    height: 140px;
+    width: 224px;
+    background-color: #bbb;
+    text-align: center;
+    border-right: 2px solid #AAAAAA;
+    border-bottom: 2px solid #AAAAAA;
+}
