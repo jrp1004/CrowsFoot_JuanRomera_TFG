@@ -229,12 +229,6 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
         //Establecemos el container del grafo y configuramos el editor
         editor.setGraphContainer(container);
-        /* //NO FUNCIONA
-        var config = mxUtils.load(
-            '../editors/config/keyhandler-minimal.xml').
-                getDocumentElement();
-        editor.configure(config);
-        */
 
         //Configuramos el layout automático para las columnas de la tabla
         //Establecemos que los hijos de las swimlanes deben ser dispuestos vertical u horizontalmente
@@ -279,13 +273,6 @@ function main(container,outline,toolbar,sidebar,status,properties){
         graph.isHtmlLabel=function(cell){
             return !this.isSwimlane(cell)&&!this.model.isEdge(cell);
         };
-
-        //No se pueden editar las aristas
-        /*
-        graph.isCellEditable=function(cell){
-            return !this.model.isEdge(cell);
-        };
-        */
 
         //Devuelve el campo name como etiqueta de la celda
         graph.convertValueToString=function(cell){
@@ -620,8 +607,10 @@ function main(container,outline,toolbar,sidebar,status,properties){
             input.accept='text/xml';
             div.appendChild(input);
 
+            //Comprobamos los cambios en el input
             mxEvent.addListener(input,'change',function(evt){
                 let nombre=input.value;
+                //Comprobamos que se trata de un fichero xml
                 if(nombre.substring(nombre.lastIndexOf('.'))!='.xml'){
                     input.value='';
                     window.alert('Selecciona un fichero .xml');
@@ -630,6 +619,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                     button.disabled=false;
                     let file=evt.srcElement.files[0];
 
+                    //Mostramos el texto del fichero en el textarea
                     let reader=new FileReader();
                     reader.onload=function(e){
                         let content=e.target.result;
@@ -639,13 +629,14 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 }
             });
 
+            //Botón para confirmar la importación del grafo
             let button=document.createElement('button');
             button.style.fontSize='10';
             button.innerHTML='Importar';
             button.disabled=true;
             div.appendChild(button);
             mxEvent.addListener(button,'click',function(evt){
-                if(confirm('¿Importar el grafo?')){
+                if(confirm('¿Importar el diagrama?')){
                     let doc=mxUtils.parseXml(textarea.value);
                     let dec=new mxCodec(doc);
 
@@ -689,6 +680,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             datosDiv.innerHTML='<br>';
             //Los últimos elementos seleccionados se encuentran en la propiedad removed del evento
             let cells=event.getProperty('removed');
+            //Eliminamos todos los listeners añadidos al panel de estilo
             mxEvent.removeAllListeners(document.getElementById('colorPicker'));
             mxEvent.removeAllListeners(document.getElementById('gradientPicker'));
             mxEvent.removeAllListeners(document.getElementById('gradientCheck'));
@@ -700,6 +692,8 @@ function main(container,outline,toolbar,sidebar,status,properties){
             mxEvent.removeAllListeners(document.getElementById('cursiva'));
             mxEvent.removeAllListeners(document.getElementById('shadowCheck'));
             //Comprobamos la longitud para evitar error con la selección múltiple
+            //Si se ha seleccionado una tabla, columna o enlace mostramos el panel de propiedades
+            //si no lo escondemos
             if(cells!=null&&cells.length>0){
                 properties.style.display="inline";
                 showProperties(graph,cells[0],datosDiv);
@@ -924,9 +918,7 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_GRADIENTCOLOR] = '#41B9F5';
     style[mxConstants.STYLE_FILLCOLOR] = '#8CCDF5';
     style[mxConstants.STYLE_SWIMLANE_FILLCOLOR] = '#ffffff';
-    //style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
     style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-    //style[mxConstants.STYLE_STROKEWIDTH] = '2';
     style[mxConstants.STYLE_STARTSIZE] = '28';
     style[mxConstants.STYLE_VERTICAL_ALIGN] = 'middle';
     style[mxConstants.STYLE_FONTSIZE] = '12';
@@ -958,6 +950,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
 
             menu.addSeparator();
 
+            //Si es columna añadimos la opción de subir y bajar
             if(graph.isHtmlLabel(cell)){
                 menu.addItem('Subir posición',null,function(){
                     let posicion=(cell.geometry.y-28)/26;
@@ -969,6 +962,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         let value_cell=cell.value.clone();
                         let temp_style=col_encima.getStyle();
 
+                        //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
                         if(col_encima.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
                             intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
                             intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
@@ -982,11 +976,14 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                             }
                         }
 
+                        //Intercambiamos valores
                         graph.model.setValue(col_encima,value_cell);
                         graph.model.setValue(cell,value_encima);
+                        //Intercambiamos estilos
                         col_encima.setStyle(cell.getStyle());
                         cell.setStyle(temp_style);
 
+                        //Seleccionamos la celda que hemos movido
                         graph.setSelectionCell(col_encima);
                     }
 
@@ -1002,6 +999,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         let value_cell=cell.value.clone();
                         let temp_style=col_debajo.getStyle();
 
+                        //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
                         if(col_debajo.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
                             intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
                             intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
@@ -1066,6 +1064,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     })
 }
 
+//Asociamos el id de la nueva columna a la relación correspondiente
 function intercambioIds(graph,relacionId,nuevo,actual){
     let relacion=graph.model.getCell(relacionId);
     let clavesForaneas=relacion.value.clavesForaneas;
@@ -1199,6 +1198,7 @@ function showProperties(graph,cell,properties){
     c_valor.outerHTML='<th>Valor</th>';
 }
 
+//Actualizamos las claves cuando se cambia la relación entre 2 tablas
 function actualizarClaves(graph,cell){
     let relacion=cell.value.clone();
 
@@ -1307,6 +1307,7 @@ function actualizarClaves(graph,cell){
     }
 }
 
+//Añade la columna pasada como clave primaria como clave foranea a la tabla indicada
 function addClaveForanea(graph,table,key,relacionAsociada){
     let columnObject=new Column("COLUMNA");
     let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
@@ -1326,6 +1327,7 @@ function addClaveForanea(graph,table,key,relacionAsociada){
     return column;
 }
 
+//Condifgura el nuevo enlace
 function editarRelacion(graph,edge,relacion,source,target,invertir){
     if(invertir){
         let temp=relacion.startArrow;
@@ -1467,6 +1469,7 @@ function configurarTabEstilos(graph,cell){
 
     let shadowCheck=document.getElementById('shadowCheck');
 
+    //Comprobamos si el degradado está activo
     if(!gradientCheck.checked){
         gradientPicker.style.display="none";
         selectGradientDirection.style.display="none";
@@ -1475,6 +1478,7 @@ function configurarTabEstilos(graph,cell){
         selectGradientDirection.style.display="inline";
     }
 
+    //La propiedad sombra sólo se aplica a las tablas
     if(graph.isSwimlane(cell)){
         shadowCheck.style.display="inline";
         document.getElementById('sombra').style.display="table-row";
@@ -1483,6 +1487,7 @@ function configurarTabEstilos(graph,cell){
         document.getElementById('sombra').style.display="none";
     }
 
+    //El degradado no se aplica a los enlaces
     if(graph.model.isEdge(cell)){
         document.getElementById('degradado').style.display="none";
     }else{
@@ -1491,7 +1496,10 @@ function configurarTabEstilos(graph,cell){
 
     let style=graph.getStylesheet().getCellStyle(cell.style);
 
+    //Comprobamos si el estilo de la celda está vacío
     if(style!=null){
+        //Si no está vacío obtenemos los valores almacenados poniendo valores por defecto
+        //a los no almacenados
         let fillColor;
         if(graph.model.isEdge(cell)){
             fillColor=style[mxConstants.STYLE_STROKECOLOR];
@@ -1553,6 +1561,7 @@ function configurarTabEstilos(graph,cell){
         }
         shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
     }else{
+        //Valores por defecto si el estilo está vacío
         if(graph.model.isEdge(cell)){
             colorFontPicker.value='#446299';
             colorPicker.value='#6482B9';
@@ -1567,6 +1576,7 @@ function configurarTabEstilos(graph,cell){
         shadowCheck.checked=false;
     }
 
+    //Listeners para los elementos que editan el estilo
     mxEvent.addListener(colorPicker,'change',function(evt){
         if(graph.model.isEdge(cell)){
             graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,colorPicker.value,[cell]);
@@ -1633,6 +1643,7 @@ function configurarTabEstilos(graph,cell){
     });
 }
 
+//Obtenemos el valor del select según el índice
 function getSelectIndex(options,value){
     for(let i=0;i<options.length;i++){
         if(options[i].value===value){
