@@ -326,77 +326,15 @@ function main(container,outline,toolbar,sidebar,status,properties){
                     style=graph.getStylesheet().getDefaultVertexStyle();
                 }
 
-                let fontfamily;
-                if(style[mxConstants.STYLE_FONTFAMILY]){
-                    fontfamily=style[mxConstants.STYLE_FONTFAMILY];
-                }else{
-                    //La fuente por defecto es arial
-                    fontfamily="arial";
-                }
-
-                let size=style[mxConstants.STYLE_FONTSIZE];
-
-                let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
-                let fontstyle="";
-                if(fontstyle_n&mxConstants.FONT_BOLD){
-                    fontstyle+="bold ";
-                }
-                if(fontstyle_n&mxConstants.FONT_ITALIC){
-                    fontstyle+="italic ";
-                }
-
-                const font=fontstyle+size+"pt "+fontfamily
-
-
                 let nueva_etiqueta=cell.value.name+": "+cell.value.type;
-                const nombre=cell.value.name;
-
-                if(getTextWidth(nueva_etiqueta,font)>cell.geometry.width){
-                    for(let i=nombre.length;i>0;i--){
-                        let etiqueta_temp=nombre.slice(0,i)+"..."+": "+cell.value.type;
-                        if(getTextWidth(etiqueta_temp,font)<cell.geometry.width){
-                            nueva_etiqueta=etiqueta_temp;
-                            break;
-                        }
-                    }
-                }
-
-                return label+mxUtils.htmlEntities(nueva_etiqueta,false);
+                let etiqueta_final=obtenerEtiquetaRecortada(nueva_etiqueta,cell.value.type,style,cell.geometry.width,true);
+                return label+mxUtils.htmlEntities(etiqueta_final,false);
             }else{
                 if(this.isSwimlane(cell)){
                     let label=cell.value.name;
 
                     const style=graph.getStylesheet().getCellStyle(cell.style);
-
-                    let fontfamily;
-                    if(style[mxConstants.STYLE_FONTFAMILY]){
-                        fontfamily=style[mxConstants.STYLE_FONTFAMILY];
-                    }else{
-                        //La fuente por defecto es arial
-                        fontfamily="arial";
-                    }
-
-                    let size=style[mxConstants.STYLE_FONTSIZE];
-
-                    let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
-                    let fontstyle="";
-                    if(fontstyle_n&mxConstants.FONT_BOLD){
-                        fontstyle+="bold ";
-                    }
-                    if(fontstyle_n&mxConstants.FONT_ITALIC){
-                        fontstyle+="italic ";
-                    }
-
-                    const font=fontstyle+size+"pt "+fontfamily;
-
-                    if(getTextWidth(label,font)>cell.geometry.width){
-                        for(let i=label.length-1;i>0;i--){
-                            let nueva_etiqueta=label.slice(0,i)+"...";
-                            if(getTextWidth(nueva_etiqueta,"bold 12pt arial")<cell.geometry.width){
-                                return nueva_etiqueta;
-                            }
-                        }
-                    }
+                    return obtenerEtiquetaRecortada(label,null,style,cell.geometry.width,false);
                 }
             }
 
@@ -1670,6 +1608,46 @@ function descarga(texto,nombre){
             window.URL.revokeObjectURL(url);
         }, 0);
     }
+}
+
+function obtenerEtiquetaRecortada(label,type,style,width,columna){
+    let fontfamily;
+    if(style[mxConstants.STYLE_FONTFAMILY]){
+        fontfamily=style[mxConstants.STYLE_FONTFAMILY];
+    }else{
+        //La fuente por defecto es arial
+        fontfamily="arial";
+    }
+
+    let size=style[mxConstants.STYLE_FONTSIZE];
+
+    let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
+    let fontstyle="";
+    if(fontstyle_n&mxConstants.FONT_BOLD){
+        fontstyle+="bold ";
+    }
+    if(fontstyle_n&mxConstants.FONT_ITALIC){
+        fontstyle+="italic ";
+    }
+
+    const font=fontstyle+size+"pt "+fontfamily;
+    let nombre=label.split(':')[0];
+    if(getTextWidth(label,font)>width){
+        for(let i=nombre.length;i>0;i--){
+            let etiqueta_temp;
+            if(columna){
+                etiqueta_temp=nombre.slice(0,i)+"..."+": "+type;
+            }else{
+                etiqueta_temp=label.slice(0,i)+"...";
+            }
+            if(getTextWidth(etiqueta_temp,font)<width){
+                return etiqueta_temp;
+            }
+        }
+    }
+
+    //La etiqueta no necesita cambios
+    return label;
 }
 
 
