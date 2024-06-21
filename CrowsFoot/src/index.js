@@ -1152,97 +1152,74 @@ function actualizarClaves(graph,cell){
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_t,table_s,true);
-
-            for(let i=0;i<primaryKey_s.length;i++){
-                let column=addClaveForanea(graph,table_t,primaryKey_s[i],e_1.getId());
-                relacion.clavesForaneas.push(column.getId());
-            }
-
-            graph.setSelectionCell(e_1);
+            insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true);
         }else{
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
             if(relacion.endArrow==='cero_o_uno'){
-                for(let i=0;i<primaryKey_t.length;i++){
-                    let column=addClaveForanea(graph,table_t,primaryKey_s[i],e_1.getId());
-                    relacion.clavesForaneas.push(column.getId());
-                }
+                insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true);
             }else{
-                //Si la parte opcional no está en el target asumimos que o está
-                //en source o es indiferente donde esté la clave
-                for(let i=0;i<primaryKey_t.length;i++){
-                    let column=addClaveForanea(graph,table_s,primaryKey_t[i],e_1.getId());
-                    relacion.clavesForaneas.push(column.getId());
-                }
+                insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
             }
             console.log("Indiferente");
-            
-            graph.setSelectionCell(e_1);
         }
     }else{
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Tabla intermedia");
-
-            //Calculamos donde colocar la nueva tabla
-            let distancia=table_t.geometry.x-(table_s.geometry.x+200);
-
-            let x=table_t.geometry.x-100-distancia/2;
-            let y=table_s.geometry.y<table_t.geometry.y?table_t.geometry.y:table_s.geometry.y;
-
-            //Creamos nueva tabla para la relación
-            let tableObject=new Table(table_s.value.name+'_'+table_t.value.name);
-            let table=new mxCell(tableObject,new mxGeometry(x,y,200,28),'table');
-    
-            table.setVertex(true);
-
-            let columnObject=new Column("COLUMNA");
-            let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
-            column.setVertex(true);
-            column.setConnectable(false);
-            let firstColumn=column.clone();
-            firstColumn.value.name=tableObject.name+'_ID';
-            firstColumn.value.type='INTEGER';
-            firstColumn.value.primaryKey=true;
-            firstColumn.value.autoIncrement=true;
-            //Insertamos la celda columna en la tabla
-            table.insert(firstColumn);
-            //Añadimos la tabla intermedia al grafo
+            let nombre=table_s.value.name+'_'+table_t.value.name;
+            let table=obtenerTablaIntermedia(table_s.geometry,table_t.geometry,nombre);
             graph.addCell(table,graph.getDefaultParent());
 
             //Claves foraneas
             let relacion_s=new Relacion("Relacion_s");
             relacion_s.startArrow='uno_o_mas';
             relacion_s.endArrow='solo_uno';
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion_s,table,table_s,false);
-            for(let i=0;i<primaryKey_s.length;i++){
-                let column=addClaveForanea(graph,table,primaryKey_s[i],e_1.getId());
-                relacion_s.clavesForaneas.push(column.getId());
-            }
+            insertarNuevaRelacion(graph,clone.clone(),relacion_s,table,table_s,primaryKey_s,false);
 
             let relacion_t=new Relacion("Relacion_t");
             relacion_t.startArrow='uno_o_mas';
             relacion_t.endArrow='solo_uno';
-            let e_2=clone.clone();
-            editarRelacion(graph,e_2,relacion_t,table,table_t,false);
-            for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table,primaryKey_t[i],e_2.getId());
-                relacion_t.clavesForaneas.push(column.getId());
-            }
+            insertarNuevaRelacion(graph,clone.clone(),relacion_t,table,table_t,primaryKey_t,false);
+            graph.setSelectionCell(table);
         }else{
             console.log("Clave en source");
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
-            for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table_s,primaryKey_t[i],e_1.getId());
-                relacion.clavesForaneas.push(column.getId());
-            }
-
-            graph.setSelectionCell(e_1);
+            insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
         }
     }
+}
+
+function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir){
+    editarRelacion(graph,enlace,relacion,source,target,invertir);
+    for(let i=0;i<pks.length;i++){
+        let column=addClaveForanea(graph,source,pks[i],enlace.getId());
+        relacion.clavesForaneas.push(column.getId());
+    }
+    graph.setSelectionCell(enlace);
+}
+
+function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
+    let distancia=geometry_t.x-(geometry_s.x+200);
+
+    let x=geometry_t.x-100-distancia/2;
+    let y=geometry_s.y<geometry_t.y?geometry_t.y:geometry_s.y;
+
+    //Creamos nueva tabla para la relación
+    let tableObject=new Table(nombre);
+    let table=new mxCell(tableObject,new mxGeometry(x,y,200,28),'table');
+
+    table.setVertex(true);
+
+    let columnObject=new Column("COLUMNA");
+    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+    column.setVertex(true);
+    column.setConnectable(false);
+    let firstColumn=column.clone();
+    firstColumn.value.name=tableObject.name+'_ID';
+    firstColumn.value.type='INTEGER';
+    firstColumn.value.primaryKey=true;
+    firstColumn.value.autoIncrement=true;
+    //Insertamos la celda columna en la tabla
+    table.insert(firstColumn);
+
+    return table;
 }
 
 //Añade la columna pasada como clave primaria como clave foranea a la tabla indicada
