@@ -1385,34 +1385,16 @@ function configurarTabEstilos(graph,cell){
     let colorPicker=document.getElementById("colorPicker"); //Cambio de color
     let gradientPicker=document.getElementById("gradientPicker"); //Cambio degradado
     let gradientCheck=document.getElementById("gradientCheck");
-    gradientCheck.checked=cell.value.gradient;
     let selectGradientDirection=document.getElementById("gradientDirection")
-
     let selectFont=document.getElementById("selectFont");
     let tamFont=document.getElementById("tamFont");
     let colorFontPicker=document.getElementById('colorFontPicker');
     let negritaButton=document.getElementById('negrita');
     let cursivaButton=document.getElementById('cursiva');
-
     let shadowCheck=document.getElementById('shadowCheck');
 
-    //Comprobamos si el degradado está activo
-    if(!gradientCheck.checked){
-        gradientPicker.style.display="none";
-        selectGradientDirection.style.display="none";
-    }else{
-        gradientPicker.style.display="inline";
-        selectGradientDirection.style.display="inline";
-    }
-
-    //La propiedad sombra sólo se aplica a las tablas
-    if(graph.isSwimlane(cell)){
-        shadowCheck.style.display="inline";
-        document.getElementById('sombra').style.display="table-row";
-    }else{
-        shadowCheck.style.display="none";
-        document.getElementById('sombra').style.display="none";
-    }
+    inicializarGradientCheck(gradientCheck,gradientPicker,selectGradientDirection,cell.value.gradient);
+    inicializarSombra(graph.isSwimlane(cell),shadowCheck);
 
     //El degradado no se aplica a los enlaces
     if(graph.model.isEdge(cell)){
@@ -1422,152 +1404,197 @@ function configurarTabEstilos(graph,cell){
     }
 
     let style=graph.getStylesheet().getCellStyle(cell.style);
+    setEstilosIniciales(style,graph.model.isEdge(cell),{
+        colorPicker,
+        gradientPicker,
+        gradientCheck,
+        selectGradientDirection,
+        selectFont,
+        tamFont,
+        colorFontPicker,
+        negritaButton,
+        cursivaButton,
+        shadowCheck
+    });
+    setListenersEstilos(graph,graph.model.isEdge(cell),cell,{
+        colorPicker,
+        gradientPicker,
+        gradientCheck,
+        selectGradientDirection,
+        selectFont,
+        tamFont,
+        colorFontPicker,
+        negritaButton,
+        cursivaButton,
+        shadowCheck
+    });
+}
 
-    //Comprobamos si el estilo de la celda está vacío
-    if(style!=null){
-        //Si no está vacío obtenemos los valores almacenados poniendo valores por defecto
-        //a los no almacenados
-        let fillColor;
-        if(graph.model.isEdge(cell)){
-            fillColor=style[mxConstants.STYLE_STROKECOLOR];
-        }else{
-            fillColor=style[mxConstants.STYLE_FILLCOLOR];
-        }
-        if(fillColor===undefined||fillColor===null){
-            if(graph.model.isEdge(cell)){
-                colorPicker.value='#6482B9';
-            }else{
-                colorPicker.value='#ffffff';
-            }
-        }else{
-            colorPicker.value=fillColor;
-        }
-
-        let gradientColor=style[mxConstants.STYLE_GRADIENTCOLOR];
-        if(gradientColor===undefined||gradientColor===null){
-            gradientPicker.value='#ffffff';
-        }else{
-            gradientPicker.value=gradientColor;
-        }
-        selectGradientDirection.options.selectedIndex=getSelectIndex(selectGradientDirection.options,style[mxConstants.STYLE_GRADIENT_DIRECTION]);
-
-        selectFont.options.selectedIndex=getSelectIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
-        let tam=style[mxConstants.STYLE_FONTSIZE];
-        if(tam===undefined||tam===null){
-            tam='11';
-        }else{
-            tamFont.value=tam;
-        }
-
-        let fontColor=style[mxConstants.STYLE_FONTCOLOR];
-        if(fontColor===undefined||fontColor===null){
-            if(graph.model.isEdge(cell)){
-                colorFontPicker.value='#446299';
-            }else{
-                colorFontPicker.value='#000000';
-            }
-        }else{
-            colorFontPicker.value=fontColor;
-        }
-
-        let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
-        if(fontStyle===undefined||fontStyle===null){
-            negritaButton.className=negritaButton.className.replace(" active","");
-            cursivaButton.className=cursivaButton.className.replace(" active","");
-        }else{
-            if(fontStyle&mxConstants.FONT_BOLD){
-                negritaButton.className+=" active";
-            }else{
-                negritaButton.className=negritaButton.className.replace(" active","");
-            }
-            if(fontStyle&mxConstants.FONT_ITALIC){
-                cursivaButton.className+=" active";
-            }else{
-                cursivaButton.className=cursivaButton.className.replace(" active","");
-            }
-        }
-        shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
+function inicializarGradientCheck(gradientCheck,gradientPicker,gradientDirection,activado){
+    gradientCheck.checked=activado;
+    if(!activado){
+        gradientPicker.style.display="none";
+        gradientDirection.style.display="none";
     }else{
-        //Valores por defecto si el estilo está vacío
-        if(graph.model.isEdge(cell)){
-            colorFontPicker.value='#446299';
-            colorPicker.value='#6482B9';
-        }else{
-            colorPicker.value="#ffffff";
-            colorFontPicker.value='#000000'
-        }
-        gradientPicker.value="#ffffff";
-        selectFont.options.selectedIndex=0;
-        selectGradientDirection.options.selectedIndex=0;
-        tamFont.value='11';
-        shadowCheck.checked=false;
+        gradientPicker.style.display="inline";
+        gradientDirection.style.display="inline";
+    }
+}
+
+function inicializarSombra(tabla,shadowCheck){
+    if(tabla){
+        shadowCheck.style.display="inline";
+        document.getElementById('sombra').style.display="table-row";
+    }else{
+        shadowCheck.style.display="none";
+        document.getElementById('sombra').style.display="none";
     }
 
-    //Listeners para los elementos que editan el estilo
+}
+
+function setEstilosIniciales(style,enlace,elementos){
+    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
+    }=elementos;
+
+    if(style!=null){
+        setColorPicker(style,colorPicker,enlace);
+        setGradientPicker(style,gradientPicker);
+        selectGradientDirection.options.selectedIndex=getSelectIndex(selectGradientDirection.options,style[mxConstants.STYLE_GRADIENT_DIRECTION]);
+        selectFont.options.selectedIndex=getSelectIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
+        setTamFont(style,tamFont);
+        setColorFontPicker(style,colorFontPicker,enlace);
+        setFontStyle(style,negritaButton,cursivaButton);
+        shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
+    }else{
+        setEstilosDefault(enlace,elementos);
+    }
+}
+
+function setColorPicker(style,colorPicker,enlace){
+    //Si es enlace la propiedad es stroke si no fill
+    let fillColor=enlace?style[mxConstants.STYLE_STROKECOLOR]:style[mxConstants.STYLE_FILLCOLOR];
+    colorPicker.value=fillColor||(enlace?'#6482B9':'#ffffff');
+}
+
+function setGradientPicker(style,gradientPicker){
+    let gradientColor=style[mxConstants.STYLE_GRADIENTCOLOR];
+    gradientPicker.value=gradientColor||'#FFFFFF';
+}
+
+function setTamFont(style,tamFont){
+    let tam=style[mxConstants.STYLE_FONTSIZE];
+    tamFont.value=tam||'11';
+}
+
+function setColorFontPicker(style,colorFontPicker,enlace){
+    let fontColor=style[mxConstants.STYLE_FONTCOLOR];
+    colorFontPicker.value=fontColor||(enlace?'#446299':'#000000');
+}
+
+function setFontStyle(style,negritaButton,cursivaButton){
+    let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
+    if(fontStyle===undefined||fontStyle===null){
+        negritaButton.className=negritaButton.className.replace(" active","");
+        cursivaButton.className=cursivaButton.className.replace(" active","");
+    }else{
+        toggleButtonActiveStyle(negritaButton,fontStyle&mxConstants.FONT_BOLD);
+        toggleButtonActiveStyle(cursivaButton,fontStyle&mxConstants.FONT_ITALIC);
+    }
+}
+
+function toggleButtonActiveStyle(button,activo){
+    if(activo){
+        button.className+=' active';
+    }else{
+        button.className=button.className.replace(" active","");
+    }
+}
+
+function setEstilosDefault(enlace,elementos){
+    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
+    }=elementos;
+
+    //Valores por defecto si el estilo está vacío
+    if(enlace){
+        colorFontPicker.value='#446299';
+        colorPicker.value='#6482B9';
+    }else{
+        colorPicker.value="#ffffff";
+        colorFontPicker.value='#000000'
+    }
+    gradientPicker.value="#ffffff";
+    selectFont.options.selectedIndex=0;
+    selectGradientDirection.options.selectedIndex=0;
+    tamFont.value='11';
+    shadowCheck.checked=false;
+    negritaButton.className=negritaButton.className.replace(" active","");
+    cursivaButton.className=cursivaButton.className.replace(" active","");
+}
+
+function setListenersEstilos(graph,enlace,cell,elementos){
+    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
+    }=elementos;
+
     mxEvent.addListener(colorPicker,'change',function(evt){
-        if(graph.model.isEdge(cell)){
-            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,colorPicker.value,[cell]);
-        }else{
-            graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
-            if(!gradientCheck.checked){
-                graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
-            }
-        }
+        handleColorPickerChange(graph,enlace,colorPicker,gradientCheck);
     });
     mxEvent.addListener(gradientPicker,'change',function(evt){
-        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value);
     });
     mxEvent.addListener(gradientCheck,'change',function(evt){
-        cell.value.gradient=gradientCheck.checked;
-        if(!gradientCheck.checked){
-            gradientPicker.style.display="none";
-            selectGradientDirection.style.display="none";
-            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
-        }else{
-            gradientPicker.style.display="inline";
-            selectGradientDirection.style.display="inline";
-            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
-        }
+        handleGradientCheckChange(graph,gradientCheck,gradientPicker,selectGradientDirection,cell);
     });
     mxEvent.addListener(selectFont,'change',function(evt){
-        graph.setCellStyles(mxConstants.STYLE_FONTFAMILY,selectFont.value,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_FONTFAMILY,selectFont.value);
     });
     mxEvent.addListener(selectGradientDirection,'change',function(evt){
-        graph.setCellStyles(mxConstants.STYLE_GRADIENT_DIRECTION,selectGradientDirection.value,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_GRADIENT_DIRECTION,selectGradientDirection.value);
     });
     mxEvent.addListener(tamFont,'change',function(evt){
-        let tam=tamFont.value;
-        if(tam>1000){
-            tam=999;
-        }else if(tam<1){
-            tam=1;
-        }
-        graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tam,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tamFont.value);
     });
     mxEvent.addListener(colorFontPicker,'change',function(evt){
-        graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,colorFontPicker.value,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,colorFontPicker.value);
     });
     mxEvent.addListener(negritaButton,'click',function(evt){
-        graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_BOLD,[cell]);
-        let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
-        if(fontStyle&mxConstants.FONT_BOLD){
-            negritaButton.className+=" active";
-        }else{
-            negritaButton.className=negritaButton.className.replace(" active","");
-        }
+        handleFontStyleButtonClick(graph,cell,negritaButton,mxConstants.FONT_BOLD);
     });
     mxEvent.addListener(cursivaButton,'click',function(evt){
-        graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_ITALIC,[cell]);
-        let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
-        if(fontStyle&mxConstants.FONT_ITALIC){
-            cursivaButton.className+=" active";
-        }else{
-            cursivaButton.className=cursivaButton.className.replace(" active","");
+        handleFontStyleButtonClick(graph,cell,cursivaButton,mxConstants.FONT_ITALIC);
+    });
+}
+
+function handleColorPickerChange(graph,enlace,colorPicker,gradientCheck){
+    if(enlace){
+        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,colorPicker.value);
+    }else{
+        graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value);
+        if(!gradientCheck.checked){
+            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value);
         }
-    });
-    mxEvent.addListener(shadowCheck,'change',function(evt){
-        graph.toggleCellStyle(mxConstants.STYLE_SHADOW,cell);
-    });
+    }
+}
+
+function handleGradientCheckChange(graph,gradientCheck,gradientPicker,selectGradientDirection,cell){
+    cell.value.gradient=gradientCheck.checked;
+    if(!gradientCheck.checked){
+        gradientPicker.style.display="none";
+        selectGradientDirection.style.display="none";
+        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value);
+    }else{
+        gradientPicker.style.display="inline";
+        selectGradientDirection.style.display="inline";
+        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value);
+    }
+}
+
+function handleFontStyleButtonClick(graph,cell,button,styleFlag){
+    graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,styleFlag);
+    let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
+    toggleButtonActiveStyle(button,fontStyle&styleFlag);
 }
 
 //Obtenemos el valor del select según el índice
