@@ -1287,58 +1287,70 @@ function createSql(graph){
         let child=graph.model.getChildAt(parent,i);
 
         if(!graph.model.isEdge(child)){
-            sql.push('CREATE TABLE IF NOT EXISTS '+child.value.name+' (');
-            let columnCount=graph.model.getChildCount(child);
-
-            let pks=' PRIMARY KEY(';
-            let pks_num=0;
-            let fks=' FOREIGN KEY(';
-            let fks_num=0;
-
-            if(columnCount>0){
-                for(let j=0;j<columnCount;j++){
-                    let column=graph.model.getChildAt(child,j).value;
-                    sql.push('\n '+column.name+' '+column.type);
-                    if(column.notNull){
-                        sql.push(' NOT NULL');
-                    }
-                    if(column.primaryKey){
-                        pks+=column.name+', ';
-                        pks_num++;
-                    }
-                    if(column.foreignKey){
-                        fks+=column.name+', ';
-                        fks_num++;
-                    }
-                    if(column.autoIncrement){
-                        sql.push(' AUTOINCREMENT');
-                    }
-                    if(column.unique){
-                        sql.push(' UNIQUE');
-                    }
-                    if(column.defaultValue!=null){
-                        sql.push(' DEFAULT '+column.defaultValue);
-                    }
-
-                    sql.push(',');
-                }
-
-                //Añadimos las claves
-                if(pks_num>0){
-                    sql.push('\n'+pks.substring(0,pks.length-2)+')');
-                    sql.push(',');
-                }
-                if(fks_num>0){
-                    sql.push('\n'+fks.substring(0,fks.length-2)+')');
-                }else{
-                    sql.splice(sql.length-1,1);
-                }
-
-                sql.push('\n);');
-            }
-            sql.push('\n');
+            sql.push(addTablaSql(graph,child))
         }
     }
+    return sql.join('');
+}
+
+function addTablaSql(graph,tabla){
+    const sql=[];
+
+    sql.push('CREATE TABLE IF NOT EXISTS '+tabla.value.name+' (');
+    let columnCount=graph.model.getChildCount(tabla);
+
+    let pks=' PRIMARY KEY(';
+    let pks_num=0;
+    let fks=' FOREIGN KEY(';
+    let fks_num=0;
+
+    if(columnCount>0){
+        for(let j=0;j<columnCount;j++){
+            let columna=graph.model.getChildAt(tabla,j).value;
+            sql.push(addColumnaSql(columna));
+            sql.join('');
+            if(columna.primaryKey){
+                pks+=columna.name+', ';
+                pks_num++;
+            }
+            if(columna.foreignKey){
+                fks+=columna.name+', ';
+                fks_num++;
+            }
+        }
+        //Añadimos las claves
+        if(pks_num>0){
+            sql.push('\n'+pks.substring(0,pks.length-2)+')');
+            sql.push(',');
+        }
+        if(fks_num>0){
+            sql.push('\n'+fks.substring(0,fks.length-2)+')');
+        }else{
+            sql.splice(sql.length-1,1);
+        }
+
+        sql.push('\n);');
+    }
+    sql.push('\n');
+    return sql.join('');
+}
+
+function addColumnaSql(columna){
+    const sql=[];
+    sql.push('\n '+columna.name+' '+columna.type);
+    if(columna.notNull){
+        sql.push(' NOT NULL');
+    }
+    if(columna.autoIncrement){
+        sql.push(' AUTOINCREMENT');
+    }
+    if(columna.unique){
+        sql.push(' UNIQUE');
+    }
+    if(columna.defaultValue!=null){
+        sql.push(' DEFAULT '+columna.defaultValue);
+    }
+    sql.push(',');
     return sql.join('');
 }
 
