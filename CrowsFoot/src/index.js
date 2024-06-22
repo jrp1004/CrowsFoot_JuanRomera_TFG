@@ -467,10 +467,14 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
             document.getElementById('propertiesDatos').click();
         });
+        editor.addAction('clear',function(editor,cell){
+            editor.graph.getModel().clear();
+        });
         
         //Añadimos el resto de botones
         //Para estos botones no hace falta añadir funciones puesto que ya están definidas en el editor
         addToolbarButton(editor,toolbar,'delete','Delete','../images/delete2.png');
+        addToolbarButton(editor,toolbar,'clear','Borrar todo','../images/delete2.png');
         toolbar.appendChild(spacer.cloneNode(true));
 
         addToolbarButton(editor,toolbar,'undo','','../images/undo.png');
