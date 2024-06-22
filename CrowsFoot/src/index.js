@@ -1051,6 +1051,8 @@ function showProperties(graph,cell,properties){
             }else{
                 clone.defaultValue=null;
             }
+
+            let old_primaryKey=clone.primaryKey;
     
             clone.primaryKey=primaryKeyField.checked;
             clone.foreignKey=foreignKeyField.checked;
@@ -1062,6 +1064,7 @@ function showProperties(graph,cell,properties){
             clone.desc=descripcion.value;
     
             graph.model.setValue(cell,clone);
+            handleNuevaClavePrimaria(graph,graph.getModel().getParent(cell),old_primaryKey,clone.primaryKey);
         });
     }else{
         //ENLACE
@@ -1134,6 +1137,17 @@ function showProperties(graph,cell,properties){
     c_propiedad.outerHTML='<th>Propiedad</th>';
     let c_valor=fila.insertCell(1);
     c_valor.outerHTML='<th>Valor</th>';
+}
+
+function handleNuevaClavePrimaria(graph,tabla,oldValue,newValue){
+    //Comprobamos que el valor cambia
+    if(oldValue!=newValue){
+        //Actualizamos las relaciones entrantes
+        let relaciones=graph.getEdges(tabla,null,true,false);
+        for(let rel of relaciones){
+            actualizarClaves(graph,rel);
+        }
+    }
 }
 
 //Actualizamos las claves cuando se cambia la relación entre 2 tablas
@@ -1564,6 +1578,9 @@ function setListenersEstilos(graph,enlace,cell,elementos){
     });
     mxEvent.addListener(cursivaButton,'click',function(evt){
         handleFontStyleButtonClick(graph,cell,cursivaButton,mxConstants.FONT_ITALIC);
+    });
+    mxEvent.addListener(shadowCheck,'change',function(evt){
+        graph.toggleCellStyle(mxConstants.STYLE_SHADOW);
     });
 }
 
