@@ -468,7 +468,9 @@ function main(container,outline,toolbar,sidebar,status,properties){
             document.getElementById('propertiesDatos').click();
         });
         editor.addAction('clear',function(editor,cell){
-            editor.graph.getModel().clear();
+            if(confirm('¿Eliminar todos los elementos del diagrama?')){
+                editor.graph.getModel().clear();
+            }
         });
         
         //Añadimos el resto de botones
