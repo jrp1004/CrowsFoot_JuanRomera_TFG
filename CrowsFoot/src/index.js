@@ -275,7 +275,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
         //Devuelve el campo name como etiqueta de la celda
         graph.convertValueToString=function(cell){
-            if(cell.value!=null&&cell.value.name!=null){
+            if(cell.value?.name){
                 return cell.value.name;
             }
 
@@ -328,13 +328,11 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 let nueva_etiqueta=cell.value.name+": "+cell.value.type;
                 let etiqueta_final=obtenerEtiquetaRecortada(nueva_etiqueta,cell.value.type,style,cell.geometry.width,true);
                 return label+mxUtils.htmlEntities(etiqueta_final,false);
-            }else{
-                if(this.isSwimlane(cell)){
+            }else if(this.isSwimlane(cell)){
                     let label=cell.value.name;
 
                     const style=graph.getStylesheet().getCellStyle(cell.style);
                     return obtenerEtiquetaRecortada(label,null,style,cell.geometry.width,false);
-                }
             }
 
             return mxGraph.prototype.getLabel.apply(this,arguments);
@@ -901,14 +899,10 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         if(col_encima.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
                             intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
                             intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                        }else{
-                            if(col_encima.value.relacionAsociada!=null){
-                                intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                            }else{
-                                if(cell.value.relacionAsociada!=null){
-                                    intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
-                                }
-                            }
+                        }else if(col_encima.value.relacionAsociada!=null){
+                            intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
+                        }else if(cell.value.relacionAsociada!=null){
+                            intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
                         }
 
                         //Intercambiamos valores
@@ -938,14 +932,10 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         if(col_debajo.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
                             intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
                             intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                        }else{
-                            if(col_debajo.value.relacionAsociada!=null){
-                                intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                            }else{
-                                if(cell.value.relacionAsociada!=null){
-                                    intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
-                                }
-                            }
+                        }else if(col_debajo.value.relacionAsociada!=null){
+                            intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
+                        }else if(cell.value.relacionAsociada!=null){
+                            intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
                         }
 
                         graph.model.setValue(col_debajo,value_cell);
@@ -1059,66 +1049,64 @@ function showProperties(graph,cell,properties){
             graph.model.setValue(cell,clone);
             handleNuevaClavePrimaria(graph,graph.getModel().getParent(cell),old_primaryKey,clone.primaryKey);
         });
-    }else{
+    }else if(graph.model.isEdge(cell)){
         //ENLACE
-        if(graph.model.isEdge(cell)){
-            let valor_actual_s=cell.value.startArrow;
-            let valor_actual_e=cell.value.endArrow;
+        let valor_actual_s=cell.value.startArrow;
+        let valor_actual_e=cell.value.endArrow;
 
-            let table_s=cell.getTerminal(true);//Tabla source
-            let table_t=cell.getTerminal(false);//Tabla target
+        let table_s=cell.getTerminal(true);//Tabla source
+        let table_t=cell.getTerminal(false);//Tabla target
 
-            let combo_s=form.addCombo(table_s.value.name,false,4);
-            //Marcamos como seleccionado el que coincida con valor_actual
-            form.addOption(combo_s,"solo uno","solo_uno","solo_uno"==valor_actual_s);
-            form.addOption(combo_s,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_s);
-            form.addOption(combo_s,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_s);
-            form.addOption(combo_s,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_s);
+        let combo_s=form.addCombo(table_s.value.name,false,4);
+        //Marcamos como seleccionado el que coincida con valor_actual
+        form.addOption(combo_s,"solo uno","solo_uno","solo_uno"==valor_actual_s);
+        form.addOption(combo_s,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_s);
+        form.addOption(combo_s,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_s);
+        form.addOption(combo_s,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_s);
 
-            let combo_e=form.addCombo(table_t.value.name,false,4);
-            form.addOption(combo_e,"solo uno","solo_uno","solo_uno"==valor_actual_e);
-            form.addOption(combo_e,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_e);
-            form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
-            form.addOption(combo_e,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_e);
+        let combo_e=form.addCombo(table_t.value.name,false,4);
+        form.addOption(combo_e,"solo uno","solo_uno","solo_uno"==valor_actual_e);
+        form.addOption(combo_e,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_e);
+        form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
+        form.addOption(combo_e,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_e);
 
-            mxEvent.addListener(form.getTable(),'change',function(event){
-                let newValue_s=combo_s.value || '';
-                let oldValue_s=valor_actual_s;
-                let newValue_e=combo_e.value || '';
-                let oldValue_e=valor_actual_e;
+        mxEvent.addListener(form.getTable(),'change',function(event){
+            let newValue_s=combo_s.value || '';
+            let oldValue_s=valor_actual_s;
+            let newValue_e=combo_e.value || '';
+            let oldValue_e=valor_actual_e;
 
-                if(newValue_s!=oldValue_s||newValue_e!=oldValue_e){
-                    graph.getModel().beginUpdate();
-                    try {
-                        let clone=cell.value.clone();
-                        clone.startArrow=newValue_s;
-                        clone.endArrow=newValue_e;
+            if(newValue_s!=oldValue_s||newValue_e!=oldValue_e){
+                graph.getModel().beginUpdate();
+                try {
+                    let clone=cell.value.clone();
+                    clone.startArrow=newValue_s;
+                    clone.endArrow=newValue_e;
 
-                        graph.model.setValue(cell,clone);
-                        actualizarClaves(graph,cell);
-                    } catch (error) {
-                        console.log("ERROR update");
-                        console.log(error);
-                    }finally{
-                        graph.getModel().endUpdate();
-                    }
+                    graph.model.setValue(cell,clone);
+                    actualizarClaves(graph,cell);
+                } catch (error) {
+                    console.log("ERROR update");
+                    console.log(error);
+                }finally{
+                    graph.getModel().endUpdate();
                 }
+            }
 
-                let clone=cell.value.clone();
+            let clone=cell.value.clone();
 
-                clone.name=nameField.value;
-                graph.model.setValue(cell,clone);
-            });
-        }else{
-            //TABLA
-            mxEvent.addListener(form.getTable(),'change',function(evt){
-                let clone=cell.value.clone();
+            clone.name=nameField.value;
+            graph.model.setValue(cell,clone);
+        });
+    }else{
+        //TABLA
+        mxEvent.addListener(form.getTable(),'change',function(evt){
+            let clone=cell.value.clone();
+
+            clone.name=nameField.value;
     
-                clone.name=nameField.value;
-        
-                graph.model.setValue(cell,clone);
-            });
-        }
+            graph.model.setValue(cell,clone);
+        });
     }
     let tabla=form.getTable();
     properties.appendChild(tabla);
