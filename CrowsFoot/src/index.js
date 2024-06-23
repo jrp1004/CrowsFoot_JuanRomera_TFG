@@ -195,7 +195,6 @@ function main(container,outline,toolbar,sidebar,status,properties){
         //selección rubberband, pero la mayor parte de la interfaz es personalizada en este ejemplo
         let editor=new mxEditor();
         let graph=editor.graph;
-        let model=graph.model;
 
         //Especificamos si el grafo puede permitir nuevas conexiones
         graph.setConnectable(true);
@@ -457,14 +456,6 @@ function main(container,outline,toolbar,sidebar,status,properties){
         addToolbarButton(editor,toolbar,'properties','Properties','../editors/images/properties.gif');
         //Añadimos la función del editor 'properties' a la función especificada
         editor.addAction('properties',function(editor,cell){
-            //Cuando se pulse el botón propiedades recibimos una celda que comprobaremos si es null
-            if(cell==null){
-                //Si es null, asignamos la primera celda del conjunto de celdas seleccionadas
-                //Esto funcionará en caso de que haya varias columnas seleccionadas
-                //Si no hay nada seleccionado, causará error
-                cell=graph.getSelectionCell();
-            }
-
             document.getElementById('propertiesDatos').click();
         });
         editor.addAction('clear',function(editor,cell){
@@ -603,7 +594,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         addToolbarButton(editor,status,'fit','','../images/fit_to_size.png');
 
         //Creamos la vista que se ve arriba a la derecha en el grafo
-        let outln=new mxOutline(graph,outline);
+        new mxOutline(graph,outline);
 
         //Hace un fundido para la splashscreen en caso de que haya alguna
         let splash=document.getElementById('splash');
@@ -1025,7 +1016,6 @@ function showProperties(graph,cell,properties){
 
     //Añadimos los campos al formulario
     let nameField=form.addText('Nombre',cell.value.name);
-    let name;
 
     if(graph.isHtmlLabel(cell)){
         //COLUMNA
@@ -1042,9 +1032,6 @@ function showProperties(graph,cell,properties){
 
         let titulo=form.addText('Titulo',cell.value.titulo);
         let descripcion=form.addTextarea('Descripcion',cell.value.desc,5);
-
-        let parent=graph.model.getParent(cell);
-        name=parent.value.name+'.'+cell.value.name;
         
         mxEvent.addListener(form.getTable(),'change',function(event){
             let clone=cell.value.clone();
@@ -1106,7 +1093,6 @@ function showProperties(graph,cell,properties){
                         let clone=cell.value.clone();
                         clone.startArrow=newValue_s;
                         clone.endArrow=newValue_e;
-                        //clone.clavesForaneas=cell.value.clavesForaneas;
 
                         graph.model.setValue(cell,clone);
                         actualizarClaves(graph,cell);
@@ -1385,8 +1371,6 @@ function getTextWidth(text,font){
 
 function openTabProperties(evt,prop){
     //Manejo de las pestañas del apartado propiedades
-    let propertiesContent=document.getElementById("propertiesContent");
-
     let tabs=document.getElementsByClassName("tab");
     for(let i=0;i<tabs.length;i++){
         tabs[i].className=tabs[i].className.replace(" active","");
