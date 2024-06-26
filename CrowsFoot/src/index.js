@@ -586,6 +586,14 @@ function main(container,outline,toolbar,sidebar,status,properties){
         });
         addToolbarButton(editor,toolbar,'import','Importar XML',null);
 
+        editor.addAction('diccionario',function(editor,cell){
+            let dicc=obtenerDiccDatos(graph);
+            showModalWindow('Diccionario de datos',dicc,window.innerWidth*0.7,window.innerHeight*0.7);
+        });
+        addToolbarButton(editor,status,'diccionario','Diccionario de datos',null);
+
+        status.appendChild(spacer.cloneNode(true));
+
         addToolbarButton(editor,status,'collapseAll','Collapse All','../images/navigate_minus.png');
         addToolbarButton(editor,status,'expandAll','Expand All','../images/navigate_plus.png');
 
@@ -709,6 +717,7 @@ function showModalWindow(title,content,width,height){
     wnd.addListener(mxEvent.DESTROY,function(event){
         mxEffects.fadeOut(background,50,true,10,30,true);
     });
+    wnd.setScrollable(true);
     wnd.setVisible(true);
 
     return wnd;
@@ -1658,6 +1667,58 @@ function obtenerEtiquetaRecortada(label,type,style,width,columna){
 
     //La etiqueta no necesita cambios
     return label;
+}
+
+function obtenerDiccDatos(graph){
+    let div=document.createElement('div');;
+    let titulo=document.createElement('p');
+    titulo.innerHTML='DICCIONARIO DE DATOS';
+    titulo.className='titulo';
+    div.appendChild(titulo);
+    div.appendChild(document.createElement('hr'));
+
+    let parent=graph.getDefaultParent();
+    let childs=graph.getChildVertices(parent);
+    for(child of childs){
+        let p=document.createElement('p');
+        p.innerHTML=child.value.name;
+        p.className='titulo';
+        div.append(p);
+        let tabla=document.createElement('table');
+        let thead=document.createElement('thead');
+        let trh=document.createElement('tr');
+        trh.appendChild(obtenerDatoTabla('th','Columna'));
+        trh.appendChild(obtenerDatoTabla('th','Tipo de datos'));
+        trh.appendChild(obtenerDatoTabla('th','Titulo'));
+        trh.appendChild(obtenerDatoTabla('th','Descripcion'));
+        thead.appendChild(trh);
+        tabla.appendChild(thead);
+
+        
+        let cols=graph.getChildVertices(child);
+        let tbody=document.createElement('tbody');
+        for(col of cols){
+            let tr=document.createElement('tr');
+            tr.appendChild(obtenerDatoTabla('td',col.value.name));
+            tr.appendChild(obtenerDatoTabla('td',col.value.type));
+            tr.appendChild(obtenerDatoTabla('td',col.value.titulo));
+            tr.appendChild(obtenerDatoTabla('td',col.value.desc));
+            tbody.appendChild(tr);
+        }
+        tabla.appendChild(tbody);
+
+        div.appendChild(tabla);
+    }
+    div.appendChild(document.createElement('br'));
+    div.style.overflow='auto';
+
+    return div;
+}
+
+function obtenerDatoTabla(tipo,dato){
+    let td=document.createElement(tipo);
+    td.innerHTML=dato;
+    return td;
 }
 
 
