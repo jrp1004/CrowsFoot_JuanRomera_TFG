@@ -195,7 +195,6 @@ function main(container,outline,toolbar,sidebar,status,properties){
         //selección rubberband, pero la mayor parte de la interfaz es personalizada en este ejemplo
         let editor=new mxEditor();
         let graph=editor.graph;
-        let model=graph.model;
 
         //Especificamos si el grafo puede permitir nuevas conexiones
         graph.setConnectable(true);
@@ -276,7 +275,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
         //Devuelve el campo name como etiqueta de la celda
         graph.convertValueToString=function(cell){
-            if(cell.value!=null&&cell.value.name!=null){
+            if(cell.value?.name){
                 return cell.value.name;
             }
 
@@ -326,78 +325,14 @@ function main(container,outline,toolbar,sidebar,status,properties){
                     style=graph.getStylesheet().getDefaultVertexStyle();
                 }
 
-                let fontfamily;
-                if(style[mxConstants.STYLE_FONTFAMILY]){
-                    fontfamily=style[mxConstants.STYLE_FONTFAMILY];
-                }else{
-                    //La fuente por defecto es arial
-                    fontfamily="arial";
-                }
-
-                let size=style[mxConstants.STYLE_FONTSIZE];
-
-                let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
-                let fontstyle="";
-                if(fontstyle_n&mxConstants.FONT_BOLD){
-                    fontstyle+="bold ";
-                }
-                if(fontstyle_n&mxConstants.FONT_ITALIC){
-                    fontstyle+="italic ";
-                }
-
-                const font=fontstyle+size+"pt "+fontfamily
-
-
                 let nueva_etiqueta=cell.value.name+": "+cell.value.type;
-                const nombre=cell.value.name;
-
-                if(getTextWidth(nueva_etiqueta,font)>cell.geometry.width){
-                    for(let i=nombre.length;i>0;i--){
-                        let etiqueta_temp=nombre.slice(0,i)+"..."+": "+cell.value.type;
-                        if(getTextWidth(etiqueta_temp,font)<cell.geometry.width){
-                            nueva_etiqueta=etiqueta_temp;
-                            break;
-                        }
-                    }
-                }
-
-                return label+mxUtils.htmlEntities(nueva_etiqueta,false);
-            }else{
-                if(this.isSwimlane(cell)){
+                let etiqueta_final=obtenerEtiquetaRecortada(nueva_etiqueta,cell.value.type,style,cell.geometry.width,true);
+                return label+mxUtils.htmlEntities(etiqueta_final,false);
+            }else if(this.isSwimlane(cell)){
                     let label=cell.value.name;
 
                     const style=graph.getStylesheet().getCellStyle(cell.style);
-
-                    let fontfamily;
-                    if(style[mxConstants.STYLE_FONTFAMILY]){
-                        fontfamily=style[mxConstants.STYLE_FONTFAMILY];
-                    }else{
-                        //La fuente por defecto es arial
-                        fontfamily="arial";
-                    }
-
-                    let size=style[mxConstants.STYLE_FONTSIZE];
-
-                    let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
-                    let fontstyle="";
-                    if(fontstyle_n&mxConstants.FONT_BOLD){
-                        fontstyle+="bold ";
-                    }
-                    if(fontstyle_n&mxConstants.FONT_ITALIC){
-                        fontstyle+="italic ";
-                    }
-
-                    const font=fontstyle+size+"pt "+fontfamily;
-
-                    if(getTextWidth(label,font)>cell.geometry.width){
-                        for(let i=label.length-1;i>0;i--){
-                            let nueva_etiqueta=label.slice(0,i)+"...";
-                            if(getTextWidth(nueva_etiqueta,"bold 12pt arial")<cell.geometry.width){
-                                return nueva_etiqueta;
-                            }
-                        }
-                    }
-                }
+                    return obtenerEtiquetaRecortada(label,null,style,cell.geometry.width,false);
             }
 
             return mxGraph.prototype.getLabel.apply(this,arguments);
@@ -519,20 +454,29 @@ function main(container,outline,toolbar,sidebar,status,properties){
         addToolbarButton(editor,toolbar,'properties','Properties','../editors/images/properties.gif');
         //Añadimos la función del editor 'properties' a la función especificada
         editor.addAction('properties',function(editor,cell){
-            //Cuando se pulse el botón propiedades recibimos una celda que comprobaremos si es null
-            if(cell==null){
-                //Si es null, asignamos la primera celda del conjunto de celdas seleccionadas
-                //Esto funcionará en caso de que haya varias columnas seleccionadas
-                //Si no hay nada seleccionado, causará error
-                cell=graph.getSelectionCell();
-            }
-
             document.getElementById('propertiesDatos').click();
+        });
+        editor.addAction('clear',function(editor,cell){
+            if(confirm('¿Eliminar todos los elementos del diagrama?')){
+                editor.graph.getModel().clear();
+            }
+        });
+        editor.addAction('borrar',function(editor,cell){
+            cell=cell||graph.getSelectionCell();
+            if(cell&&graph.isHtmlLabel(cell)){
+                if(cell.value.primaryKey){
+                    cell.value.primaryKey=false;
+                    handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),true,false);
+                    graph.setSelectionCell(cell);
+                }
+            }
+            editor.execute('delete',cell);
         });
         
         //Añadimos el resto de botones
         //Para estos botones no hace falta añadir funciones puesto que ya están definidas en el editor
-        addToolbarButton(editor,toolbar,'delete','Delete','../images/delete2.png');
+        addToolbarButton(editor,toolbar,'borrar','Delete','../images/delete2.png');
+        addToolbarButton(editor,toolbar,'clear','Borrar todo','../images/delete2.png');
         toolbar.appendChild(spacer.cloneNode(true));
 
         addToolbarButton(editor,toolbar,'undo','','../images/undo.png');
@@ -659,7 +603,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         addToolbarButton(editor,status,'fit','','../images/fit_to_size.png');
 
         //Creamos la vista que se ve arriba a la derecha en el grafo
-        let outln=new mxOutline(graph,outline);
+        new mxOutline(graph,outline);
 
         //Hace un fundido para la splashscreen en caso de que haya alguna
         let splash=document.getElementById('splash');
@@ -966,14 +910,10 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         if(col_encima.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
                             intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
                             intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                        }else{
-                            if(col_encima.value.relacionAsociada!=null){
-                                intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                            }else{
-                                if(cell.value.relacionAsociada!=null){
-                                    intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
-                                }
-                            }
+                        }else if(col_encima.value.relacionAsociada!=null){
+                            intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
+                        }else if(cell.value.relacionAsociada!=null){
+                            intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
                         }
 
                         //Intercambiamos valores
@@ -1003,14 +943,10 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         if(col_debajo.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
                             intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
                             intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                        }else{
-                            if(col_debajo.value.relacionAsociada!=null){
-                                intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                            }else{
-                                if(cell.value.relacionAsociada!=null){
-                                    intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
-                                }
-                            }
+                        }else if(col_debajo.value.relacionAsociada!=null){
+                            intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
+                        }else if(cell.value.relacionAsociada!=null){
+                            intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
                         }
 
                         graph.model.setValue(col_debajo,value_cell);
@@ -1043,7 +979,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
         }
 
         menu.addItem('Borrar','../images/delete2.png',function(){
-            editor.execute('delete',cell);
+            editor.execute('borrar',cell);
         });
 
         menu.addSeparator();
@@ -1061,7 +997,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
 
     menu.addItem('Mostrar SQL','../images/export1.png',function(){
         editor.execute('showSql',cell);
-    })
+    });
 }
 
 //Asociamos el id de la nueva columna a la relación correspondiente
@@ -1081,7 +1017,6 @@ function showProperties(graph,cell,properties){
 
     //Añadimos los campos al formulario
     let nameField=form.addText('Nombre',cell.value.name);
-    let name;
 
     if(graph.isHtmlLabel(cell)){
         //COLUMNA
@@ -1098,9 +1033,6 @@ function showProperties(graph,cell,properties){
 
         let titulo=form.addText('Titulo',cell.value.titulo);
         let descripcion=form.addTextarea('Descripcion',cell.value.desc,5);
-
-        let parent=graph.model.getParent(cell);
-        name=parent.value.name+'.'+cell.value.name;
         
         mxEvent.addListener(form.getTable(),'change',function(event){
             let clone=cell.value.clone();
@@ -1113,6 +1045,8 @@ function showProperties(graph,cell,properties){
             }else{
                 clone.defaultValue=null;
             }
+
+            let old_primaryKey=clone.primaryKey;
     
             clone.primaryKey=primaryKeyField.checked;
             clone.foreignKey=foreignKeyField.checked;
@@ -1124,68 +1058,67 @@ function showProperties(graph,cell,properties){
             clone.desc=descripcion.value;
     
             graph.model.setValue(cell,clone);
+            handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),old_primaryKey,clone.primaryKey);
+            graph.setSelectionCell(cell);
+        });
+    }else if(graph.model.isEdge(cell)){
+        //ENLACE
+        let valor_actual_s=cell.value.startArrow;
+        let valor_actual_e=cell.value.endArrow;
+
+        let table_s=cell.getTerminal(true);//Tabla source
+        let table_t=cell.getTerminal(false);//Tabla target
+
+        let combo_s=form.addCombo(table_s.value.name,false,4);
+        //Marcamos como seleccionado el que coincida con valor_actual
+        form.addOption(combo_s,"solo uno","solo_uno","solo_uno"==valor_actual_s);
+        form.addOption(combo_s,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_s);
+        form.addOption(combo_s,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_s);
+        form.addOption(combo_s,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_s);
+
+        let combo_e=form.addCombo(table_t.value.name,false,4);
+        form.addOption(combo_e,"solo uno","solo_uno","solo_uno"==valor_actual_e);
+        form.addOption(combo_e,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_e);
+        form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
+        form.addOption(combo_e,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_e);
+
+        mxEvent.addListener(form.getTable(),'change',function(event){
+            let newValue_s=combo_s.value || '';
+            let oldValue_s=valor_actual_s;
+            let newValue_e=combo_e.value || '';
+            let oldValue_e=valor_actual_e;
+
+            if(newValue_s!=oldValue_s||newValue_e!=oldValue_e){
+                graph.getModel().beginUpdate();
+                try {
+                    let clone=cell.value.clone();
+                    clone.startArrow=newValue_s;
+                    clone.endArrow=newValue_e;
+
+                    graph.model.setValue(cell,clone);
+                    actualizarClaves(graph,cell);
+                } catch (error) {
+                    console.log("ERROR update");
+                    console.log(error);
+                }finally{
+                    graph.getModel().endUpdate();
+                }
+            }
+
+            let clone=cell.value.clone();
+
+            clone.name=nameField.value;
+            graph.model.setValue(cell,clone);
         });
     }else{
-        //ENLACE
-        if(graph.model.isEdge(cell)){
-            let valor_actual_s=cell.value.startArrow;
-            let valor_actual_e=cell.value.endArrow;
+        //TABLA
+        mxEvent.addListener(form.getTable(),'change',function(evt){
+            let clone=cell.value.clone();
 
-            let table_s=cell.getTerminal(true);//Tabla source
-            let table_t=cell.getTerminal(false);//Tabla target
-
-            let combo_s=form.addCombo(table_s.value.name,false,4);
-            //Marcamos como seleccionado el que coincida con valor_actual
-            form.addOption(combo_s,"solo uno","solo_uno","solo_uno"==valor_actual_s);
-            form.addOption(combo_s,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_s);
-            form.addOption(combo_s,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_s);
-            form.addOption(combo_s,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_s);
-
-            let combo_e=form.addCombo(table_t.value.name,false,4);
-            form.addOption(combo_e,"solo uno","solo_uno","solo_uno"==valor_actual_e);
-            form.addOption(combo_e,"cero o uno","cero_o_uno","cero_o_uno"==valor_actual_e);
-            form.addOption(combo_e,"cero o mas","cero_o_mas","cero_o_mas"==valor_actual_e);
-            form.addOption(combo_e,"uno o mas","uno_o_mas","uno_o_mas"==valor_actual_e);
-
-            mxEvent.addListener(form.getTable(),'change',function(event){
-                let newValue_s=combo_s.value || '';
-                let oldValue_s=valor_actual_s;
-                let newValue_e=combo_e.value || '';
-                let oldValue_e=valor_actual_e;
-
-                if(newValue_s!=oldValue_s||newValue_e!=oldValue_e){
-                    graph.getModel().beginUpdate();
-                    try {
-                        let clone=cell.value.clone();
-                        clone.startArrow=newValue_s;
-                        clone.endArrow=newValue_e;
-                        //clone.clavesForaneas=cell.value.clavesForaneas;
-
-                        graph.model.setValue(cell,clone);
-                        actualizarClaves(graph,cell);
-                    } catch (error) {
-                        console.log("ERROR update");
-                        console.log(error);
-                    }finally{
-                        graph.getModel().endUpdate();
-                    }
-                }
-
-                let clone=cell.value.clone();
-
-                clone.name=nameField.value;
-                graph.model.setValue(cell,clone);
-            });
-        }else{
-            //TABLA
-            mxEvent.addListener(form.getTable(),'change',function(evt){
-                let clone=cell.value.clone();
+            clone.name=nameField.value;
     
-                clone.name=nameField.value;
-        
-                graph.model.setValue(cell,clone);
-            });
-        }
+            graph.model.setValue(cell,clone);
+        });
     }
     let tabla=form.getTable();
     properties.appendChild(tabla);
@@ -1196,6 +1129,17 @@ function showProperties(graph,cell,properties){
     c_propiedad.outerHTML='<th>Propiedad</th>';
     let c_valor=fila.insertCell(1);
     c_valor.outerHTML='<th>Valor</th>';
+}
+
+function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
+    //Comprobamos que el valor cambia
+    if(oldValue!=newValue){
+        //Actualizamos las relaciones entrantes
+        let relaciones=graph.getEdges(tabla,null,true,false);
+        for(let rel of relaciones){
+            actualizarClaves(graph,rel);
+        }
+    }
 }
 
 //Actualizamos las claves cuando se cambia la relación entre 2 tablas
@@ -1214,97 +1158,74 @@ function actualizarClaves(graph,cell){
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_t,table_s,true);
-
-            for(let i=0;i<primaryKey_s.length;i++){
-                let column=addClaveForanea(graph,table_t,primaryKey_s[i],e_1.getId());
-                relacion.clavesForaneas.push(column.getId());
-            }
-
-            graph.setSelectionCell(e_1);
+            insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true);
         }else{
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
             if(relacion.endArrow==='cero_o_uno'){
-                for(let i=0;i<primaryKey_t.length;i++){
-                    let column=addClaveForanea(graph,table_t,primaryKey_s[i],e_1.getId());
-                    relacion.clavesForaneas.push(column.getId());
-                }
+                insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true);
             }else{
-                //Si la parte opcional no está en el target asumimos que o está
-                //en source o es indiferente donde esté la clave
-                for(let i=0;i<primaryKey_t.length;i++){
-                    let column=addClaveForanea(graph,table_s,primaryKey_t[i],e_1.getId());
-                    relacion.clavesForaneas.push(column.getId());
-                }
+                insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
             }
             console.log("Indiferente");
-            
-            graph.setSelectionCell(e_1);
         }
     }else{
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Tabla intermedia");
-
-            //Calculamos donde colocar la nueva tabla
-            let distancia=table_t.geometry.x-(table_s.geometry.x+200);
-
-            let x=table_t.geometry.x-100-distancia/2;
-            let y=table_s.geometry.y<table_t.geometry.y?table_t.geometry.y:table_s.geometry.y;
-
-            //Creamos nueva tabla para la relación
-            let tableObject=new Table(table_s.value.name+'_'+table_t.value.name);
-            let table=new mxCell(tableObject,new mxGeometry(x,y,200,28),'table');
-    
-            table.setVertex(true);
-
-            let columnObject=new Column("COLUMNA");
-            let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
-            column.setVertex(true);
-            column.setConnectable(false);
-            let firstColumn=column.clone();
-            firstColumn.value.name=tableObject.name+'_ID';
-            firstColumn.value.type='INTEGER';
-            firstColumn.value.primaryKey=true;
-            firstColumn.value.autoIncrement=true;
-            //Insertamos la celda columna en la tabla
-            table.insert(firstColumn);
-            //Añadimos la tabla intermedia al grafo
+            let nombre=table_s.value.name+'_'+table_t.value.name;
+            let table=obtenerTablaIntermedia(table_s.geometry,table_t.geometry,nombre);
             graph.addCell(table,graph.getDefaultParent());
 
             //Claves foraneas
             let relacion_s=new Relacion("Relacion_s");
             relacion_s.startArrow='uno_o_mas';
             relacion_s.endArrow='solo_uno';
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion_s,table,table_s,false);
-            for(let i=0;i<primaryKey_s.length;i++){
-                let column=addClaveForanea(graph,table,primaryKey_s[i],e_1.getId());
-                relacion_s.clavesForaneas.push(column.getId());
-            }
+            insertarNuevaRelacion(graph,clone.clone(),relacion_s,table,table_s,primaryKey_s,false);
 
             let relacion_t=new Relacion("Relacion_t");
             relacion_t.startArrow='uno_o_mas';
             relacion_t.endArrow='solo_uno';
-            let e_2=clone.clone();
-            editarRelacion(graph,e_2,relacion_t,table,table_t,false);
-            for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table,primaryKey_t[i],e_2.getId());
-                relacion_t.clavesForaneas.push(column.getId());
-            }
+            insertarNuevaRelacion(graph,clone.clone(),relacion_t,table,table_t,primaryKey_t,false);
+            graph.setSelectionCell(table);
         }else{
             console.log("Clave en source");
-            let e_1=clone.clone();
-            editarRelacion(graph,e_1,relacion,table_s,table_t,false);
-            for(let i=0;i<primaryKey_t.length;i++){
-                let column=addClaveForanea(graph,table_s,primaryKey_t[i],e_1.getId());
-                relacion.clavesForaneas.push(column.getId());
-            }
-
-            graph.setSelectionCell(e_1);
+            insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
         }
     }
+}
+
+function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir){
+    editarRelacion(graph,enlace,relacion,source,target,invertir);
+    for(let i=0;i<pks.length;i++){
+        let column=addClaveForanea(graph,source,pks[i],enlace.getId());
+        relacion.clavesForaneas.push(column.getId());
+    }
+    graph.setSelectionCell(enlace);
+}
+
+function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
+    let distancia=geometry_t.x-(geometry_s.x+200);
+
+    let x=geometry_t.x-100-distancia/2;
+    let y=geometry_s.y<geometry_t.y?geometry_t.y:geometry_s.y;
+
+    //Creamos nueva tabla para la relación
+    let tableObject=new Table(nombre);
+    let table=new mxCell(tableObject,new mxGeometry(x,y,200,28),'table');
+
+    table.setVertex(true);
+
+    let columnObject=new Column("COLUMNA");
+    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+    column.setVertex(true);
+    column.setConnectable(false);
+    let firstColumn=column.clone();
+    firstColumn.value.name=tableObject.name+'_ID';
+    firstColumn.value.type='INTEGER';
+    firstColumn.value.primaryKey=true;
+    firstColumn.value.autoIncrement=true;
+    //Insertamos la celda columna en la tabla
+    table.insert(firstColumn);
+
+    return table;
 }
 
 //Añade la columna pasada como clave primaria como clave foranea a la tabla indicada
@@ -1372,58 +1293,70 @@ function createSql(graph){
         let child=graph.model.getChildAt(parent,i);
 
         if(!graph.model.isEdge(child)){
-            sql.push('CREATE TABLE IF NOT EXISTS '+child.value.name+' (');
-            let columnCount=graph.model.getChildCount(child);
-
-            let pks=' PRIMARY KEY(';
-            let pks_num=0;
-            let fks=' FOREIGN KEY(';
-            let fks_num=0;
-
-            if(columnCount>0){
-                for(let j=0;j<columnCount;j++){
-                    let column=graph.model.getChildAt(child,j).value;
-                    sql.push('\n '+column.name+' '+column.type);
-                    if(column.notNull){
-                        sql.push(' NOT NULL');
-                    }
-                    if(column.primaryKey){
-                        pks+=column.name+', ';
-                        pks_num++;
-                    }
-                    if(column.foreignKey){
-                        fks+=column.name+', ';
-                        fks_num++;
-                    }
-                    if(column.autoIncrement){
-                        sql.push(' AUTOINCREMENT');
-                    }
-                    if(column.unique){
-                        sql.push(' UNIQUE');
-                    }
-                    if(column.defaultValue!=null){
-                        sql.push(' DEFAULT '+column.defaultValue);
-                    }
-
-                    sql.push(',');
-                }
-
-                //Añadimos las claves
-                if(pks_num>0){
-                    sql.push('\n'+pks.substring(0,pks.length-2)+')');
-                    sql.push(',');
-                }
-                if(fks_num>0){
-                    sql.push('\n'+fks.substring(0,fks.length-2)+')');
-                }else{
-                    sql.splice(sql.length-1,1);
-                }
-
-                sql.push('\n);');
-            }
-            sql.push('\n');
+            sql.push(addTablaSql(graph,child))
         }
     }
+    return sql.join('');
+}
+
+function addTablaSql(graph,tabla){
+    const sql=[];
+
+    sql.push('CREATE TABLE IF NOT EXISTS '+tabla.value.name+' (');
+    let columnCount=graph.model.getChildCount(tabla);
+
+    let pks=' PRIMARY KEY(';
+    let pks_num=0;
+    let fks=' FOREIGN KEY(';
+    let fks_num=0;
+
+    if(columnCount>0){
+        for(let j=0;j<columnCount;j++){
+            let columna=graph.model.getChildAt(tabla,j).value;
+            sql.push(addColumnaSql(columna));
+            sql.join('');
+            if(columna.primaryKey){
+                pks+=columna.name+', ';
+                pks_num++;
+            }
+            if(columna.foreignKey){
+                fks+=columna.name+', ';
+                fks_num++;
+            }
+        }
+        //Añadimos las claves
+        if(pks_num>0){
+            sql.push('\n'+pks.substring(0,pks.length-2)+')');
+            sql.push(',');
+        }
+        if(fks_num>0){
+            sql.push('\n'+fks.substring(0,fks.length-2)+')');
+        }else{
+            sql.splice(sql.length-1,1);
+        }
+
+        sql.push('\n);');
+    }
+    sql.push('\n');
+    return sql.join('');
+}
+
+function addColumnaSql(columna){
+    const sql=[];
+    sql.push('\n '+columna.name+' '+columna.type);
+    if(columna.notNull){
+        sql.push(' NOT NULL');
+    }
+    if(columna.autoIncrement){
+        sql.push(' AUTOINCREMENT');
+    }
+    if(columna.unique){
+        sql.push(' UNIQUE');
+    }
+    if(columna.defaultValue!=null){
+        sql.push(' DEFAULT '+columna.defaultValue);
+    }
+    sql.push(',');
     return sql.join('');
 }
 
@@ -1438,8 +1371,6 @@ function getTextWidth(text,font){
 
 function openTabProperties(evt,prop){
     //Manejo de las pestañas del apartado propiedades
-    let propertiesContent=document.getElementById("propertiesContent");
-
     let tabs=document.getElementsByClassName("tab");
     for(let i=0;i<tabs.length;i++){
         tabs[i].className=tabs[i].className.replace(" active","");
@@ -1458,34 +1389,16 @@ function configurarTabEstilos(graph,cell){
     let colorPicker=document.getElementById("colorPicker"); //Cambio de color
     let gradientPicker=document.getElementById("gradientPicker"); //Cambio degradado
     let gradientCheck=document.getElementById("gradientCheck");
-    gradientCheck.checked=cell.value.gradient;
     let selectGradientDirection=document.getElementById("gradientDirection")
-
     let selectFont=document.getElementById("selectFont");
     let tamFont=document.getElementById("tamFont");
     let colorFontPicker=document.getElementById('colorFontPicker');
     let negritaButton=document.getElementById('negrita');
     let cursivaButton=document.getElementById('cursiva');
-
     let shadowCheck=document.getElementById('shadowCheck');
 
-    //Comprobamos si el degradado está activo
-    if(!gradientCheck.checked){
-        gradientPicker.style.display="none";
-        selectGradientDirection.style.display="none";
-    }else{
-        gradientPicker.style.display="inline";
-        selectGradientDirection.style.display="inline";
-    }
-
-    //La propiedad sombra sólo se aplica a las tablas
-    if(graph.isSwimlane(cell)){
-        shadowCheck.style.display="inline";
-        document.getElementById('sombra').style.display="table-row";
-    }else{
-        shadowCheck.style.display="none";
-        document.getElementById('sombra').style.display="none";
-    }
+    inicializarGradientCheck(gradientCheck,gradientPicker,selectGradientDirection,cell.value.gradient);
+    inicializarSombra(graph.isSwimlane(cell),shadowCheck);
 
     //El degradado no se aplica a los enlaces
     if(graph.model.isEdge(cell)){
@@ -1495,152 +1408,200 @@ function configurarTabEstilos(graph,cell){
     }
 
     let style=graph.getStylesheet().getCellStyle(cell.style);
+    setEstilosIniciales(style,graph.model.isEdge(cell),{
+        colorPicker,
+        gradientPicker,
+        gradientCheck,
+        selectGradientDirection,
+        selectFont,
+        tamFont,
+        colorFontPicker,
+        negritaButton,
+        cursivaButton,
+        shadowCheck
+    });
+    setListenersEstilos(graph,graph.model.isEdge(cell),cell,{
+        colorPicker,
+        gradientPicker,
+        gradientCheck,
+        selectGradientDirection,
+        selectFont,
+        tamFont,
+        colorFontPicker,
+        negritaButton,
+        cursivaButton,
+        shadowCheck
+    });
+}
 
-    //Comprobamos si el estilo de la celda está vacío
-    if(style!=null){
-        //Si no está vacío obtenemos los valores almacenados poniendo valores por defecto
-        //a los no almacenados
-        let fillColor;
-        if(graph.model.isEdge(cell)){
-            fillColor=style[mxConstants.STYLE_STROKECOLOR];
-        }else{
-            fillColor=style[mxConstants.STYLE_FILLCOLOR];
-        }
-        if(fillColor===undefined||fillColor===null){
-            if(graph.model.isEdge(cell)){
-                colorPicker.value='#6482B9';
-            }else{
-                colorPicker.value='#ffffff';
-            }
-        }else{
-            colorPicker.value=fillColor;
-        }
-
-        let gradientColor=style[mxConstants.STYLE_GRADIENTCOLOR];
-        if(gradientColor===undefined||gradientColor===null){
-            gradientPicker.value='#ffffff';
-        }else{
-            gradientPicker.value=gradientColor;
-        }
-        selectGradientDirection.options.selectedIndex=getSelectIndex(selectGradientDirection.options,style[mxConstants.STYLE_GRADIENT_DIRECTION]);
-
-        selectFont.options.selectedIndex=getSelectIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
-        let tam=style[mxConstants.STYLE_FONTSIZE];
-        if(tam===undefined||tam===null){
-            tam='11';
-        }else{
-            tamFont.value=tam;
-        }
-
-        let fontColor=style[mxConstants.STYLE_FONTCOLOR];
-        if(fontColor===undefined||fontColor===null){
-            if(graph.model.isEdge(cell)){
-                colorFontPicker.value='#446299';
-            }else{
-                colorFontPicker.value='#000000';
-            }
-        }else{
-            colorFontPicker.value=fontColor;
-        }
-
-        let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
-        if(fontStyle===undefined||fontStyle===null){
-            negritaButton.className=negritaButton.className.replace(" active","");
-            cursivaButton.className=cursivaButton.className.replace(" active","");
-        }else{
-            if(fontStyle&mxConstants.FONT_BOLD){
-                negritaButton.className+=" active";
-            }else{
-                negritaButton.className=negritaButton.className.replace(" active","");
-            }
-            if(fontStyle&mxConstants.FONT_ITALIC){
-                cursivaButton.className+=" active";
-            }else{
-                cursivaButton.className=cursivaButton.className.replace(" active","");
-            }
-        }
-        shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
+function inicializarGradientCheck(gradientCheck,gradientPicker,gradientDirection,activado){
+    gradientCheck.checked=activado;
+    if(!activado){
+        gradientPicker.style.display="none";
+        gradientDirection.style.display="none";
     }else{
-        //Valores por defecto si el estilo está vacío
-        if(graph.model.isEdge(cell)){
-            colorFontPicker.value='#446299';
-            colorPicker.value='#6482B9';
-        }else{
-            colorPicker.value="#ffffff";
-            colorFontPicker.value='#000000'
-        }
-        gradientPicker.value="#ffffff";
-        selectFont.options.selectedIndex=0;
-        selectGradientDirection.options.selectedIndex=0;
-        tamFont.value='11';
-        shadowCheck.checked=false;
+        gradientPicker.style.display="inline";
+        gradientDirection.style.display="inline";
+    }
+}
+
+function inicializarSombra(tabla,shadowCheck){
+    if(tabla){
+        shadowCheck.style.display="inline";
+        document.getElementById('sombra').style.display="table-row";
+    }else{
+        shadowCheck.style.display="none";
+        document.getElementById('sombra').style.display="none";
     }
 
-    //Listeners para los elementos que editan el estilo
+}
+
+function setEstilosIniciales(style,enlace,elementos){
+    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
+    }=elementos;
+
+    if(style!=null){
+        setColorPicker(style,colorPicker,enlace);
+        setGradientPicker(style,gradientPicker);
+        selectGradientDirection.options.selectedIndex=getSelectIndex(selectGradientDirection.options,style[mxConstants.STYLE_GRADIENT_DIRECTION]);
+        selectFont.options.selectedIndex=getSelectIndex(selectFont.options,style[mxConstants.STYLE_FONTFAMILY]);
+        setTamFont(style,tamFont);
+        setColorFontPicker(style,colorFontPicker,enlace);
+        setFontStyle(style,negritaButton,cursivaButton);
+        shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
+    }else{
+        setEstilosDefault(enlace,elementos);
+    }
+}
+
+function setColorPicker(style,colorPicker,enlace){
+    //Si es enlace la propiedad es stroke si no fill
+    let fillColor=enlace?style[mxConstants.STYLE_STROKECOLOR]:style[mxConstants.STYLE_FILLCOLOR];
+    colorPicker.value=fillColor||(enlace?'#6482B9':'#ffffff');
+}
+
+function setGradientPicker(style,gradientPicker){
+    let gradientColor=style[mxConstants.STYLE_GRADIENTCOLOR];
+    gradientPicker.value=gradientColor||'#FFFFFF';
+}
+
+function setTamFont(style,tamFont){
+    let tam=style[mxConstants.STYLE_FONTSIZE];
+    tamFont.value=tam||'11';
+}
+
+function setColorFontPicker(style,colorFontPicker,enlace){
+    let fontColor=style[mxConstants.STYLE_FONTCOLOR];
+    colorFontPicker.value=fontColor||(enlace?'#446299':'#000000');
+}
+
+function setFontStyle(style,negritaButton,cursivaButton){
+    let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
+    if(fontStyle===undefined||fontStyle===null){
+        negritaButton.className=negritaButton.className.replace(" active","");
+        cursivaButton.className=cursivaButton.className.replace(" active","");
+    }else{
+        toggleButtonActiveStyle(negritaButton,fontStyle&mxConstants.FONT_BOLD);
+        toggleButtonActiveStyle(cursivaButton,fontStyle&mxConstants.FONT_ITALIC);
+    }
+}
+
+function toggleButtonActiveStyle(button,activo){
+    if(activo){
+        button.className+=' active';
+    }else{
+        button.className=button.className.replace(" active","");
+    }
+}
+
+function setEstilosDefault(enlace,elementos){
+    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
+    }=elementos;
+
+    //Valores por defecto si el estilo está vacío
+    if(enlace){
+        colorFontPicker.value='#446299';
+        colorPicker.value='#6482B9';
+    }else{
+        colorPicker.value="#ffffff";
+        colorFontPicker.value='#000000'
+    }
+    gradientPicker.value="#ffffff";
+    selectFont.options.selectedIndex=0;
+    selectGradientDirection.options.selectedIndex=0;
+    tamFont.value='11';
+    shadowCheck.checked=false;
+    negritaButton.className=negritaButton.className.replace(" active","");
+    cursivaButton.className=cursivaButton.className.replace(" active","");
+}
+
+function setListenersEstilos(graph,enlace,cell,elementos){
+    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
+    }=elementos;
+
     mxEvent.addListener(colorPicker,'change',function(evt){
-        if(graph.model.isEdge(cell)){
-            graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,colorPicker.value,[cell]);
-        }else{
-            graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value,[cell]);
-            if(!gradientCheck.checked){
-                graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
-            }
-        }
+        handleColorPickerChange(graph,enlace,colorPicker,gradientCheck);
     });
     mxEvent.addListener(gradientPicker,'change',function(evt){
-        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value);
     });
     mxEvent.addListener(gradientCheck,'change',function(evt){
-        cell.value.gradient=gradientCheck.checked;
-        if(!gradientCheck.checked){
-            gradientPicker.style.display="none";
-            selectGradientDirection.style.display="none";
-            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value,[cell]);
-        }else{
-            gradientPicker.style.display="inline";
-            selectGradientDirection.style.display="inline";
-            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value,[cell]);
-        }
+        handleGradientCheckChange(graph,gradientCheck,gradientPicker,selectGradientDirection,cell);
     });
     mxEvent.addListener(selectFont,'change',function(evt){
-        graph.setCellStyles(mxConstants.STYLE_FONTFAMILY,selectFont.value,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_FONTFAMILY,selectFont.value);
     });
     mxEvent.addListener(selectGradientDirection,'change',function(evt){
-        graph.setCellStyles(mxConstants.STYLE_GRADIENT_DIRECTION,selectGradientDirection.value,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_GRADIENT_DIRECTION,selectGradientDirection.value);
     });
     mxEvent.addListener(tamFont,'change',function(evt){
-        let tam=tamFont.value;
-        if(tam>1000){
-            tam=999;
-        }else if(tam<1){
-            tam=1;
-        }
-        graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tam,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_FONTSIZE,tamFont.value);
     });
     mxEvent.addListener(colorFontPicker,'change',function(evt){
-        graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,colorFontPicker.value,[cell]);
+        graph.setCellStyles(mxConstants.STYLE_FONTCOLOR,colorFontPicker.value);
     });
     mxEvent.addListener(negritaButton,'click',function(evt){
-        graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_BOLD,[cell]);
-        let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
-        if(fontStyle&mxConstants.FONT_BOLD){
-            negritaButton.className+=" active";
-        }else{
-            negritaButton.className=negritaButton.className.replace(" active","");
-        }
+        handleFontStyleButtonClick(graph,cell,negritaButton,mxConstants.FONT_BOLD);
     });
     mxEvent.addListener(cursivaButton,'click',function(evt){
-        graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,mxConstants.FONT_ITALIC,[cell]);
-        let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
-        if(fontStyle&mxConstants.FONT_ITALIC){
-            cursivaButton.className+=" active";
-        }else{
-            cursivaButton.className=cursivaButton.className.replace(" active","");
-        }
+        handleFontStyleButtonClick(graph,cell,cursivaButton,mxConstants.FONT_ITALIC);
     });
     mxEvent.addListener(shadowCheck,'change',function(evt){
-        graph.toggleCellStyle(mxConstants.STYLE_SHADOW,cell);
+        graph.toggleCellStyle(mxConstants.STYLE_SHADOW);
     });
+}
+
+function handleColorPickerChange(graph,enlace,colorPicker,gradientCheck){
+    if(enlace){
+        graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,colorPicker.value);
+    }else{
+        graph.setCellStyles(mxConstants.STYLE_FILLCOLOR,colorPicker.value);
+        if(!gradientCheck.checked){
+            graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value);
+        }
+    }
+}
+
+function handleGradientCheckChange(graph,gradientCheck,gradientPicker,selectGradientDirection,cell){
+    cell.value.gradient=gradientCheck.checked;
+    if(!gradientCheck.checked){
+        gradientPicker.style.display="none";
+        selectGradientDirection.style.display="none";
+        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,colorPicker.value);
+    }else{
+        gradientPicker.style.display="inline";
+        selectGradientDirection.style.display="inline";
+        graph.setCellStyles(mxConstants.STYLE_GRADIENTCOLOR,gradientPicker.value);
+    }
+}
+
+function handleFontStyleButtonClick(graph,cell,button,styleFlag){
+    graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,styleFlag);
+    let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
+    toggleButtonActiveStyle(button,fontStyle&styleFlag);
 }
 
 //Obtenemos el valor del select según el índice
@@ -1670,6 +1631,46 @@ function descarga(texto,nombre){
             window.URL.revokeObjectURL(url);
         }, 0);
     }
+}
+
+function obtenerEtiquetaRecortada(label,type,style,width,columna){
+    let fontfamily;
+    if(style[mxConstants.STYLE_FONTFAMILY]){
+        fontfamily=style[mxConstants.STYLE_FONTFAMILY];
+    }else{
+        //La fuente por defecto es arial
+        fontfamily="arial";
+    }
+
+    let size=style[mxConstants.STYLE_FONTSIZE];
+
+    let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
+    let fontstyle="";
+    if(fontstyle_n&mxConstants.FONT_BOLD){
+        fontstyle+="bold ";
+    }
+    if(fontstyle_n&mxConstants.FONT_ITALIC){
+        fontstyle+="italic ";
+    }
+
+    const font=fontstyle+size+"pt "+fontfamily;
+    let nombre=label.split(':')[0];
+    if(getTextWidth(label,font)>width){
+        for(let i=nombre.length;i>0;i--){
+            let etiqueta_temp;
+            if(columna){
+                etiqueta_temp=nombre.slice(0,i)+"..."+": "+type;
+            }else{
+                etiqueta_temp=label.slice(0,i)+"...";
+            }
+            if(getTextWidth(etiqueta_temp,font)<width){
+                return etiqueta_temp;
+            }
+        }
+    }
+
+    //La etiqueta no necesita cambios
+    return label;
 }
 
 
