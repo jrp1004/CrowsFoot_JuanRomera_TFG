@@ -463,6 +463,9 @@ function main(container,outline,toolbar,sidebar,status,properties){
                     handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),true,false);
                     graph.setSelectionCell(cell);
                 }
+                if(cell.value.unique){
+                    handleCambioUnique(cell,graph.getModel().getParent(cell),true,false);
+                }
             }
             editor.execute('delete',cell);
         });
@@ -567,6 +570,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 }
             });
 
+            let wnd=null;
             //Botón para confirmar la importación del grafo
             let button=document.createElement('button');
             button.style.fontSize='10';
@@ -579,10 +583,12 @@ function main(container,outline,toolbar,sidebar,status,properties){
                     let dec=new mxCodec(doc);
 
                     dec.decode(doc.documentElement,graph.getModel());
+
+                    wnd.destroy();
                 }
             });
 
-            showModalWindow('IMPORTAR',div,410,480);
+            wnd=showModalWindow('IMPORTAR',div,410,480);
         });
         addToolbarButton(editor,toolbar,'import','Importar XML',null);
 
@@ -911,6 +917,10 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
                     }
 
+                    if(parent.value.uniqueComp.length){
+                        intercambioIdsUnique(graph,parent,cell.getId(),col_encima.getId());
+                    }
+
                     //Intercambiamos valores
                     graph.model.setValue(col_encima,value_cell);
                     graph.model.setValue(cell,value_encima);
@@ -942,6 +952,10 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                         intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
                     }else if(cell.value.relacionAsociada!=null){
                         intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
+                    }
+
+                    if(parent.value.uniqueComp.length){
+                        intercambioIdsUnique(graph,parent,cell.getId(),col_debajo.getId());
                     }
 
                     graph.model.setValue(col_debajo,value_cell);
@@ -1005,6 +1019,19 @@ function intercambioIds(graph,relacionId,nuevo,actual){
     }
 }
 
+function intercambioIdsUnique(graph,parent,id_1,id_2){
+    for(arr of parent.value.uniqueComp){
+        let index1=arr.indexOf(id_1);
+        let index2=arr.indexOf(id_2);
+        if(index1>-1){
+            arr[index1]=id_2;
+        }
+        if(index2>-1){
+            arr[index2]=id_1;
+        }
+    }
+}
+
 //Función que crea un formulario para editar los parámetros de las columnas
 function showProperties(graph,cell,properties){
     let form=new mxForm('properties');
@@ -1041,6 +1068,7 @@ function showProperties(graph,cell,properties){
             }
 
             let old_primaryKey=clone.primaryKey;
+            let old_unique=clone.unique;
     
             clone.primaryKey=primaryKeyField.checked;
             clone.foreignKey=foreignKeyField.checked;
@@ -1053,6 +1081,7 @@ function showProperties(graph,cell,properties){
     
             graph.model.setValue(cell,clone);
             handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),old_primaryKey,clone.primaryKey);
+            handleCambioUnique(cell,graph.getModel().getParent(cell),old_unique!=clone.unique,clone.unique);
             graph.setSelectionCell(cell);
         });
     }else if(graph.model.isEdge(cell)){
@@ -1123,6 +1152,11 @@ function showProperties(graph,cell,properties){
     c_propiedad.outerHTML='<th>Propiedad</th>';
     let c_valor=fila.insertCell(1);
     c_valor.outerHTML='<th>Valor</th>';
+
+    if(graph.isSwimlane(cell)){
+        let uniqueTable=getTableUniqueComp(graph,cell);
+        properties.appendChild(uniqueTable);
+    }
 }
 
 function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
@@ -1134,6 +1168,19 @@ function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
             actualizarClaves(graph,rel);
         }
     }
+}
+
+function handleCambioUnique(cell,parent,cambio,new_value){
+    if(cambio&&!new_value){
+        //El valor ha cambiado y ya no es verdadero
+        let uniqueComp=parent.value.uniqueComp;
+        for(let i=0;i<uniqueComp.length;i++){
+            if(uniqueComp[i].indexOf(cell.getId())>-1){
+                uniqueComp.splice(i,1);
+                i--;
+            }
+        }
+    }  
 }
 
 //Actualizamos las claves cuando se cambia la relación entre 2 tablas
@@ -1327,6 +1374,16 @@ function addTablaSql(graph,tabla){
         }
         if(fks_num>0){
             sql.push('\n'+fks.substring(0,fks.length-2)+')');
+            sql.push(',');
+        }
+        
+        if(tabla.value.uniqueComp.length){
+            for(uniques of tabla.value.uniqueComp){
+                sql.push('\n UNIQUE(');
+                sql.push(getNombreUniComp(graph,uniques)+')');
+                sql.push(',')
+            }
+            sql.splice(sql.length-1,1);
         }else{
             sql.splice(sql.length-1,1);
         }
@@ -1721,6 +1778,139 @@ function obtenerDatoTabla(tipo,dato){
     return td;
 }
 
+function getTableUniqueComp(graph,cell){
+    let div=document.createElement('div');
+    let titulo=document.createElement('p');
+    titulo.className='titulo';
+    titulo.innerHTML='Unique compuesto';
+    div.appendChild(titulo);
+
+    let tabla=document.createElement('table');
+    let thead=document.createElement('thead');
+    let trh=document.createElement('tr');
+    trh.appendChild(obtenerDatoTabla('th','Id'));
+    trh.appendChild(obtenerDatoTabla('th','Columnas'));
+    trh.appendChild(obtenerDatoTabla('th','Eliminar'));
+    thead.appendChild(trh);
+    tabla.appendChild(thead);
+    let tbody=document.createElement('tbody');
+
+    if(cell.value.uniqueComp.length){
+        
+        for(let i=0;i<cell.value.uniqueComp.length;i++){
+            let tr=document.createElement('tr');
+            tr.appendChild(obtenerDatoTabla('td',i));
+            let nombres=getNombreUniComp(graph,cell.value.uniqueComp[i]);
+            tr.appendChild(obtenerDatoTabla('td',nombres));
+            let btnEliminar=document.createElement('button');
+            mxEvent.addListener(btnEliminar,'click',function(evt){
+                eliminarUniqueComp(graph,cell,i,tabla);
+            });
+            btnEliminar.innerHTML='Elim';
+            btnEliminar.className='buttonToolbar';
+            let td=document.createElement('td');
+            td.appendChild(btnEliminar);
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        }
+        
+    }
+    tabla.appendChild(tbody);
+    div.appendChild(tabla);
+    div.appendChild(document.createElement('br'));
+    let btnAdd=document.createElement('button');
+    mxEvent.addListener(btnAdd,'click',function(evt){
+        addUniqueComp(graph,cell,tabla);
+    });
+    btnAdd.className='buttonToolbar';
+    btnAdd.innerHTML='Add';
+    div.appendChild(btnAdd);
+
+    return div;
+}
+
+function eliminarUniqueComp(graph,cell,id,tabla){
+    let clone=cell.value.clone();
+    clone.uniqueComp.splice(id,1);
+    graph.model.setValue(cell,clone);
+    tabla.deleteRow(id+1);
+}
+
+function addUniqueComp(graph,cell,tabla){
+    let uniqueCount=0;
+    let cols=graph.getChildVertices(cell);
+    let uniques=[]
+    for(col of cols){
+        if(col.value.unique){
+            uniqueCount++;
+            uniques.push(col);
+        }
+    }
+
+    if(uniqueCount>1){
+        //Mostramos ventana
+        let form=new mxForm('Uniques');
+        const ids=[];
+        for(col of uniques){
+            let nombre=col.value.name;
+            let id=col.getId();
+            let input=form.addCheckbox(nombre);
+            mxEvent.addListener(input,'change',function(evt){
+                if(input.checked){
+                    ids.push(id);
+                }else{
+                    ids.splice(ids.lastIndexOf(id),1);
+                }
+            });
+        }
+        let vetnana=null;
+        let acepFunc=function(){
+            if(ids.length>1){
+                let res=getNombreUniComp(graph,ids);
+                let clone=cell.value.clone();
+                clone.uniqueComp.push(ids);
+                graph.model.setValue(cell,clone);
+
+                let row=tabla.tBodies[0].insertRow();
+                let id=row.insertCell(0);
+                id.innerHTML=clone.uniqueComp.length-1;
+                let name=row.insertCell(1);
+                name.innerHTML=res;
+                let cellBtn=row.insertCell(2);
+                let btnEliminar=document.createElement('button');
+                mxEvent.addListener(btnEliminar,'click',function(evt){
+                    eliminarUniqueComp(graph,cell,clone.uniqueComp.length-1,tabla);
+                });
+                btnEliminar.innerHTML='Elim';
+                btnEliminar.className='buttonToolbar';
+                cellBtn.appendChild(btnEliminar);
+
+                vetnana.destroy();
+            }else{
+                alert('Selecciona por lo menos dos columnas');
+            }
+        }
+        let cancelFunc=function(){
+            vetnana.destroy();
+        }
+        form.addButtons(acepFunc,cancelFunc);
+        vetnana=showModalWindow('Unique compuesta',form.getTable(),240,240);
+    }else{
+        alert('Necesitas por lo menos 2 columnas con la propiedad Unique');
+    }
+}
+
+function getNombreUniComp(graph,ids){
+    const texto=[];
+    for(id of ids){
+        let cell=graph.model.getCell(id)
+        texto.push(cell.value.name);
+        texto.push(', ');
+    }
+    texto.splice(texto.length-1,1);
+    return texto.join('');
+}
+
 
 //Definición del objeto de usuario columna
 function Column(name){
@@ -1746,6 +1936,7 @@ Column.prototype.relacionAsociada=null;
 //Definición del objeto de usuario tabla
 function Table(name){
     this.name=name;
+    this.uniqueComp=[];
 }
 Table.prototype.clone=function(){
     return mxUtils.clone(this);
