@@ -461,10 +461,21 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 editor.graph.getModel().clear();
             }
         });
+        editor.addAction('borrar',function(editor,cell){
+            cell=cell||graph.getSelectionCell();
+            if(cell&&graph.isHtmlLabel(cell)){
+                if(cell.value.primaryKey){
+                    cell.value.primaryKey=false;
+                    handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),true,false);
+                    graph.setSelectionCell(cell);
+                }
+            }
+            editor.execute('delete',cell);
+        });
         
         //Añadimos el resto de botones
         //Para estos botones no hace falta añadir funciones puesto que ya están definidas en el editor
-        addToolbarButton(editor,toolbar,'delete','Delete','../images/delete2.png');
+        addToolbarButton(editor,toolbar,'borrar','Delete','../images/delete2.png');
         addToolbarButton(editor,toolbar,'clear','Borrar todo','../images/delete2.png');
         toolbar.appendChild(spacer.cloneNode(true));
 
@@ -968,7 +979,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
         }
 
         menu.addItem('Borrar','../images/delete2.png',function(){
-            editor.execute('delete',cell);
+            editor.execute('borrar',cell);
         });
 
         menu.addSeparator();
@@ -986,7 +997,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
 
     menu.addItem('Mostrar SQL','../images/export1.png',function(){
         editor.execute('showSql',cell);
-    })
+    });
 }
 
 //Asociamos el id de la nueva columna a la relación correspondiente
@@ -1047,7 +1058,8 @@ function showProperties(graph,cell,properties){
             clone.desc=descripcion.value;
     
             graph.model.setValue(cell,clone);
-            handleNuevaClavePrimaria(graph,graph.getModel().getParent(cell),old_primaryKey,clone.primaryKey);
+            handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),old_primaryKey,clone.primaryKey);
+            graph.setSelectionCell(cell);
         });
     }else if(graph.model.isEdge(cell)){
         //ENLACE
@@ -1119,7 +1131,7 @@ function showProperties(graph,cell,properties){
     c_valor.outerHTML='<th>Valor</th>';
 }
 
-function handleNuevaClavePrimaria(graph,tabla,oldValue,newValue){
+function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
     //Comprobamos que el valor cambia
     if(oldValue!=newValue){
         //Actualizamos las relaciones entrantes
