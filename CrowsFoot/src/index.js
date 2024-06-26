@@ -410,7 +410,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 this.addCell(edge);//Añadimos el edge para poder obtener el id
                 let relacion=new Relacion("Relacion");
                 for(let i=0;i<primaryKey.length;i++){
-                    let columna=addClaveForanea(this,source,primaryKey[i],edge.getId());
+                    let columna=addClaveForanea(this,source,primaryKey[i],edge.getId(),relacion.endArrow);
                     relacion.clavesForaneas.push(columna.getId());
                 }
                 edge.setValue(relacion);
@@ -1143,12 +1143,12 @@ function actualizarClaves(graph,cell){
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
-            insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true);
+            insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true,relacion.startArrow);
         }else{
             if(relacion.endArrow==='cero_o_uno'){
-                insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true);
+                insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true,relacion.startArrow);
             }else{
-                insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
+                insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false,relacion.endArrow);
             }
             console.log("Indiferente");
         }
@@ -1163,24 +1163,24 @@ function actualizarClaves(graph,cell){
             let relacion_s=new Relacion("Relacion_s");
             relacion_s.startArrow='uno_o_mas';
             relacion_s.endArrow='solo_uno';
-            insertarNuevaRelacion(graph,clone.clone(),relacion_s,table,table_s,primaryKey_s,false);
+            insertarNuevaRelacion(graph,clone.clone(),relacion_s,table,table_s,primaryKey_s,false,relacion_s.endArrow);
 
             let relacion_t=new Relacion("Relacion_t");
             relacion_t.startArrow='uno_o_mas';
             relacion_t.endArrow='solo_uno';
-            insertarNuevaRelacion(graph,clone.clone(),relacion_t,table,table_t,primaryKey_t,false);
+            insertarNuevaRelacion(graph,clone.clone(),relacion_t,table,table_t,primaryKey_t,false,relacion_t.endArrow);
             graph.setSelectionCell(table);
         }else{
             console.log("Clave en source");
-            insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
+            insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false,relacion.endArrow);
         }
     }
 }
 
-function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir){
+function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir,simb){
     editarRelacion(graph,enlace,relacion,source,target,invertir);
     for(let i=0;i<pks.length;i++){
-        let column=addClaveForanea(graph,source,pks[i],enlace.getId());
+        let column=addClaveForanea(graph,source,pks[i],enlace.getId(),simb);
         relacion.clavesForaneas.push(column.getId());
     }
     graph.setSelectionCell(enlace);
@@ -1214,7 +1214,7 @@ function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
 }
 
 //Añade la columna pasada como clave primaria como clave foranea a la tabla indicada
-function addClaveForanea(graph,table,key,relacionAsociada){
+function addClaveForanea(graph,table,key,relacionAsociada,simb){
     let columnObject=new Column("COLUMNA");
     let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
 
@@ -1225,6 +1225,8 @@ function addClaveForanea(graph,table,key,relacionAsociada){
     column.value.type=key.value.type;
     column.value.foreignKey=true;
     column.value.relacionAsociada=relacionAsociada;
+    column.value.notNull=(simb=='solo_uno'||simb=='uno_o_mas');//Comprobar obligatoriedad
+    column.value.unique=(simb=='solo_uno'||simb=='cero_o_uno');//Comprobar máximo uno
 
     column.geometry.y=table.geometry.y; //Ajuste para corregir error con la tabla intermedia
 
