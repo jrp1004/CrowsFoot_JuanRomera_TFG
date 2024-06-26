@@ -450,12 +450,6 @@ function main(container,outline,toolbar,sidebar,status,properties){
         spacer.style.display='inline';
         spacer.style.padding='8px';
 
-        //Añadimos el botón propiedades
-        addToolbarButton(editor,toolbar,'properties','Properties','../editors/images/properties.gif');
-        //Añadimos la función del editor 'properties' a la función especificada
-        editor.addAction('properties',function(editor,cell){
-            document.getElementById('propertiesDatos').click();
-        });
         editor.addAction('clear',function(editor,cell){
             if(confirm('¿Eliminar todos los elementos del diagrama?')){
                 editor.graph.getModel().clear();
@@ -887,80 +881,71 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     //Comprobamos si hemos hecho click en una tabla o en una columna
     if(cell!=null){
         //Si hemos hecho click en una columna añadimos la entrada propiedades
-        if(graph.isHtmlLabel(cell)||graph.model.isEdge(cell)){
-            menu.addItem('Propiedades','../editors/images/properties.gif',function(){
-                editor.execute('properties',cell);
+        if(graph.isHtmlLabel(cell)){
+            menu.addItem('Subir posición',null,function(){
+                let posicion=(cell.geometry.y-28)/26;
+                let parent=cell.getParent();
+
+                if(posicion>0){
+                    let col_encima=graph.model.getChildAt(parent,posicion-1);
+                    let value_encima=col_encima.value.clone();
+                    let value_cell=cell.value.clone();
+                    let temp_style=col_encima.getStyle();
+
+                    //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
+                    if(col_encima.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
+                        intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
+                        intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
+                    }else if(col_encima.value.relacionAsociada!=null){
+                        intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
+                    }else if(cell.value.relacionAsociada!=null){
+                        intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
+                    }
+
+                    //Intercambiamos valores
+                    graph.model.setValue(col_encima,value_cell);
+                    graph.model.setValue(cell,value_encima);
+                    //Intercambiamos estilos
+                    col_encima.setStyle(cell.getStyle());
+                    cell.setStyle(temp_style);
+
+                    //Seleccionamos la celda que hemos movido
+                    graph.setSelectionCell(col_encima);
+                }
+
+            });
+            menu.addItem('Bajar posición',null,function(){
+                let posicion=(cell.geometry.y-28)/26;
+                let parent=cell.getParent();
+                let hijos=graph.model.getChildCount(parent);
+
+                if(posicion<hijos-1){
+                    let col_debajo=graph.model.getChildAt(parent,posicion+1);
+                    let value_debajo=col_debajo.value.clone();
+                    let value_cell=cell.value.clone();
+                    let temp_style=col_debajo.getStyle();
+
+                    //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
+                    if(col_debajo.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
+                        intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
+                        intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
+                    }else if(col_debajo.value.relacionAsociada!=null){
+                        intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
+                    }else if(cell.value.relacionAsociada!=null){
+                        intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
+                    }
+
+                    graph.model.setValue(col_debajo,value_cell);
+                    graph.model.setValue(cell,value_debajo);
+                    col_debajo.setStyle(cell.getStyle());
+                    cell.setStyle(temp_style);
+
+                    graph.setSelectionCell(col_debajo);
+                }
             });
 
             menu.addSeparator();
-
-            //Si es columna añadimos la opción de subir y bajar
-            if(graph.isHtmlLabel(cell)){
-                menu.addItem('Subir posición',null,function(){
-                    let posicion=(cell.geometry.y-28)/26;
-                    let parent=cell.getParent();
-
-                    if(posicion>0){
-                        let col_encima=graph.model.getChildAt(parent,posicion-1);
-                        let value_encima=col_encima.value.clone();
-                        let value_cell=cell.value.clone();
-                        let temp_style=col_encima.getStyle();
-
-                        //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
-                        if(col_encima.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
-                            intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
-                            intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                        }else if(col_encima.value.relacionAsociada!=null){
-                            intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                        }else if(cell.value.relacionAsociada!=null){
-                            intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
-                        }
-
-                        //Intercambiamos valores
-                        graph.model.setValue(col_encima,value_cell);
-                        graph.model.setValue(cell,value_encima);
-                        //Intercambiamos estilos
-                        col_encima.setStyle(cell.getStyle());
-                        cell.setStyle(temp_style);
-
-                        //Seleccionamos la celda que hemos movido
-                        graph.setSelectionCell(col_encima);
-                    }
-
-                });
-                menu.addItem('Bajar posición',null,function(){
-                    let posicion=(cell.geometry.y-28)/26;
-                    let parent=cell.getParent();
-                    let hijos=graph.model.getChildCount(parent);
-
-                    if(posicion<hijos-1){
-                        let col_debajo=graph.model.getChildAt(parent,posicion+1);
-                        let value_debajo=col_debajo.value.clone();
-                        let value_cell=cell.value.clone();
-                        let temp_style=col_debajo.getStyle();
-
-                        //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
-                        if(col_debajo.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
-                            intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
-                            intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                        }else if(col_debajo.value.relacionAsociada!=null){
-                            intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                        }else if(cell.value.relacionAsociada!=null){
-                            intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
-                        }
-
-                        graph.model.setValue(col_debajo,value_cell);
-                        graph.model.setValue(cell,value_debajo);
-                        col_debajo.setStyle(cell.getStyle());
-                        cell.setStyle(temp_style);
-
-                        graph.setSelectionCell(col_debajo);
-                    }
-                });
-            }
-
-            menu.addSeparator();
-        }else{
+        }else if(graph.isSwimlane(cell)){
             menu.addItem('Anadir columna','../images/plus.png',function(){
                 //Nueva columna
                 let columnCount=graph.model.getChildCount(cell)+1;
