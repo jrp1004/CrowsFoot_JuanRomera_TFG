@@ -1942,21 +1942,12 @@ function eliminarUniqueComp(graph,cell,id,tabla){
 }
 
 function addUniqueComp(graph,cell,tabla){
-    let uniqueCount=0;
     let cols=graph.getChildVertices(cell);
-    let uniques=[]
-    for(col of cols){
-        if(col.value.unique){
-            uniqueCount++;
-            uniques.push(col);
-        }
-    }
-
-    if(uniqueCount>1){
+    if(cols.length>1){
         //Mostramos ventana
         let form=new mxForm('Uniques');
         const ids=[];
-        for(col of uniques){
+        for(col of cols){
             let nombre=col.value.name;
             let id=col.getId();
             let input=form.addCheckbox(nombre);
@@ -2001,7 +1992,7 @@ function addUniqueComp(graph,cell,tabla){
         form.addButtons(acepFunc,cancelFunc);
         vetnana=showModalWindow('Unique compuesta',form.getTable(),240,240);
     }else{
-        alert('Necesitas por lo menos 2 columnas con la propiedad Unique');
+        alert('Necesitas por lo menos 2 columnas');
     }
 }
 
