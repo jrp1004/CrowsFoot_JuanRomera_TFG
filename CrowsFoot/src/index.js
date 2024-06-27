@@ -1463,7 +1463,7 @@ function addTablaSqlAlchemy(graph,tabla){
 
     let fksArray=Object.entries(fks).map(([id,val])=>[id,val]);
     
-    if(fksArray.length){
+    if(fksArray.length||tabla.value.uniqueComp.length){
         sql.push('\t__table_args__=(\n');
         for(grupo of fksArray){
             sql.push('\t\tForeignKeyConstraint(\n');
@@ -1485,6 +1485,13 @@ function addTablaSqlAlchemy(graph,tabla){
 
             sql.push('\t\t\t'+nombres.join('')+', '+referencias.join('')+'\n');
             sql.push('\t\t),\n');
+        }
+
+        for(grupo of tabla.value.uniqueComp){
+            sql.push('\t\tUniqueConstraint(');
+            let nombres=getNombreUniComp(graph,grupo).split(',');
+            sql.push(nombres.map(nom => `"${nom.trim()}"`).join(', '));
+            sql.push('),\n');
         }
         sql.push('\t)');
     }
