@@ -1673,10 +1673,9 @@ function setColorFontPicker(style,colorFontPicker,enlace){
 
 function setFontStyle(style,negritaButton,cursivaButton){
     let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
-    if(fontStyle===undefined||fontStyle===null){
-        negritaButton.className=negritaButton.className.replace(" active","");
-        cursivaButton.className=cursivaButton.className.replace(" active","");
-    }else{
+    negritaButton.className=negritaButton.className.replace(" active","");
+    cursivaButton.className=cursivaButton.className.replace(" active","");
+    if(fontStyle){
         toggleButtonActiveStyle(negritaButton,fontStyle&mxConstants.FONT_BOLD);
         toggleButtonActiveStyle(cursivaButton,fontStyle&mxConstants.FONT_ITALIC);
     }
