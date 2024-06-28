@@ -342,14 +342,11 @@ function main(container,outline,toolbar,sidebar,status,properties){
         //Las aristas sueltas se eliminan al no estar permitadas en el setAllowDanglingEdges
         graph.addListener(mxEvent.REMOVE_CELLS,function(sender,evt){
             let cells=evt.getProperty('cells');
-
-            for(let i=0;i<cells.length;i++){
-                let cell=cells[i];
-
+            for(cell of cells){
                 if(this.model.isEdge(cell)){
                     const clavesForaneas=cell.value.clavesForaneas;
-                    for(let i=0;i<clavesForaneas.length;i++){
-                        this.model.remove(this.model.getCell(clavesForaneas[i]));
+                    for(id of clavesForaneas){
+                        this.model.remove(this.model.getCell(id));
                     }
                 }
             }
@@ -407,13 +404,8 @@ function main(container,outline,toolbar,sidebar,status,properties){
             //Actualizamos el grafo con la nueva columna
             this.model.beginUpdate();
             try {
-                this.addCell(edge);//Añadimos el edge para poder obtener el id
                 let relacion=new Relacion("Relacion");
-                for(let i=0;i<primaryKey.length;i++){
-                    let columna=addClaveForanea(this,source,primaryKey[i],edge.getId(),relacion.endArrow,relacion.startArrow);
-                    relacion.clavesForaneas.push(columna.getId());
-                }
-                edge.setValue(relacion);
+                insertarNuevaRelacion(this,edge,relacion,source,target,primaryKey,false,relacion.startArrow,relacion.endArrow);
 
                 return mxGraph.prototype.addEdge.apply(this,arguments);
             } catch (error) {
@@ -1233,8 +1225,8 @@ function actualizarClaves(graph,cell){
 
 function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir,simbO,simbM){
     editarRelacion(graph,enlace,relacion,source,target,invertir);
-    for(let i=0;i<pks.length;i++){
-        let column=addClaveForanea(graph,source,pks[i],enlace.getId(),simbO,simbM);
+    for(pk of pks){
+        let column=addClaveForanea(graph,source,pk,enlace.getId(),simbO,simbM);
         relacion.clavesForaneas.push(column.getId());
     }
     graph.setSelectionCell(enlace);
@@ -1531,13 +1523,13 @@ function getTextWidth(text,font){
 function openTabProperties(evt,prop){
     //Manejo de las pestañas del apartado propiedades
     let tabs=document.getElementsByClassName("tab");
-    for(let i=0;i<tabs.length;i++){
-        tabs[i].className=tabs[i].className.replace(" active","");
+    for(tab of tabs){
+        tab.className=tab.className.replace(" active","");
     }
 
     let tabcontent=document.getElementsByClassName("tabcontent");
-    for(let i=0;i<tabcontent.length;i++){
-        tabcontent[i].style.display="none";
+    for(content of tabcontent){
+        content.style.display="none";
     }
     document.getElementById(prop).style.display="block";
     evt.currentTarget.className+=" active";
