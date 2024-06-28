@@ -1562,7 +1562,6 @@ function configurarTabEstilos(graph,cell){
     setEstilosIniciales(style,graph.model.isEdge(cell),{
         colorPicker,
         gradientPicker,
-        gradientCheck,
         selectGradientDirection,
         selectFont,
         tamFont,
@@ -1608,7 +1607,7 @@ function inicializarSombra(tabla,shadowCheck){
 }
 
 function setEstilosIniciales(style,enlace,elementos){
-    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+    const{colorPicker,gradientPicker,selectGradientDirection,selectFont,
         tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
     }=elementos;
 
@@ -1666,7 +1665,7 @@ function toggleButtonActiveStyle(button,activo){
 }
 
 function setEstilosDefault(enlace,elementos){
-    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+    const{colorPicker,gradientPicker,selectGradientDirection,selectFont,
         tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
     }=elementos;
 
