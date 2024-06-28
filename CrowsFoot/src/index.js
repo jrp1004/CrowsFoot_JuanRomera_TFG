@@ -1362,10 +1362,9 @@ function addTablaSql(graph,tabla){
     sql.push('CREATE TABLE IF NOT EXISTS '+tabla.value.name+' (');
     let columnCount=graph.model.getChildCount(tabla);
 
-    let pks=' PRIMARY KEY(';
+    let pks='\tPRIMARY KEY(';
     let pks_num=0;
-    let fks=' FOREIGN KEY(';
-    let fks_num=0;
+    let fks={};
 
     if(columnCount>0){
         for(let j=0;j<columnCount;j++){
@@ -1377,8 +1376,13 @@ function addTablaSql(graph,tabla){
                 pks_num++;
             }
             if(columna.foreignKey){
-                fks+=columna.name+', ';
-                fks_num++;
+                let relacion=graph.getModel().getCell(columna.relacionAsociada);
+                let target=relacion.getTerminal(false);
+                let id=target.getId();
+                if(!fks[id]){
+                    fks[id]=[];
+                }
+                fks[id].push(columna.name);
             }
         }
         //Añadimos las claves
@@ -1386,14 +1390,20 @@ function addTablaSql(graph,tabla){
             sql.push('\n'+pks.substring(0,pks.length-2)+')');
             sql.push(',');
         }
-        if(fks_num>0){
-            sql.push('\n'+fks.substring(0,fks.length-2)+')');
-            sql.push(',');
+        let fksArray=Object.entries(fks).map(([id,val])=>[id,val]);
+        if(fksArray.length){
+            for(grupo of fksArray){
+                let parent=graph.getModel().getCell(grupo[0]);
+                sql.push('\n\tFOREIGN KEY (');
+                sql.push(grupo[1].join(',')+')');
+                sql.push(' REFERENCES '+parent.value.name+'('+grupo[1].join(',')+')');
+                sql.push(',');
+            }
         }
         
         if(tabla.value.uniqueComp.length){
             for(uniques of tabla.value.uniqueComp){
-                sql.push('\n UNIQUE(');
+                sql.push('\n\tUNIQUE(');
                 sql.push(getNombreUniComp(graph,uniques)+')');
                 sql.push(',')
             }
@@ -1410,7 +1420,7 @@ function addTablaSql(graph,tabla){
 
 function addColumnaSql(columna){
     const sql=[];
-    sql.push('\n '+columna.name+' '+columna.type);
+    sql.push('\n\t'+columna.name+' '+columna.type);
     if(columna.notNull){
         sql.push(' NOT NULL');
     }
