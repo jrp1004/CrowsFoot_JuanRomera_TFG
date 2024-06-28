@@ -426,25 +426,6 @@ function main(container,outline,toolbar,sidebar,status,properties){
             return null;
         }
 
-        graph.getView().updateStyle=true;
-        let previous=graph.model.getStyle;
-
-        graph.model.getStyle=function(cell){
-            if(cell!=null){
-                let style=previous.apply(this,arguments);
-
-                if(this.isEdge(cell)){
-                    if(style===null||style===undefined){
-                        style="startArrow="+cell.value.startArrow+";endArrow="+cell.value.endArrow+";";
-                    }
-                }
-
-                return style;
-                
-            }
-            return null;
-        };
-
         //Elemento que añadiremos en las toolbar para generar un espacio entre botones
         let spacer=document.createElement('div');
         spacer.style.display='inline';
@@ -903,6 +884,8 @@ function configureStylesheet(graph){
     style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
     style[mxConstants.STYLE_STARTSIZE]='8';
     style[mxConstants.STYLE_ENDSIZE]='8';
+    style[mxConstants.STYLE_STARTARROW]='solo_uno';
+    style[mxConstants.STYLE_ENDARROW]='solo_uno';
 }
 
 //Función para crear las entradas del menú popup
@@ -1169,6 +1152,7 @@ function showProperties(graph,cell,properties){
 
     if(graph.isSwimlane(cell)){
         let uniqueTable=getTableUniqueComp(graph,cell);
+        properties.appendChild(document.createElement('hr'));
         properties.appendChild(uniqueTable);
     }
 }
