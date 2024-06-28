@@ -788,6 +788,9 @@ function addSidebarIcon(graph,sidebar,prototype,image){
                     v1.geometry.alternateBounds=new mxRectangle(0,0,v1.geometry.width,v1.geometry.height);
                     //Editamos el nombre de la columna que contiene la clave primaria para que coincida con el de la tabla
                     v1.children[0].value.name=name+'_ID';
+                }else if(parent.isCollapsed()){
+                    //Corregir bug add columna a tabla colapsada
+                    v1.geometry.height=prototype.geometry.height;
                 }
             } catch (error) {
                 console.log("ERROR addSidebarIcon:");
@@ -970,11 +973,15 @@ function createPopupMenu(editor,graph,menu,cell,evt){
 
                 let columnObject=new Column(name);
                 let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+                let altura=column.geometry.height;
 
                 column.setVertex(true);
                 column.setConnectable(false);
                 //Añadimos la nueva columna a la tabla
                 graph.addCell(column,cell);
+                if(cell.isCollapsed()){
+                    column.geometry.height=altura;
+                }
             });
 
             menu.addSeparator();
@@ -1268,6 +1275,7 @@ function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
 function addClaveForanea(graph,table,key,relacionAsociada,simbO,simbM){
     let columnObject=new Column("COLUMNA");
     let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+    let altura=column.geometry.height;
 
     column.setVertex(true);
     column.setConnectable(false);
@@ -1282,6 +1290,10 @@ function addClaveForanea(graph,table,key,relacionAsociada,simbO,simbM){
     column.geometry.y=table.geometry.y; //Ajuste para corregir error con la tabla intermedia
 
     graph.addCell(column,table);
+    if(table.isCollapsed){
+        //Corregir bug add columna a tabla colapsada
+        column.geometry.height=altura;
+    }
 
     return column;
 }
