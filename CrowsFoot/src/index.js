@@ -568,8 +568,13 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 if(confirm('¿Importar el diagrama?')){
                     let doc=mxUtils.parseXml(textarea.value);
                     let dec=new mxCodec(doc);
-
-                    dec.decode(doc.documentElement,graph.getModel());
+                    try{
+                        dec.decode(doc.documentElement,graph.getModel());
+                    }catch(error){
+                        console.log(error);
+                        alert('El fichero XML contiene errores');
+                        editor.graph.getModel().clear();
+                    }
 
                     wnd.destroy();
                 }
