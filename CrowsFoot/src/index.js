@@ -899,34 +899,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                 let parent=cell.getParent();
 
                 if(posicion>0){
-                    let col_encima=graph.model.getChildAt(parent,posicion-1);
-                    let value_encima=col_encima.value.clone();
-                    let value_cell=cell.value.clone();
-                    let temp_style=col_encima.getStyle();
-
-                    //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
-                    if(col_encima.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
-                        intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
-                        intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                    }else if(col_encima.value.relacionAsociada!=null){
-                        intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                    }else if(cell.value.relacionAsociada!=null){
-                        intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
-                    }
-
-                    if(parent.value.uniqueComp.length){
-                        intercambioIdsUnique(graph,parent,cell.getId(),col_encima.getId());
-                    }
-
-                    //Intercambiamos valores
-                    graph.model.setValue(col_encima,value_cell);
-                    graph.model.setValue(cell,value_encima);
-                    //Intercambiamos estilos
-                    col_encima.setStyle(cell.getStyle());
-                    cell.setStyle(temp_style);
-
-                    //Seleccionamos la celda que hemos movido
-                    graph.setSelectionCell(col_encima);
+                   moverPosicionColumna(graph,cell,parent,posicion,1);
                 }
 
             });
@@ -936,31 +909,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                 let hijos=graph.model.getChildCount(parent);
 
                 if(posicion<hijos-1){
-                    let col_debajo=graph.model.getChildAt(parent,posicion+1);
-                    let value_debajo=col_debajo.value.clone();
-                    let value_cell=cell.value.clone();
-                    let temp_style=col_debajo.getStyle();
-
-                    //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
-                    if(col_debajo.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
-                        intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
-                        intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                    }else if(col_debajo.value.relacionAsociada!=null){
-                        intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                    }else if(cell.value.relacionAsociada!=null){
-                        intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
-                    }
-
-                    if(parent.value.uniqueComp.length){
-                        intercambioIdsUnique(graph,parent,cell.getId(),col_debajo.getId());
-                    }
-
-                    graph.model.setValue(col_debajo,value_cell);
-                    graph.model.setValue(cell,value_debajo);
-                    col_debajo.setStyle(cell.getStyle());
-                    cell.setStyle(temp_style);
-
-                    graph.setSelectionCell(col_debajo);
+                    moverPosicionColumna(graph,cell,parent,posicion,-1)
                 }
             });
 
@@ -1007,6 +956,36 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     menu.addItem('Mostrar SQL','../images/export1.png',function(){
         editor.execute('showSql',cell);
     });
+}
+
+function moverPosicionColumna(graph,col_a_mover,parent,posicion,desp){
+    let col_desplazada=graph.model.getChildAt(parent,posicion-desp);
+    let value_desplazada=col_desplazada.value.clone();
+    let value_cell=col_a_mover.value.clone();
+    let temp_style=col_desplazada.getStyle();
+
+    //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
+    if(col_desplazada.value.relacionAsociada!=null&&col_a_mover.value.relacionAsociada!=null){
+        intercambioIds(graph,col_a_mover.value.relacionAsociada,col_desplazada.getId(),col_a_mover.getId());
+        intercambioIds(graph,col_desplazada.value.relacionAsociada,col_a_mover.getId(),col_desplazada.getId());
+    }else if(col_desplazada.value.relacionAsociada!=null){
+        intercambioIds(graph,col_desplazada.value.relacionAsociada,col_a_mover.getId(),col_desplazada.getId());
+    }else if(col_a_mover.value.relacionAsociada!=null){
+        intercambioIds(graph,col_a_mover.value.relacionAsociada,col_desplazada.getId(),col_a_mover.getId());
+    }
+
+    //Intercambiamos los ids en caso de que pertenzcan a un unique compuesto
+    if(parent.value.uniqueComp.length){
+        intercambioIdsUnique(graph,parent,col_a_mover.getId(),col_desplazada.getId());
+    }
+
+    //Actualizamos valores y estilos
+    graph.model.setValue(col_desplazada,value_cell);
+    graph.model.setValue(col_a_mover,value_desplazada);
+    graph.model.setStyle(col_desplazada,col_a_mover.getStyle());
+    graph.model.setStyle(col_a_mover,temp_style);
+
+    graph.setSelectionCell(col_desplazada);
 }
 
 //Asociamos el id de la nueva columna a la relación correspondiente
