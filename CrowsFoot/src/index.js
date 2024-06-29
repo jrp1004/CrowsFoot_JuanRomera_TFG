@@ -1265,6 +1265,7 @@ function addClaveForanea(graph,table,key,relacionAsociada,simbO,simbM){
     column.value.relacionAsociada=relacionAsociada;
     column.value.notNull=(simbO=='solo_uno'||simbO=='uno_o_mas');//Comprobar obligatoriedad
     column.value.unique=(simbM=='solo_uno'||simbM=='cero_o_uno');//Comprobar máximo uno
+    column.value.pkAsociada=key.getId();//Asociamos la fk a la clave
 
     column.geometry.y=table.geometry.y; //Ajuste para corregir error con la tabla intermedia
 
@@ -1300,93 +1301,59 @@ function editarRelacion(graph,edge,relacion,source,target,invertir){
 //Devuelve la celda correspondiente a la clave primaria de la tabla indicada
 function obtenerClavePrimaria(graph,tabla){
     const primaryKey=[]
-    let childCount=graph.model.getChildCount(tabla);
-
-    for(let i=0;i<childCount;i++){
-        let child=graph.model.getChildAt(tabla,i);
-        if(child.value.primaryKey){
-            primaryKey.push(child);
-        }
-    }
-
+    let childs=graph.getChildVertices(tabla);
+    primaryKey.push(...childs.filter(child=>child.value.primaryKey));
     return primaryKey;
 }
 
 //Función que crea el código SQL según los elementos del grafo
 function createSql(graph){
-    const sql=[];
     let parent=graph.getDefaultParent();
-    let childCount=graph.model.getChildCount(parent);
-
-    for(let i=0;i<childCount;i++){
-        let child=graph.model.getChildAt(parent,i);
-
-        if(!graph.model.isEdge(child)){
-            sql.push(addTablaSql(graph,child))
-        }
-    }
-    return sql.join('');
+    let childs=graph.getChildVertices(parent);
+    return childs.map(child=>addTablaSql(graph,child)).join('');
 }
 
 function addTablaSql(graph,tabla){
     const sql=[];
 
     sql.push('CREATE TABLE IF NOT EXISTS '+tabla.value.name+' (');
-    let columnCount=graph.model.getChildCount(tabla);
+    let columnas=graph.getChildVertices(tabla);
 
-    let pks='\tPRIMARY KEY(';
-    let pks_num=0;
-    let fks={};
-
-    if(columnCount>0){
-        for(let j=0;j<columnCount;j++){
-            let columna=graph.model.getChildAt(tabla,j).value;
-            sql.push(addColumnaSql(columna));
-            sql.join('');
-            if(columna.primaryKey){
-                pks+=columna.name+', ';
-                pks_num++;
-            }
-            if(columna.foreignKey){
-                let relacion=graph.getModel().getCell(columna.relacionAsociada);
-                let target=relacion.getTerminal(false);
-                let id=target.getId();
-                if(!fks[id]){
-                    fks[id]=[];
-                }
-                fks[id].push(columna.name);
-            }
+    const pks=[];
+    const fks={};
+    for(let columna of columnas){
+        let value=columna.value;
+        sql.push(addColumnaSql(value));
+        if(value.primaryKey){
+            pks.push(value.name);
         }
-        //Añadimos las claves
-        if(pks_num>0){
-            sql.push('\n'+pks.substring(0,pks.length-2)+')');
-            sql.push(',');
+        if(value.foreignKey){
+            addFKData(graph,value,fks);
         }
-        let fksArray=Object.entries(fks).map(([id,val])=>[id,val]);
-        if(fksArray.length){
-            for(grupo of fksArray){
-                let parent=graph.getModel().getCell(grupo[0]);
-                sql.push('\n\tFOREIGN KEY (');
-                sql.push(grupo[1].join(',')+')');
-                sql.push(' REFERENCES '+parent.value.name+'('+grupo[1].join(',')+')');
-                sql.push(',');
-            }
-        }
-        
-        if(tabla.value.uniqueComp.length){
-            for(uniques of tabla.value.uniqueComp){
-                sql.push('\n\tUNIQUE(');
-                sql.push(getNombreUniComp(graph,uniques)+')');
-                sql.push(',')
-            }
-            sql.splice(sql.length-1,1);
-        }else{
-            sql.splice(sql.length-1,1);
-        }
-
-        sql.push('\n);');
     }
-    sql.push('\n');
+
+    //Añadimos las claves
+    if(pks.length){
+        sql.push('\n\tPRIMARY KEY('+pks.join(', ')+')');
+        sql.push(',');
+    }
+    let fksArray=Object.entries(fks).map(([id,val])=>[id,val]);
+    for(let grupo of fksArray){
+        let parent=graph.getModel().getCell(grupo[0]);
+        const nomFks=grupo[1].map(nombre=>nombre[0]);
+        const nomPks=grupo[1].map(nombre=>graph.model.getCell(nombre[1]).value.name);
+
+        sql.push('\n\tFOREIGN KEY ('+nomFks.join(',')+') REFERENCES '+parent.value.name+'('+nomPks.join(',')+')');
+        sql.push(',');
+    }
+    
+    if(tabla.value.uniqueComp.length){
+        sql.push(tabla.value.uniqueComp.map(uniques=>'\n\tUNIQUE('+getNombreUniComp(graph,uniques)+')'));
+    }else{
+        sql.splice(sql.length-1,1);
+    }
+
+    sql.push('\n);\n');
     return sql.join('');
 }
 
@@ -1410,16 +1377,9 @@ function addColumnaSql(columna){
 }
 
 function createSqlAlchemy(graph){
-    const sql=[];
     let parent=graph.getDefaultParent();
     let childs=graph.getChildVertices(parent);
-
-    for(child of childs){
-        sql.push(addTablaSqlAlchemy(graph,child));
-        sql.push('\n');
-    }
-
-    return sql.join('');
+    return childs.map(child=>addTablaSqlAlchemy(graph,child)+'\n').join('');
 }
 
 function addTablaSqlAlchemy(graph,tabla){
@@ -1430,16 +1390,10 @@ function addTablaSqlAlchemy(graph,tabla){
 
     const fks={};
 
-    for(child of childs){
+    for(let child of childs){
         sql.push(addColumnaSqlAlchemy(graph,child));
         if(child.value.foreignKey){
-            let relacion=graph.getModel().getCell(child.value.relacionAsociada);
-            let target=relacion.getTerminal(false);
-            let id=target.getId();
-            if(!fks[id]){
-                fks[id]=[];
-            }
-            fks[id].push(child.value.name);
+            addFKData(graph,child.value,fks);
         }
     }
 
@@ -1449,31 +1403,18 @@ function addTablaSqlAlchemy(graph,tabla){
         sql.push('\t__table_args__=(\n');
         for(grupo of fksArray){
             sql.push('\t\tForeignKeyConstraint(\n');
-            const nombres=[];
-            const referencias=[];
             let parent=graph.getModel().getCell(grupo[0]);
-            nombres.push('[')
-            referencias.push('[');
-            for(nomb of grupo[1]){
-                nombres.push('"'+nomb+'"');
-                nombres.push(', ');
-                referencias.push('"'+parent.value.name+'.'+nomb+'"');
-                referencias.push(', ');
-            }
-            nombres.splice(nombres.length-1,1);
-            referencias.splice(referencias.length-1,1);
-            nombres.push(']');
-            referencias.push(']');
 
-            sql.push('\t\t\t'+nombres.join('')+', '+referencias.join('')+'\n');
-            sql.push('\t\t),\n');
+            const nomFks=grupo[1].map(nombre=>`"${nombre[0].trim()}"`);
+            const refs=grupo[1].map(nombre=>`"${parent.value.name}.${graph.model.getCell(nombre[1]).value.name.trim()}"`);
+
+            sql.push('\t\t\t['+nomFks.join(', ')+'], ['+refs.join(', ')+']\n\t\t),\n');
         }
 
         for(grupo of tabla.value.uniqueComp){
             sql.push('\t\tUniqueConstraint(');
             let nombres=getNombreUniComp(graph,grupo).split(',');
-            sql.push(nombres.map(nom => `"${nom.trim()}"`).join(', '));
-            sql.push('),\n');
+            sql.push(nombres.map(nom => `"${nom.trim()}"`).join(', ')+'),\n');
         }
         sql.push('\t)');
     }
@@ -1505,6 +1446,16 @@ function addColumnaSqlAlchemy(graph,columna){
     sql.splice(sql.length-1,1);
     sql.push(')\n');
     return sql.join('');
+}
+
+function addFKData(graph,value,fks){
+    let relacion=graph.getModel().getCell(value.relacionAsociada);
+    let target=relacion.getTerminal(false);
+    let id=target.getId();
+    if(!fks[id]){
+        fks[id]=[];
+    }
+    fks[id].push([value.name,value.pkAsociada]);
 }
 
 //Función para obtener la anchura de una cadena de texto en píxeles
@@ -2014,7 +1965,7 @@ Column.prototype.desc='DESCRIPCION';
 Column.prototype.titulo='TITULO';
 Column.prototype.gradient=false;
 Column.prototype.relacionAsociada=null;
-
+Column.prototype.pkAsociada=null;
 
 //Definición del objeto de usuario tabla
 function Table(name){
