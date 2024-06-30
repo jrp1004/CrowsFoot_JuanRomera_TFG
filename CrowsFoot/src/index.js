@@ -965,18 +965,21 @@ function moverPosicionColumna(graph,col_a_mover,parent,posicion,desp){
     let temp_style=col_desplazada.getStyle();
 
     //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
-    if(col_desplazada.value.relacionAsociada!=null&&col_a_mover.value.relacionAsociada!=null){
-        intercambioIds(graph,col_a_mover.value.relacionAsociada,col_desplazada.getId(),col_a_mover.getId());
+    if(col_desplazada.value.relacionAsociada){
         intercambioIds(graph,col_desplazada.value.relacionAsociada,col_a_mover.getId(),col_desplazada.getId());
-    }else if(col_desplazada.value.relacionAsociada!=null){
-        intercambioIds(graph,col_desplazada.value.relacionAsociada,col_a_mover.getId(),col_desplazada.getId());
-    }else if(col_a_mover.value.relacionAsociada!=null){
+    }
+    if(col_a_mover.value.relacionAsociada){
         intercambioIds(graph,col_a_mover.value.relacionAsociada,col_desplazada.getId(),col_a_mover.getId());
+    }
+    
+    //Actualizamos referencias a claves primarias
+    if(col_a_mover.value.primaryKey||col_desplazada.value.primaryKey){
+        actualizarRefPK(graph,col_a_mover,col_desplazada,parent);
     }
 
     //Intercambiamos los ids en caso de que pertenzcan a un unique compuesto
     if(parent.value.uniqueComp.length){
-        intercambioIdsUnique(graph,parent,col_a_mover.getId(),col_desplazada.getId());
+        intercambioIdsUnique(parent,col_a_mover.getId(),col_desplazada.getId());
     }
 
     //Actualizamos valores y estilos
@@ -999,7 +1002,7 @@ function intercambioIds(graph,relacionId,nuevo,actual){
     }
 }
 
-function intercambioIdsUnique(graph,parent,id_1,id_2){
+function intercambioIdsUnique(parent,id_1,id_2){
     for(arr of parent.value.uniqueComp){
         let index1=arr.indexOf(id_1);
         let index2=arr.indexOf(id_2);
@@ -1008,6 +1011,21 @@ function intercambioIdsUnique(graph,parent,id_1,id_2){
         }
         if(index2>-1){
             arr[index2]=id_1;
+        }
+    }
+}
+
+function actualizarRefPK(graph,key1,key2,tabla){
+    const enlaces=graph.getEdges(tabla,null,true,false);
+    for(const enlace of enlaces){
+        const clavesForaneas=enlace.value.clavesForaneas;
+        for(const fkID of clavesForaneas){
+            let cell=graph.model.getCell(fkID);
+            if(cell.value.pkAsociada===key1.getId()){
+                cell.value.pkAsociada=key2.getId();
+            }else if(cell.value.pkAsociada===key2.getId()){
+                cell.value.pkAsociada=key1.getId();
+            }
         }
     }
 }
