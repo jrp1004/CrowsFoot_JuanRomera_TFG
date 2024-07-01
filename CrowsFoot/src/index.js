@@ -342,10 +342,10 @@ function main(container,outline,toolbar,sidebar,status,properties){
         //Las aristas sueltas se eliminan al no estar permitadas en el setAllowDanglingEdges
         graph.addListener(mxEvent.REMOVE_CELLS,function(sender,evt){
             let cells=evt.getProperty('cells');
-            for(cell of cells){
+            for(let cell of cells){
                 if(this.model.isEdge(cell)){
                     const clavesForaneas=cell.value.clavesForaneas;
-                    for(id of clavesForaneas){
+                    for(let id of clavesForaneas){
                         this.model.remove(this.model.getCell(id));
                     }
                 }
@@ -405,7 +405,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             this.model.beginUpdate();
             try {
                 let relacion=new Relacion("Relacion");
-                insertarNuevaRelacion(this,edge,relacion,source,target,primaryKey,false,relacion.startArrow,relacion.endArrow);
+                insertarNuevaRelacion(this,edge,relacion,source,target,primaryKey,false);
 
                 return mxGraph.prototype.addEdge.apply(this,arguments);
             } catch (error) {
@@ -759,16 +759,8 @@ function addSidebarIcon(graph,sidebar,prototype,image){
             let columnCount=graph.model.getChildCount(parent)+1;
             name=mxUtils.prompt('Introduce el nombre para la nueva columna','COLUMN'+columnCount);
         }else{
-            let tableCount=0;
-            let childCount=graph.model.getChildCount(parent);
-
-            for(let i=0;i<childCount;i++){
-                if(!graph.model.isEdge(graph.model.getChildAt(parent,i))){
-                    tableCount++;
-                }
-            }
-
-            name=mxUtils.prompt('Introduce el nombre para la tabla nueva','TABLE'+(tableCount+1));
+            let childCount=graph.getChildVertices(parent).length;
+            name=mxUtils.prompt('Introduce el nombre para la tabla nueva','TABLE'+(childCount+1));
         }
 
         if(name!=null){
@@ -964,7 +956,7 @@ function intercambioIds(graph,relacionId,nuevo,actual){
 }
 
 function intercambioIdsUnique(parent,id_1,id_2){
-    for(arr of parent.value.uniqueComp){
+    for(const arr of parent.value.uniqueComp){
         let index1=arr.indexOf(id_1);
         let index2=arr.indexOf(id_2);
         if(index1>-1){
@@ -1027,7 +1019,6 @@ function showProperties(graph,cell,properties){
             }
 
             let old_primaryKey=clone.primaryKey;
-            let old_unique=clone.unique;
     
             clone.primaryKey=primaryKeyField.checked;
             clone.foreignKey=foreignKeyField.checked;
@@ -1040,7 +1031,6 @@ function showProperties(graph,cell,properties){
     
             graph.model.setValue(cell,clone);
             handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),old_primaryKey,clone.primaryKey);
-            handleCambioUnique(cell,graph.getModel().getParent(cell),old_unique!=clone.unique,clone.unique);
             graph.setSelectionCell(cell);
         });
     }else if(graph.model.isEdge(cell)){
@@ -1159,44 +1149,42 @@ function actualizarClaves(graph,cell){
     if(relacion.startArrow==='solo_uno'||relacion.startArrow==='cero_o_uno'){
         if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
             console.log("Clave en target");
-            insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true,relacion.startArrow,relacion.endArrow);
+            insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true);
         }else{
             if(relacion.endArrow==='cero_o_uno'){
-                insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true,relacion.startArrow,relacion.endArrow);
+                insertarNuevaRelacion(graph,clone.clone(),relacion,table_t,table_s,primaryKey_s,true);
             }else{
-                insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false,relacion.endArrow,relacion.startArrow);
+                insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
             }
             console.log("Indiferente");
         }
+    }else if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
+        console.log("Tabla intermedia");
+        let nombre=table_s.value.name+'_'+table_t.value.name;
+        let table=obtenerTablaIntermedia(table_s.geometry,table_t.geometry,nombre);
+        graph.addCell(table,graph.getDefaultParent());
+
+        //Claves foraneas
+        let relacion_s=new Relacion("Relacion_s");
+        relacion_s.startArrow='uno_o_mas';
+        relacion_s.endArrow='solo_uno';
+        insertarNuevaRelacion(graph,clone.clone(),relacion_s,table,table_s,primaryKey_s,false);
+
+        let relacion_t=new Relacion("Relacion_t");
+        relacion_t.startArrow='uno_o_mas';
+        relacion_t.endArrow='solo_uno';
+        insertarNuevaRelacion(graph,clone.clone(),relacion_t,table,table_t,primaryKey_t,false);
+        graph.setSelectionCell(table);
     }else{
-        if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
-            console.log("Tabla intermedia");
-            let nombre=table_s.value.name+'_'+table_t.value.name;
-            let table=obtenerTablaIntermedia(table_s.geometry,table_t.geometry,nombre);
-            graph.addCell(table,graph.getDefaultParent());
-
-            //Claves foraneas
-            let relacion_s=new Relacion("Relacion_s");
-            relacion_s.startArrow='uno_o_mas';
-            relacion_s.endArrow='solo_uno';
-            insertarNuevaRelacion(graph,clone.clone(),relacion_s,table,table_s,primaryKey_s,false,relacion_s.endArrow,relacion_s.startArrow);
-
-            let relacion_t=new Relacion("Relacion_t");
-            relacion_t.startArrow='uno_o_mas';
-            relacion_t.endArrow='solo_uno';
-            insertarNuevaRelacion(graph,clone.clone(),relacion_t,table,table_t,primaryKey_t,false,relacion_t.endArrow,relacion_t.startArrow);
-            graph.setSelectionCell(table);
-        }else{
-            console.log("Clave en source");
-            insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false,relacion.endArrow,relacion.startArrow);
-        }
+        console.log("Clave en source");
+        insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
     }
 }
 
-function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir,simbO,simbM){
+function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir){
     editarRelacion(graph,enlace,relacion,source,target,invertir);
-    for(pk of pks){
-        let column=addClaveForanea(graph,source,pk,enlace.getId(),simbO,simbM);
+    for(let pk of pks){
+        let column=addClaveForanea(graph,source,pk,enlace.getId(),relacion.endArrow,relacion.startArrow);
         relacion.clavesForaneas.push(column.getId());
     }
     graph.setSelectionCell(enlace);
@@ -1380,7 +1368,7 @@ function addTablaSqlAlchemy(graph,tabla){
     
     if(fksArray.length||tabla.value.uniqueComp.length){
         sql.push('\t__table_args__=(\n');
-        for(grupo of fksArray){
+        for(let grupo of fksArray){
             sql.push('\t\tForeignKeyConstraint(\n');
             let parent=graph.getModel().getCell(grupo[0]);
 
@@ -1390,7 +1378,7 @@ function addTablaSqlAlchemy(graph,tabla){
             sql.push('\t\t\t['+nomFks.join(', ')+'], ['+refs.join(', ')+']\n\t\t),\n');
         }
 
-        for(grupo of tabla.value.uniqueComp){
+        for(let grupo of tabla.value.uniqueComp){
             sql.push('\t\tUniqueConstraint(');
             let nombres=getNombreUniComp(graph,grupo).split(',');
             sql.push(nombres.map(nom => `"${nom.trim()}"`).join(', ')+'),\n');
@@ -1451,12 +1439,12 @@ function getTextWidth(text,font){
 function openTabProperties(evt,prop){
     //Manejo de las pestañas del apartado propiedades
     let tabs=document.getElementsByClassName("tab");
-    for(tab of tabs){
+    for(let tab of tabs){
         tab.className=tab.className.replace(" active","");
     }
 
     let tabcontent=document.getElementsByClassName("tabcontent");
-    for(content of tabcontent){
+    for(let content of tabcontent){
         content.style.display="none";
     }
     document.getElementById(prop).style.display="block";
@@ -1760,7 +1748,7 @@ function obtenerDiccDatos(graph){
 
     let parent=graph.getDefaultParent();
     let childs=graph.getChildVertices(parent);
-    for(child of childs){
+    for(let child of childs){
         let p=document.createElement('p');
         p.innerHTML=child.value.name;
         p.className='titulo';
@@ -1778,7 +1766,7 @@ function obtenerDiccDatos(graph){
         
         let cols=graph.getChildVertices(child);
         let tbody=document.createElement('tbody');
-        for(col of cols){
+        for(let col of cols){
             let tr=document.createElement('tr');
             tr.appendChild(obtenerDatoTabla('td',col.value.name));
             tr.appendChild(obtenerDatoTabla('td',col.value.type));
@@ -1866,7 +1854,7 @@ function addUniqueComp(graph,cell,tabla){
         //Mostramos ventana
         let form=new mxForm('Uniques');
         const ids=[];
-        for(col of cols){
+        for(let col of cols){
             let nombre=col.value.name;
             let id=col.getId();
             let input=form.addCheckbox(nombre);
@@ -1917,7 +1905,7 @@ function addUniqueComp(graph,cell,tabla){
 
 function getNombreUniComp(graph,ids){
     const texto=[];
-    for(id of ids){
+    for(let id of ids){
         let cell=graph.model.getCell(id)
         texto.push(cell.value.name);
         texto.push(', ');
