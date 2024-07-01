@@ -841,51 +841,11 @@ function addSidebarIcon(graph,sidebar,prototype,image){
     };
 }
 
-function configureStylesheet(graph){
-    let style=new Object();
-    style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
-    style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-    style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
-    style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
-    style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-    style[mxConstants.STYLE_FONTSIZE] = '11';
-    style[mxConstants.STYLE_FONTSTYLE] = 0;
-    style[mxConstants.STYLE_SPACING_LEFT] = 4; //Modificado para evitar error con getPreferredSizeForCell
-    style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
-    style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
-    style[mxConstants.STYLE_STROKEWIDTH] = '2';
-    style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
-    style[mxConstants.STYLE_FILLCOLOR]='#FFFFFF';
-    graph.getStylesheet().putDefaultVertexStyle(style);
-
-    style = new Object();
-    style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_SWIMLANE;
-    style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-    style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
-    style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-    style[mxConstants.STYLE_GRADIENTCOLOR] = '#41B9F5';
-    style[mxConstants.STYLE_FILLCOLOR] = '#8CCDF5';
-    style[mxConstants.STYLE_SWIMLANE_FILLCOLOR] = '#ffffff';
-    style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-    style[mxConstants.STYLE_STARTSIZE] = '28';
-    style[mxConstants.STYLE_VERTICAL_ALIGN] = 'middle';
-    style[mxConstants.STYLE_FONTSIZE] = '12';
-    style[mxConstants.STYLE_IMAGE] = '../images/icons48/table.png';
-    // Looks better without opacity if shadow is enabled
-    //style[mxConstants.STYLE_OPACITY] = '80';
-    style[mxConstants.STYLE_SHADOW] = 1;
-    style[mxConstants.STYLE_SPACING_LEFT]=48;
-    graph.getStylesheet().putCellStyle('table', style);
-
-    style = graph.stylesheet.getDefaultEdgeStyle();
-    style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = '#FFFFFF';
-    style[mxConstants.STYLE_STROKEWIDTH] = '2';
-    style[mxConstants.STYLE_ROUNDED] = true;
-    style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
-    style[mxConstants.STYLE_STARTSIZE]='8';
-    style[mxConstants.STYLE_ENDSIZE]='8';
-    style[mxConstants.STYLE_STARTARROW]='solo_uno';
-    style[mxConstants.STYLE_ENDARROW]='solo_uno';
+function configureStylesheet(graph){ 
+    let req = mxUtils.load('../editors/config/stylesheet.xml');
+    let root = req.getDocumentElement();
+    let dec = new mxCodec(root.ownerDocument);
+    dec.decode(root, graph.getStylesheet());
 }
 
 //Función para crear las entradas del menú popup
@@ -919,17 +879,18 @@ function createPopupMenu(editor,graph,menu,cell,evt){
                 //Nueva columna
                 let columnCount=graph.model.getChildCount(cell)+1;
                 let name=mxUtils.prompt('Introduce el nombre para la nueva columna','COLUMN'+columnCount);
-
-                let columnObject=new Column(name);
-                let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
-                let altura=column.geometry.height;
-
-                column.setVertex(true);
-                column.setConnectable(false);
-                //Añadimos la nueva columna a la tabla
-                graph.addCell(column,cell);
-                if(cell.isCollapsed()){
-                    column.geometry.height=altura;
+                if(name){
+                    let columnObject=new Column(name);
+                    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+                    let altura=column.geometry.height;
+    
+                    column.setVertex(true);
+                    column.setConnectable(false);
+                    //Añadimos la nueva columna a la tabla
+                    graph.addCell(column,cell);
+                    if(cell.isCollapsed()){
+                        column.geometry.height=altura;
+                    }
                 }
             });
 
@@ -1468,12 +1429,14 @@ function addColumnaSqlAlchemy(graph,columna){
 
 function addFKData(graph,value,fks){
     let relacion=graph.getModel().getCell(value.relacionAsociada);
-    let target=relacion.getTerminal(false);
-    let id=target.getId();
-    if(!fks[id]){
-        fks[id]=[];
+    if(relacion){
+        let target=relacion.getTerminal(false);
+        let id=target.getId();
+        if(!fks[id]){
+            fks[id]=[];
+        }
+        fks[id].push([value.name,value.pkAsociada]);
     }
-    fks[id].push([value.name,value.pkAsociada]);
 }
 
 //Función para obtener la anchura de una cadena de texto en píxeles
