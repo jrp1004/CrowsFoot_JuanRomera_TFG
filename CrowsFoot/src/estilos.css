@@ -202,7 +202,7 @@ table tbody tr:hover {
     left: 0px;
     height: 140px;
     width: 224px;
-    background-color: #bbb;
+    background-color: rgb(192, 194, 198);
     text-align: center;
     border-right: 2px solid #AAAAAA;
     border-bottom: 2px solid #AAAAAA;
