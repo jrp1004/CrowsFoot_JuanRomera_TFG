@@ -1,0 +1,20 @@
+<mxEditor>
+	<mxDefaultKeyHandler as="keyHandler">
+		<add as="35" action="refresh"/> <!--fin-->
+		<add as="37" action="selectPrevious"/><!--Flecha izq-->
+		<add as="38" action="selectParent"/><!--Flecha arriba-->
+		<add as="40" action="selectChild"/><!--Flecha abajo-->
+		<add as="39" action="selectNext"/><!--Flecha der-->
+		<add as="46" action="borrar"/><!--supr-->
+		<add as="65" control="1" action="selectAll"/><!--A-->
+		<add as="90" control="1" action="undo"/><!--Z-->
+		<add as="89" control="1" action="redo"/><!--Y-->
+		<add as="113" action="edit"/><!--f2-->
+		<add as="107" action="zoomIn"/><!--Num pad +-->
+		<add as="109" action="zoomOut"/><!--Num pad - -->
+		<add as="87" action="subirColumna"/><!--W-->
+		<add as="83" action="bajarColumna"/><!--S-->
+		<add as="8" action="collapse"/><!--Borrar-->
+		<add as="13" action="expand"/><!--Intro-->
+	</mxDefaultKeyHandler>
+</mxEditor>

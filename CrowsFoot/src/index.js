@@ -441,6 +441,33 @@ function main(container,outline,toolbar,sidebar,status,properties){
             editor.execute('delete',cell);
         });
         
+        editor.addAction('subirColumna',function(editor,cell){
+            cell=cell||graph.getSelectionCell();
+            if(graph.isHtmlLabel(cell)){
+                let posicion=(cell.geometry.y-28)/26;
+                let parent=cell.getParent();
+                if(posicion>0){
+                   moverPosicionColumna(graph,cell,parent,posicion,1);
+                }
+            }
+        });
+        editor.addAction('bajarColumna',function(editor,cell){
+            cell=cell||graph.getSelectionCell();
+            if(graph.isHtmlLabel(cell)){
+                let posicion=(cell.geometry.y-28)/26;
+                let parent=cell.getParent();
+                if(posicion<parent.getChildCount()-1){
+                    moverPosicionColumna(graph,cell,parent,posicion,-1);
+                }
+            }
+        });
+
+        editor.setGraphContainer(container);
+        let config = mxUtils.load(
+            '../editors/config/keyhandler.xml').
+                getDocumentElement();
+        editor.configure(config);
+
         //Añadimos el resto de botones
         //Para estos botones no hace falta añadir funciones puesto que ya están definidas en el editor
         addToolbarButton(editor,toolbar,'borrar','Delete','../images/delete2.png');
@@ -845,22 +872,10 @@ function createPopupMenu(editor,graph,menu,cell,evt){
         //Si hemos hecho click en una columna añadimos la entrada propiedades
         if(graph.isHtmlLabel(cell)){
             menu.addItem('Subir posición',null,function(){
-                let posicion=(cell.geometry.y-28)/26;
-                let parent=cell.getParent();
-
-                if(posicion>0){
-                   moverPosicionColumna(graph,cell,parent,posicion,1);
-                }
-
+                editor.execute('subirColumna',cell);
             });
             menu.addItem('Bajar posición',null,function(){
-                let posicion=(cell.geometry.y-28)/26;
-                let parent=cell.getParent();
-                let hijos=graph.model.getChildCount(parent);
-
-                if(posicion<hijos-1){
-                    moverPosicionColumna(graph,cell,parent,posicion,-1)
-                }
+                editor.execute('bajarColumna',cell);
             });
 
             menu.addSeparator();
