@@ -436,9 +436,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                     handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),true,false);
                     graph.setSelectionCell(cell);
                 }
-                if(cell.value.unique){
-                    handleCambioUnique(cell,graph.getModel().getParent(cell),true,false);
-                }
+                handleCambioUnique(cell,graph.getModel().getParent(cell));
             }
             editor.execute('delete',cell);
         });
@@ -1120,16 +1118,10 @@ function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
     }
 }
 
-function handleCambioUnique(cell,parent,cambio,new_value){
-    if(cambio&&!new_value){
-        //El valor ha cambiado y ya no es verdadero
+function handleCambioUnique(cell,parent){
+    if(parent.value.uniqueComp.length){
         let uniqueComp=parent.value.uniqueComp;
-        for(let i=0;i<uniqueComp.length;i++){
-            if(uniqueComp[i].indexOf(cell.getId())>-1){
-                uniqueComp.splice(i,1);
-                i--;
-            }
-        }
+        parent.value.uniqueComp=uniqueComp.filter(unique=>!unique.includes(cell.getId()));
     }  
 }
 
