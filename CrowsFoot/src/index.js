@@ -554,7 +554,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             //Botón de descarga
             let button=document.createElement('button');
             button.style.fontSize='10';
-            button.innerHTML='Descargar';
+            button.textContent='Descargar';
             div.appendChild(button);
             mxEvent.addListener(button,'click',function(evt){
                 let nombre=null;
@@ -607,7 +607,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             //Botón para confirmar la importación del grafo
             let button=document.createElement('button');
             button.style.fontSize='10';
-            button.innerHTML='Importar';
+            button.textContent='Importar';
             button.disabled=true;
             div.appendChild(button);
             mxEvent.addListener(button,'click',function(evt){
@@ -1763,7 +1763,7 @@ function obtenerEtiquetaRecortada(label,type,style,width,columna){
 function obtenerDiccDatos(graph){
     let div=document.createElement('div');;
     let titulo=document.createElement('p');
-    titulo.innerHTML='DICCIONARIO DE DATOS';
+    titulo.textContent='DICCIONARIO DE DATOS';
     titulo.className='titulo';
     div.appendChild(titulo);
     div.appendChild(document.createElement('hr'));
@@ -1772,7 +1772,7 @@ function obtenerDiccDatos(graph){
     let childs=graph.getChildVertices(parent);
     for(let child of childs){
         let p=document.createElement('p');
-        p.innerHTML=child.value.name;
+        p.textContent=child.value.name;
         p.className='titulo';
         div.append(p);
         let tabla=document.createElement('table');
@@ -1828,7 +1828,7 @@ function getTableUniqueComp(graph,cell){
     let div=document.createElement('div');
     let titulo=document.createElement('p');
     titulo.className='titulo';
-    titulo.innerHTML='Unique compuesto';
+    titulo.textContent='Unique compuesto';
     div.appendChild(titulo);
 
     let tabla=document.createElement('table');
@@ -1852,7 +1852,7 @@ function getTableUniqueComp(graph,cell){
             mxEvent.addListener(btnEliminar,'click',function(evt){
                 eliminarUniqueComp(graph,cell,tr,tabla);
             });
-            btnEliminar.innerHTML='Elim';
+            btnEliminar.textContent='Elim';
             btnEliminar.className='buttonToolbar';
             let td=document.createElement('td');
             td.appendChild(btnEliminar);
@@ -1869,7 +1869,7 @@ function getTableUniqueComp(graph,cell){
         addUniqueComp(graph,cell,tabla);
     });
     btnAdd.className='buttonToolbar';
-    btnAdd.innerHTML='Add';
+    btnAdd.textContent='Add';
     div.appendChild(btnAdd);
 
     return div;
@@ -1928,15 +1928,15 @@ function addUniqueComp(graph,cell,tabla){
 
                 let row=tabla.tBodies[0].insertRow();
                 let id=row.insertCell(0);
-                id.innerHTML=clone.uniqueComp.length-1;
+                id.textContent=clone.uniqueComp.length-1;
                 let name=row.insertCell(1);
-                name.innerHTML=res;
+                name.textContent=res;
                 let cellBtn=row.insertCell(2);
                 let btnEliminar=document.createElement('button');
                 mxEvent.addListener(btnEliminar,'click',function(evt){
                     eliminarUniqueComp(graph,cell,clone.uniqueComp.length-1,tabla);
                 });
-                btnEliminar.innerHTML='Elim';
+                btnEliminar.textContent='Elim';
                 btnEliminar.className='buttonToolbar';
                 cellBtn.appendChild(btnEliminar);
 
