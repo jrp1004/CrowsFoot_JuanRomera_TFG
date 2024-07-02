@@ -6,9 +6,9 @@
 		<add as="40" action="selectChild"/><!--Flecha abajo-->
 		<add as="39" action="selectNext"/><!--Flecha der-->
 		<add as="46" action="borrar"/><!--supr-->
-		<add as="65" control="1" action="selectAll"/><!--A-->
-		<add as="90" control="1" action="undo"/><!--Z-->
-		<add as="89" control="1" action="redo"/><!--Y-->
+		<add as="65" control="1" action="selectAll"/><!--Ctrl+A-->
+		<add as="90" control="1" action="undo"/><!--Ctrl+Z-->
+		<add as="89" control="1" action="redo"/><!--Ctrl+Y-->
 		<add as="113" action="edit"/><!--f2-->
 		<add as="107" action="zoomIn"/><!--Num pad +-->
 		<add as="109" action="zoomOut"/><!--Num pad - -->
