@@ -699,7 +699,15 @@ function main(container,outline,toolbar,sidebar,status,properties){
     }
 }
 
-//Función para añadir un botón a una toolbar
+/**
+ * Añade un botón a la toolbar indicada realizando la acción correspondiente
+ * @param {mxEditor} editor - Instancia del editor
+ * @param {HTMLDivElement} toolbar - Div de la toolbar
+ * @param {string} action - Nombre de la acción que ejecutará el botón
+ * @param {string} label - Etiqueta del botón
+ * @param {string} image - URL de la imagen del botón
+ * @param {boolean} isTransparent - Indica si el fondo del botón será transparente
+ */
 function addToolbarButton(editor,toolbar,action,label,image,isTransparent){
     //Creamos le botón HTML
     let button=document.createElement('button');
@@ -734,6 +742,15 @@ function addToolbarButton(editor,toolbar,action,label,image,isTransparent){
 }
 
 //Función para mostrar una ventana modal
+/**
+ * Muestra una ventana modal con el título y contenido indicados
+ * Modifica el fondo para cuando se muestre la ventana se oscurezca
+ * @param {string} title - Título de la ventana modal
+ * @param {HTMLElement} content - Contenido a mostrar en la ventana
+ * @param {number} width - Ancho de la ventana
+ * @param {number} height - Altura de la ventana
+ * @returns {mxWindow} - Ventana modal
+ */
 function showModalWindow(title,content,width,height){
     //Modificamos el fondo para cuando se muestre la ventana se oscurezca
     let background=document.createElement('div');
@@ -767,8 +784,14 @@ function showModalWindow(title,content,width,height){
     return wnd;
 }
 
-//Añadimos los iconos de la barra lateral
-//Iconos para añadir tabla y columna
+/**
+ * Añade un icono a la barra lateral y lo configura para su uso
+ * Utilizado para añadir columnas y tablas
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {HTMLDivElement} sidebar - Div donde se añadirán los iconos
+ * @param {mxCell} prototype - Prototipo de la celda que se añadirá
+ * @param {string} image - URL de la imagen
+ */
 function addSidebarIcon(graph,sidebar,prototype,image){
     //Función que se ejecutará cuando se suelte uno de estos iconos en el grafo
     //El parámetro cell indica la celda que hay debajo del ratón
@@ -879,6 +902,10 @@ function addSidebarIcon(graph,sidebar,prototype,image){
     };
 }
 
+/**
+ * Configura el estilo del grafo a partir de un fichero de configuración XML
+ * @param {mxGraph} graph - Instancia del grafo
+ */
 function configureStylesheet(graph){ 
     let req = mxUtils.load('../editors/config/stylesheet.xml');
     let root = req.getDocumentElement();
@@ -886,7 +913,14 @@ function configureStylesheet(graph){
     dec.decode(root, graph.getStylesheet());
 }
 
-//Función para crear las entradas del menú popup
+/**
+ * Crea un menú popup para la celda indicada
+ * @param {mxEditor} editor - Instancia del editor
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxPopupMenu} menu - Instancia del menú popup
+ * @param {mxCell} cell - Celda para la que se crea el menú
+ * @param {Event} evt - Evento
+ */
 function createPopupMenu(editor,graph,menu,cell,evt){
     //Comprobamos si hemos hecho click en una tabla o en una columna
     if(cell!=null){
@@ -939,6 +973,14 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     });
 }
 
+/**
+ * Mueve de posición una columna dentro de una tabla
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} col_a_mover - Columna a mover
+ * @param {mxCell} parent - Tabla la columna a mover
+ * @param {number} posicion - Posición de la columna a mover
+ * @param {number} desp - Desplazamiento
+ */
 function moverPosicionColumna(graph,col_a_mover,parent,posicion,desp){
     let col_desplazada=graph.model.getChildAt(parent,posicion-desp);
     let value_desplazada=col_desplazada.value.clone();
@@ -972,7 +1014,14 @@ function moverPosicionColumna(graph,col_a_mover,parent,posicion,desp){
     graph.setSelectionCell(col_desplazada);
 }
 
-//Asociamos el id de la nueva columna a la relación correspondiente
+/**
+ * Actualizamos las claves foráneas asociadas a una relación
+ * cuando movemos una columna dentro de una tabla
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {number} relacionId - Id de la relación asociada
+ * @param {number} nuevo - Id de la nueva columna
+ * @param {number} actual - Id de la columna actual
+ */
 function intercambioIds(graph,relacionId,nuevo,actual){
     let relacion=graph.model.getCell(relacionId);
     let clavesForaneas=relacion.value.clavesForaneas;
@@ -983,6 +1032,13 @@ function intercambioIds(graph,relacionId,nuevo,actual){
     }
 }
 
+/**
+ * Actualiza las referencias en los unique compuestos a las columnas que pueda tener una tabla
+ * cuando movemos de posición una columna dentro de una tabla
+ * @param {mxCell} parent - Celda de la tabla donde se realiza el cambio
+ * @param {number} id_1 - Id de una de las columnas a mover
+ * @param {number} id_2 - Id de una de las columnas a mover
+ */
 function intercambioIdsUnique(parent,id_1,id_2){
     for(const arr of parent.value.uniqueComp){
         let index1=arr.indexOf(id_1);
@@ -996,6 +1052,14 @@ function intercambioIdsUnique(parent,id_1,id_2){
     }
 }
 
+/**
+ * Actualizamos las referencias a las claves primarias que pueda tener una clave foráne
+ * cuando movemos de posición una columna dentro de una tabla
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} key1 - Id de una de las columnas a mover
+ * @param {mxCell} key2 - Id de una de las columnas a mover
+ * @param {mxCell} tabla - Celda de la tabla donde se realiza el cambio
+ */
 function actualizarRefPK(graph,key1,key2,tabla){
     const enlaces=graph.getEdges(tabla,null,true,false);
     for(const enlace of enlaces){
@@ -1011,7 +1075,12 @@ function actualizarRefPK(graph,key1,key2,tabla){
     }
 }
 
-//Función que crea un formulario para editar los parámetros de las columnas
+/**
+ * Configura el menú propiedades para la celda indicada
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} cell - Celda de la que mostrar propiedades
+ * @param {HTMLDivElement} properties - Div donde se mostrarán las propiedades
+ */
 function showProperties(graph,cell,properties){
     let form=new mxForm('properties');
 
@@ -1137,6 +1206,14 @@ function showProperties(graph,cell,properties){
     }
 }
 
+/**
+ * Maneja un cambio de clave primara de una tabla
+ * Se actualizan las relaciones entrantes, añadiendo o eliminando la clave foránea correspondiente
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {*} tabla - Celda de la tabla
+ * @param {boolean} oldValue - Valor anterior
+ * @param {boolean} newValue - Valor nuevo
+ */
 function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
     //Comprobamos que el valor cambia
     if(oldValue!=newValue){
@@ -1148,6 +1225,11 @@ function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
     }
 }
 
+/**
+ * Maneja un posible cambio en un unique compuesto de la tabla indicadada
+ * @param {mxCell} cell - Celda de la columna
+ * @param {mxCell} parent - Celda de la tabla
+ */
 function handleCambioUnique(cell,parent){
     if(parent.value.uniqueComp.length){
         let uniqueComp=parent.value.uniqueComp;
@@ -1155,7 +1237,11 @@ function handleCambioUnique(cell,parent){
     }  
 }
 
-//Actualizamos las claves cuando se cambia la relación entre 2 tablas
+/**
+ * Actualizamos las claves cuando se cambia la relación entre 2 tablas
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} cell - Celda de la relación
+ */
 function actualizarClaves(graph,cell){
     let relacion=cell.value.clone();
 
@@ -1203,6 +1289,16 @@ function actualizarClaves(graph,cell){
     }
 }
 
+/**
+ * Inserta una nueva relación entre 2 tablas
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} enlace - Celda correspondiente al enlace
+ * @param {Relacion} relacion - Relación entre las tablas
+ * @param {mxCell} source - Tabla origen
+ * @param {mxCell} target - Tabla destino
+ * @param {Array<mxCell>} pks - Array de claves primarias
+ * @param {boolean} invertir - Indica si invertir la relación
+ */
 function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir){
     editarRelacion(graph,enlace,relacion,source,target,invertir);
     for(let pk of pks){
@@ -1212,6 +1308,13 @@ function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir)
     graph.setSelectionCell(enlace);
 }
 
+/**
+ * Obtiene una tabla intermedia entre 2 tablas para las relaciones M:M
+ * @param {mxGeometry} geometry_s - Geometría de la tabla origen
+ * @param {mxGeometry} geometry_t - Geometría de la tabla destino
+ * @param {string} nombre - Nombre de la tabla intermedia
+ * @returns {mxCell} - Tabla intermedia
+ */
 function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
     let distancia=geometry_t.x-(geometry_s.x+200);
 
@@ -1239,7 +1342,16 @@ function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
     return table;
 }
 
-//Añade la columna pasada como clave primaria como clave foranea a la tabla indicada
+/**
+ * Añade la columna pasada como clave primaria como clave foranea a la tabla indicada
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} table - Tabla a la que añadir la clave foranea
+ * @param {mxCell} key - Celda correspondiente a la clave primaria
+ * @param {number} relacionAsociada - Id de la relación asociada
+ * @param {string} simbO - Símbolo de obligatoriedad
+ * @param {string} simbM - Símbolo de multiplicidad
+ * @returns 
+ */
 function addClaveForanea(graph,table,key,relacionAsociada,simbO,simbM){
     let columnObject=new Column("COLUMNA");
     let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
@@ -1267,7 +1379,15 @@ function addClaveForanea(graph,table,key,relacionAsociada,simbO,simbM){
     return column;
 }
 
-//Condifgura el nuevo enlace
+/**
+ * Configura la relación entre dos tablas
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} edge - Enlace a editar
+ * @param {Relacion} relacion - Objeto de la relación
+ * @param {mxCell} source - Tabla origen
+ * @param {mxCell} target - Tabla destino
+ * @param {boolean} invertir - Indica si se debe invertir el origen y destino de la relación
+ */
 function editarRelacion(graph,edge,relacion,source,target,invertir){
     if(invertir){
         let temp=relacion.startArrow;
@@ -1287,7 +1407,12 @@ function editarRelacion(graph,edge,relacion,source,target,invertir){
     graph.setCellStyles(mxConstants.STYLE_ENDARROW,relacion.endArrow,[edge]);
 }
 
-//Devuelve la celda correspondiente a la clave primaria de la tabla indicada
+/**
+ * Devuelve las celdas correspondientes a las claves primarias de la tabla indicada
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} tabla - Tabla de la que obtenemos las claves
+ * @returns {Array<mxCell>} - Claves primarias de la tabla
+ */
 function obtenerClavePrimaria(graph,tabla){
     const primaryKey=[]
     let childs=graph.getChildVertices(tabla);
@@ -1295,13 +1420,23 @@ function obtenerClavePrimaria(graph,tabla){
     return primaryKey;
 }
 
-//Función que crea el código SQL según los elementos del grafo
+/**
+ * Función que crea el código SQL según los elementos del grafo
+ * @param {mxGraph} graph - Instancia del grafo
+ * @returns {string} - Código SQL correspondiente al diagrama del usuario
+ */
 function createSql(graph){
     let parent=graph.getDefaultParent();
     let childs=graph.getChildVertices(parent);
     return childs.map(child=>addTablaSql(graph,child)).join('');
 }
 
+/**
+ * Transforma la tabla indicada en código SQL
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {Table} tabla - Tabla de la que obtenemos los datos
+ * @returns {string} - Código SQL de la tabla
+ */
 function addTablaSql(graph,tabla){
     const sql=[];
 
@@ -1346,6 +1481,11 @@ function addTablaSql(graph,tabla){
     return sql.join('');
 }
 
+/**
+ * Añade los datos de una columna para SQL
+ * @param {Column} columna - Columna de la que obtenemos los datos
+ * @returns {string} - Cadena con la información de la columna para SQL
+ */
 function addColumnaSql(columna){
     const sql=[];
     sql.push('\n\t'+columna.name+' '+columna.type);
@@ -1365,12 +1505,23 @@ function addColumnaSql(columna){
     return sql.join('');
 }
 
+/**
+ * Transforma el diagrama creado por el usuario en código SQLAlchemy
+ * @param {mxGraph} graph - Instancia del grafo
+ * @returns {string} - Código SQLAlchemy correspondiente al diagrama creado
+ */
 function createSqlAlchemy(graph){
     let parent=graph.getDefaultParent();
     let childs=graph.getChildVertices(parent);
     return childs.map(child=>addTablaSqlAlchemy(graph,child)+'\n').join('');
 }
 
+/**
+ * Transforma la tabla indicada en código SQLAlchemy
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {Table} tabla - Tabla de la que obtenemos los datos
+ * @returns {string} - Código SQLAlchemy correspondiente a la tabla indicada
+ */
 function addTablaSqlAlchemy(graph,tabla){
     const sql=[];
     sql.push('class '+tabla.value.name+'(Base):\n');
@@ -1380,7 +1531,7 @@ function addTablaSqlAlchemy(graph,tabla){
     const fks={};
 
     for(let child of childs){
-        sql.push(addColumnaSqlAlchemy(graph,child));
+        sql.push(addColumnaSqlAlchemy(child));
         if(child.value.foreignKey){
             addFKData(graph,child.value,fks);
         }
@@ -1411,32 +1562,35 @@ function addTablaSqlAlchemy(graph,tabla){
     return sql.join('');
 }
 
-function addColumnaSqlAlchemy(graph,columna){
-    const sql=[];
-    sql.push('\t'+columna.value.name+'=Column('+columna.value.type);
-    sql.push(',');
-    if(columna.value.primaryKey){
-        sql.push(' primary_key=True');
-        sql.push(',');
+/**
+ * Añade los datos de una columna para SQLAlchemy
+ * @param {Column} columna - Columna de la que obtener la información
+ * @returns {string} - Cadena con la información de la columna para SQLAlchemy
+ */
+function addColumnaSqlAlchemy(columna) {
+    let sql = '\t' + columna.value.name + '=Column(' + columna.value.type;
+    if (columna.value.primaryKey) {
+        sql += ', primary_key=True';
     }
-    if(columna.value.notNull){
-        sql.push(' nullable=False');
-        sql.push(',');
+    if (columna.value.notNull) {
+        sql += ', nullable=False';
     }
-    if(columna.value.default){
-        sql.push(' default='+columna.value.defaultValue);
-        sql.push(',');
+    if (columna.value.defaultValue) {
+        sql += ', default=' + columna.value.defaultValue;
     }
-    if(columna.value.unique){
-        sql.push(' unique=True');
-        sql.push(',');
+    if (columna.value.unique) {
+        sql += ', unique=True';
     }
 
-    sql.splice(sql.length-1,1);
-    sql.push(')\n');
-    return sql.join('');
+    sql += ')\n';
+    return sql;
 }
-
+/**
+ * Añade los datos de la clave foránea a un diccionario
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {Column} value - Objeto columna del que obtener la información
+ * @param {Object} fks - Diccionario de claves foráneas
+ */
 function addFKData(graph,value,fks){
     let relacion=graph.getModel().getCell(value.relacionAsociada);
     if(relacion){
@@ -1449,7 +1603,12 @@ function addFKData(graph,value,fks){
     }
 }
 
-//Función para obtener la anchura de una cadena de texto en píxeles
+/**
+ * Calcula el ancho del texto en píxeles
+ * @param {string} text - Texto sobre el que realizar el cálculo
+ * @param {string} font - Cadena con la información del tipo de fuente del texto
+ * @returns {number} - Ancho del texto en píxeles
+ */
 function getTextWidth(text,font){
     const canvas=getTextWidth.canvas || (getTextWidth.canvas=document.createElement("canvas"));
     const context=canvas.getContext("2d");
@@ -1458,6 +1617,11 @@ function getTextWidth(text,font){
     return metrics.width;
 }
 
+/**
+ * Abre la pestaña de propiedades indicada
+ * @param {Event} evt - Objeto del evento
+ * @param {string} prop - Id de la pestaña a abrir
+ */
 function openTabProperties(evt,prop){
     //Manejo de las pestañas del apartado propiedades
     let tabs=document.getElementsByClassName("tab");
@@ -1473,6 +1637,11 @@ function openTabProperties(evt,prop){
     evt.currentTarget.className+=" active";
 }
 
+/**
+ * Configura el panel de estilos para la celda indicada
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} cell - Celda a modificar
+ */
 function configurarTabEstilos(graph,cell){
     //Establecemos los elementos del div estilos
     let colorPicker=document.getElementById("colorPicker"); //Cambio de color
@@ -1496,7 +1665,9 @@ function configurarTabEstilos(graph,cell){
         document.getElementById('degradado').style.display="table-row";
     }
 
+    //Obtenemos el estilo de la celda
     let style=graph.getStylesheet().getCellStyle(cell.style);
+    //Establecemos estilos iniciales
     setEstilosIniciales(style,graph.model.isEdge(cell),{
         colorPicker,
         gradientPicker,
@@ -1508,6 +1679,7 @@ function configurarTabEstilos(graph,cell){
         cursivaButton,
         shadowCheck
     });
+    //Establecemos los listeners para los cambios de estilos
     setListenersEstilos(graph,graph.model.isEdge(cell),cell,{
         colorPicker,
         gradientPicker,
@@ -1522,6 +1694,13 @@ function configurarTabEstilos(graph,cell){
     });
 }
 
+/**
+ * Inicializa el check del degradado
+ * @param {HTMLInputElement} gradientCheck - Check de degradado
+ * @param {HTMLInputElement} gradientPicker - Selector de color de degradado
+ * @param {HTMLSelectElement} gradientDirection - Selector de dirección del degradado
+ * @param {boolean} activado - Indica si el degradado está activado
+ */
 function inicializarGradientCheck(gradientCheck,gradientPicker,gradientDirection,activado){
     gradientCheck.checked=activado;
     if(!activado){
@@ -1533,6 +1712,12 @@ function inicializarGradientCheck(gradientCheck,gradientPicker,gradientDirection
     }
 }
 
+/**
+ * Establece el valor inicial del check de la sombra
+ * Comprueba si es una tabla para mostrarlo o no
+ * @param {boolean} tabla - Indica si la celda es una tabla
+ * @param {HTMLInputElement} shadowCheck - Check de sombra
+ */
 function inicializarSombra(tabla,shadowCheck){
     if(tabla){
         shadowCheck.style.display="inline";
@@ -1544,6 +1729,12 @@ function inicializarSombra(tabla,shadowCheck){
 
 }
 
+/**
+ * Establece los valor iniciales para los elementos de estilos
+ * @param {Object} style - Estilos de la celda
+ * @param {boolean} enlace - Indica si la celda es un enlace
+ * @param {Object} elementos - Elementos a los que establecer los valores de estilos iniciales
+ */
 function setEstilosIniciales(style,enlace,elementos){
     const{colorPicker,gradientPicker,selectGradientDirection,selectFont,
         tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
@@ -1563,27 +1754,55 @@ function setEstilosIniciales(style,enlace,elementos){
     }
 }
 
+/**
+ * Establece el color del selector de color de la celda
+ * @param {Object} style - Estilos de la celda
+ * @param {HTMLInputElement} colorPicker - Selector de color de la celda
+ * @param {boolean} enlace - Indica si la celda es un enlace
+ */
 function setColorPicker(style,colorPicker,enlace){
     //Si es enlace la propiedad es stroke si no fill
     let fillColor=enlace?style[mxConstants.STYLE_STROKECOLOR]:style[mxConstants.STYLE_FILLCOLOR];
     colorPicker.value=fillColor||(enlace?'#6482B9':'#ffffff');
 }
 
+/**
+ * Establece el color del degradado en el selector de color del degradado
+ * @param {Object} style - Estilos de la celda
+ * @param {HTMLInputElement} gradientPicker - Selector de color del degradado
+ */
 function setGradientPicker(style,gradientPicker){
     let gradientColor=style[mxConstants.STYLE_GRADIENTCOLOR];
     gradientPicker.value=gradientColor||'#FFFFFF';
 }
 
+/**
+ * Establece el tamaño de la fuente en el selector de tamaño de la fuente
+ * @param {Object} style - Estilos de la celda
+ * @param {HTMLInputElement} tamFont - Selector de tamaño de la fuente
+ */
 function setTamFont(style,tamFont){
     let tam=style[mxConstants.STYLE_FONTSIZE];
     tamFont.value=tam||'11';
 }
 
+/**
+ * Establece el color de la fuente en el selector de color de la fuente
+ * @param {Object} style - Estilos de la celda
+ * @param {HTMLInputElement} colorFontPicker - Selector de color de la fuente
+ * @param {boolean} enlace - Indica si la celda es un enlace
+ */
 function setColorFontPicker(style,colorFontPicker,enlace){
     let fontColor=style[mxConstants.STYLE_FONTCOLOR];
     colorFontPicker.value=fontColor||(enlace?'#446299':'#000000');
 }
 
+/**
+ * Establece si los botones negrita y cursiva están activados o no
+ * @param {Object} style - Estilos de la celda
+ * @param {HTMLButtonElement} negritaButton - Botón de negrita
+ * @param {HTMLButtonElement} cursivaButton - Botón de cursiva
+ */
 function setFontStyle(style,negritaButton,cursivaButton){
     let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
     negritaButton.className=negritaButton.className.replace(" active","");
@@ -1594,6 +1813,11 @@ function setFontStyle(style,negritaButton,cursivaButton){
     }
 }
 
+/**
+ * 
+ * @param {HTMLButtonElement} button - Botón a activar o desactivar
+ * @param {boolean} activo - Indica si el botón está activo o no
+ */
 function toggleButtonActiveStyle(button,activo){
     if(activo){
         button.className+=' active';
@@ -1602,6 +1826,11 @@ function toggleButtonActiveStyle(button,activo){
     }
 }
 
+/**
+ * Establece los valores por defecto de los elementos del apartado estilos
+ * @param {boolean} enlace - Indica si la celda es un enlace o no
+ * @param {Object} elementos - Elementos a los que establecer los valores por defecto
+ */
 function setEstilosDefault(enlace,elementos){
     const{colorPicker,gradientPicker,selectGradientDirection,selectFont,
         tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
@@ -1624,6 +1853,13 @@ function setEstilosDefault(enlace,elementos){
     cursivaButton.className=cursivaButton.className.replace(" active","");
 }
 
+/**
+ * Establece los listeners de los elementos del apartado estilos
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {Boolean} enlace - Indica si la celda es un enlace o no
+ * @param {mxCell} cell - Celda a modificar
+ * @param {Object} elementos - Elementos a los que establecer los listeners
+ */
 function setListenersEstilos(graph,enlace,cell,elementos){
     const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
         tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
@@ -1661,6 +1897,15 @@ function setListenersEstilos(graph,enlace,cell,elementos){
     });
 }
 
+/**
+ * Manejo del evento change del colorPicker
+ * Cambia el color de la celda
+ * Si el degradado está desactivado, cambia el color de degradado
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {boolean} enlace - Indica si la celda es un enlace
+ * @param {HTMLInputElement} colorPicker - Selector de color
+ * @param {HTMLInputElement} gradientCheck - Check de degradado
+ */
 function handleColorPickerChange(graph,enlace,colorPicker,gradientCheck){
     if(enlace){
         graph.setCellStyles(mxConstants.STYLE_STROKECOLOR,colorPicker.value);
@@ -1672,6 +1917,15 @@ function handleColorPickerChange(graph,enlace,colorPicker,gradientCheck){
     }
 }
 
+/**
+ * Manejo del evento change del gradientCheck
+ * Alterna si se muestra o no el apartado degradado y modifica la apariencia de la celda
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {HTMLInputElement} gradientCheck - Check de degradado
+ * @param {HTMLInputElement} gradientPicker - Selector de color de degradado
+ * @param {HTMLSelectElement} selectGradientDirection - Selector de dirección de degradado
+ * @param {mxCell} cell - Celda a modificar
+ */
 function handleGradientCheckChange(graph,gradientCheck,gradientPicker,selectGradientDirection,cell){
     cell.value.gradient=gradientCheck.checked;
     if(!gradientCheck.checked){
@@ -1685,13 +1939,26 @@ function handleGradientCheckChange(graph,gradientCheck,gradientPicker,selectGrad
     }
 }
 
+/**
+ * Manejo del evento click de un botón de estilos
+ * Alterna el valor de la propiedad de estilo para el botón negrita o cursiva
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {mxCell} cell - Celda a modificar
+ * @param {HTMLButtonElement} button - Botón pulsado
+ * @param {number} styleFlag - Flags de estilo a modificar
+ */
 function handleFontStyleButtonClick(graph,cell,button,styleFlag){
     graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,styleFlag);
     let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
     toggleButtonActiveStyle(button,fontStyle&styleFlag);
 }
 
-//Obtenemos el valor del select según el índice
+/**
+ * Función para obtener el valor del select según el índice
+ * @param {HTMLSelectElement} options - Elemento select
+ * @param {string} value - Valor a buscar en las opciones
+ * @returns {number} - Índice de la opción que coincide con el valor
+ */
 function getSelectIndex(options,value){
     for(let i=0;i<options.length;i++){
         if(options[i].value===value){
@@ -1701,7 +1968,11 @@ function getSelectIndex(options,value){
     return 0;
 }
 
-//Función para descargar el fichero xml
+/**
+ * Función para descarga un fichero con el texto indicado
+ * @param {string} texto - Texto a descargar
+ * @param {string} nombre - Nombre del fichero
+ */
 function descarga(texto,nombre){
     let file=new Blob([texto],{type:'text/xml'});
     if(window.navigator.msSaveOrOpenBlob){//Soporte IE
@@ -1720,6 +1991,15 @@ function descarga(texto,nombre){
     }
 }
 
+/**
+ * 
+ * @param {string} label - Etiqueta
+ * @param {string} type - Tipo de dato de la columna
+ * @param {Object} style - Objeto representando el style de la celda
+ * @param {number} width - Ancho de la celda
+ * @param {boolean} columna - Si es una columna o no
+ * @returns {string} - Etiqueta recortada
+ */
 function obtenerEtiquetaRecortada(label,type,style,width,columna){
     let fontfamily;
     if(style[mxConstants.STYLE_FONTFAMILY]){
@@ -1760,6 +2040,12 @@ function obtenerEtiquetaRecortada(label,type,style,width,columna){
     return label;
 }
 
+/**
+ * Funcion para obtener una tabla con el diccionario de datos que describe
+ * los elementos del diagrama
+ * @param {mxGraph} graph - Instancia del grafo
+ * @returns {HTMLDivElement} - div con el diccionario de datos
+ */
 function obtenerDiccDatos(graph){
     let div=document.createElement('div');;
     let titulo=document.createElement('p');
@@ -1962,15 +2248,7 @@ function addUniqueComp(graph,cell,tabla){
  * @returns {string} - Nombre de las columnas separadas por comas
  */
 function getNombreUniComp(graph,ids){
-    const texto=[];
-    for(let id of ids){
-        let cell=graph.model.getCell(id)
-        texto.push(cell.value.name);
-        texto.push(', ');
-    }
-    //Elimina la última coma
-    texto.splice(texto.length-1,1);
-    return texto.join('');
+    return ids.map(id=>graph.model.getCell(id).value.name).join(', ');
 }
 
 
