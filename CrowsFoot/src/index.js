@@ -520,7 +520,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 mxUtils.alert('Esquema vacío');
             }
         });
-        addToolbarButton(editor,sidebar,'showSql','Mostrar SQL','../images/sql.png');
+        addToolbarButton(editor,sidebar,'showSql','SQL','../images/sql.png');
         editor.addAction('showSqlAlch',function(editor,cell){
             const sql=createSqlAlchemy(graph);
             if(sql.length){
@@ -534,7 +534,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 alert('Esquema vacío');
             }
         });
-        addToolbarButton(editor,sidebar,'showSqlAlch','Mostrar SQLAlchemy',null);
+        addToolbarButton(editor,sidebar,'showSqlAlch','SQLAlchemy','../images/Python-logo_24.png');
 
         //Añadimos la función que exporta el grafo a XML
         editor.addAction('export',function(editor,cell){
@@ -634,7 +634,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             let dicc=obtenerDiccDatos(graph);
             showModalWindow('Diccionario de datos',dicc,window.innerWidth*0.7,window.innerHeight*0.7);
         });
-        addToolbarButton(editor,status,'diccionario','Diccionario de datos',null);
+        addToolbarButton(editor,status,'diccionario','Diccionario','../images/dict-icon.jpg');
 
         status.appendChild(spacer.cloneNode(true));
 
@@ -925,8 +925,17 @@ function createPopupMenu(editor,graph,menu,cell,evt){
 
     menu.addSeparator();
 
-    menu.addItem('Mostrar SQL','../images/export1.png',function(){
+    menu.addItem('Mostrar SQL','../images/sql.png',function(){
         editor.execute('showSql',cell);
+    });
+    menu.addItem('Mostrar SQLAlchemy','../images/Python-logo_24.png',function(){
+        editor.execute('showSqlAlch',cell);
+    });
+
+    menu.addSeparator();
+
+    menu.addItem('Mostrar Diccionario de datos','../images/dict-icon_24.jpg',function(){
+        editor.execute('diccionario',cell);
     });
 }
 
