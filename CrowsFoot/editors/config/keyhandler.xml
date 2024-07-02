@@ -16,5 +16,6 @@
 		<add as="83" action="bajarColumna"/><!--S-->
 		<add as="8" action="collapse"/><!--Borrar-->
 		<add as="13" action="expand"/><!--Intro-->
+		<add as="115" action="addColumna"/><!--F4-->
 	</mxDefaultKeyHandler>
 </mxEditor>

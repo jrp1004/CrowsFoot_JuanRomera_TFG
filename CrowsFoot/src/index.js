@@ -462,6 +462,27 @@ function main(container,outline,toolbar,sidebar,status,properties){
             }
         });
 
+        editor.addAction('addColumna',function(editor,cell){ 
+            cell=cell||graph.getSelectionCell();
+            if(graph.isSwimlane(cell)){
+                let columnCount=graph.model.getChildCount(cell)+1;
+                let name=mxUtils.prompt('Introduce el nombre para la nueva columna','COLUMN'+columnCount);
+                if(name){
+                    let columnObject=new Column(name);
+                    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+                    let altura=column.geometry.height;
+    
+                    column.setVertex(true);
+                    column.setConnectable(false);
+                    //Añadimos la nueva columna a la tabla
+                    graph.addCell(column,cell);
+                    if(cell.isCollapsed()){
+                        column.geometry.height=altura;
+                    }
+                }
+            }
+        });
+
         editor.setGraphContainer(container);
         let config = mxUtils.load(
             '../editors/config/keyhandler.xml').
@@ -881,22 +902,7 @@ function createPopupMenu(editor,graph,menu,cell,evt){
             menu.addSeparator();
         }else if(graph.isSwimlane(cell)){
             menu.addItem('Anadir columna','../images/plus.png',function(){
-                //Nueva columna
-                let columnCount=graph.model.getChildCount(cell)+1;
-                let name=mxUtils.prompt('Introduce el nombre para la nueva columna','COLUMN'+columnCount);
-                if(name){
-                    let columnObject=new Column(name);
-                    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
-                    let altura=column.geometry.height;
-    
-                    column.setVertex(true);
-                    column.setConnectable(false);
-                    //Añadimos la nueva columna a la tabla
-                    graph.addCell(column,cell);
-                    if(cell.isCollapsed()){
-                        column.geometry.height=altura;
-                    }
-                }
+                editor.execute('addColumna',cell);
             });
 
             menu.addSeparator();
