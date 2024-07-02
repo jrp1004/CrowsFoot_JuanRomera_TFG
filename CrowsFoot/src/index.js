@@ -342,14 +342,11 @@ function main(container,outline,toolbar,sidebar,status,properties){
         //Las aristas sueltas se eliminan al no estar permitadas en el setAllowDanglingEdges
         graph.addListener(mxEvent.REMOVE_CELLS,function(sender,evt){
             let cells=evt.getProperty('cells');
-
-            for(let i=0;i<cells.length;i++){
-                let cell=cells[i];
-
+            for(let cell of cells){
                 if(this.model.isEdge(cell)){
                     const clavesForaneas=cell.value.clavesForaneas;
-                    for(let i=0;i<clavesForaneas.length;i++){
-                        this.model.remove(this.model.getCell(clavesForaneas[i]));
+                    for(let id of clavesForaneas){
+                        this.model.remove(this.model.getCell(id));
                     }
                 }
             }
@@ -407,13 +404,8 @@ function main(container,outline,toolbar,sidebar,status,properties){
             //Actualizamos el grafo con la nueva columna
             this.model.beginUpdate();
             try {
-                this.addCell(edge);//Añadimos el edge para poder obtener el id
                 let relacion=new Relacion("Relacion");
-                for(let i=0;i<primaryKey.length;i++){
-                    let columna=addClaveForanea(this,source,primaryKey[i],edge.getId());
-                    relacion.clavesForaneas.push(columna.getId());
-                }
-                edge.setValue(relacion);
+                insertarNuevaRelacion(this,edge,relacion,source,target,primaryKey,false);
 
                 return mxGraph.prototype.addEdge.apply(this,arguments);
             } catch (error) {
@@ -426,36 +418,11 @@ function main(container,outline,toolbar,sidebar,status,properties){
             return null;
         }
 
-        graph.getView().updateStyle=true;
-        let previous=graph.model.getStyle;
-
-        graph.model.getStyle=function(cell){
-            if(cell!=null){
-                let style=previous.apply(this,arguments);
-
-                if(this.isEdge(cell)){
-                    if(style===null||style===undefined){
-                        style="startArrow="+cell.value.startArrow+";endArrow="+cell.value.endArrow+";";
-                    }
-                }
-
-                return style;
-                
-            }
-            return null;
-        };
-
         //Elemento que añadiremos en las toolbar para generar un espacio entre botones
         let spacer=document.createElement('div');
         spacer.style.display='inline';
         spacer.style.padding='8px';
 
-        //Añadimos el botón propiedades
-        addToolbarButton(editor,toolbar,'properties','Properties','../editors/images/properties.gif');
-        //Añadimos la función del editor 'properties' a la función especificada
-        editor.addAction('properties',function(editor,cell){
-            document.getElementById('propertiesDatos').click();
-        });
         editor.addAction('clear',function(editor,cell){
             if(confirm('¿Eliminar todos los elementos del diagrama?')){
                 editor.graph.getModel().clear();
@@ -469,10 +436,59 @@ function main(container,outline,toolbar,sidebar,status,properties){
                     handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),true,false);
                     graph.setSelectionCell(cell);
                 }
+                handleCambioUnique(cell,graph.getModel().getParent(cell));
             }
             editor.execute('delete',cell);
         });
         
+        editor.addAction('subirColumna',function(editor,cell){
+            cell=cell||graph.getSelectionCell();
+            if(graph.isHtmlLabel(cell)){
+                let posicion=(cell.geometry.y-28)/26;
+                let parent=cell.getParent();
+                if(posicion>0){
+                   moverPosicionColumna(graph,cell,parent,posicion,1);
+                }
+            }
+        });
+        editor.addAction('bajarColumna',function(editor,cell){
+            cell=cell||graph.getSelectionCell();
+            if(graph.isHtmlLabel(cell)){
+                let posicion=(cell.geometry.y-28)/26;
+                let parent=cell.getParent();
+                if(posicion<parent.getChildCount()-1){
+                    moverPosicionColumna(graph,cell,parent,posicion,-1);
+                }
+            }
+        });
+
+        editor.addAction('addColumna',function(editor,cell){ 
+            cell=cell||graph.getSelectionCell();
+            if(graph.isSwimlane(cell)){
+                let columnCount=graph.model.getChildCount(cell)+1;
+                let name=mxUtils.prompt('Introduce el nombre para la nueva columna','COLUMN'+columnCount);
+                if(name){
+                    let columnObject=new Column(name);
+                    let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+                    let altura=column.geometry.height;
+    
+                    column.setVertex(true);
+                    column.setConnectable(false);
+                    //Añadimos la nueva columna a la tabla
+                    graph.addCell(column,cell);
+                    if(cell.isCollapsed()){
+                        column.geometry.height=altura;
+                    }
+                }
+            }
+        });
+
+        editor.setGraphContainer(container);
+        let config = mxUtils.load(
+            '../editors/config/keyhandler.xml').
+                getDocumentElement();
+        editor.configure(config);
+
         //Añadimos el resto de botones
         //Para estos botones no hace falta añadir funciones puesto que ya están definidas en el editor
         addToolbarButton(editor,toolbar,'borrar','Delete','../images/delete2.png');
@@ -504,7 +520,21 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 mxUtils.alert('Esquema vacío');
             }
         });
-        addToolbarButton(editor,toolbar,'showSql','Mostrar SQL','../images/sql.png');
+        addToolbarButton(editor,sidebar,'showSql','SQL','../images/sql.png');
+        editor.addAction('showSqlAlch',function(editor,cell){
+            const sql=createSqlAlchemy(graph);
+            if(sql.length){
+                let textarea=document.createElement('textarea');
+                textarea.style.width='400px';
+                textarea.style.height='400px';
+
+                textarea.value=sql;
+                showModalWindow('SQLAlchemy',textarea,410,440);
+            }else{
+                alert('Esquema vacío');
+            }
+        });
+        addToolbarButton(editor,sidebar,'showSqlAlch','SQLAlchemy','../images/Python-logo_24.png');
 
         //Añadimos la función que exporta el grafo a XML
         editor.addAction('export',function(editor,cell){
@@ -573,6 +603,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 }
             });
 
+            let wnd=null;
             //Botón para confirmar la importación del grafo
             let button=document.createElement('button');
             button.style.fontSize='10';
@@ -583,14 +614,29 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 if(confirm('¿Importar el diagrama?')){
                     let doc=mxUtils.parseXml(textarea.value);
                     let dec=new mxCodec(doc);
+                    try{
+                        dec.decode(doc.documentElement,graph.getModel());
+                    }catch(error){
+                        console.log(error);
+                        alert('El fichero XML contiene errores');
+                        editor.graph.getModel().clear();
+                    }
 
-                    dec.decode(doc.documentElement,graph.getModel());
+                    wnd.destroy();
                 }
             });
 
-            showModalWindow('IMPORTAR',div,410,480);
+            wnd=showModalWindow('IMPORTAR',div,410,480);
         });
         addToolbarButton(editor,toolbar,'import','Importar XML',null);
+
+        editor.addAction('diccionario',function(editor,cell){
+            let dicc=obtenerDiccDatos(graph);
+            showModalWindow('Diccionario de datos',dicc,window.innerWidth*0.7,window.innerHeight*0.7);
+        });
+        addToolbarButton(editor,status,'diccionario','Diccionario','../images/dict-icon.jpg');
+
+        status.appendChild(spacer.cloneNode(true));
 
         addToolbarButton(editor,status,'collapseAll','Collapse All','../images/navigate_minus.png');
         addToolbarButton(editor,status,'expandAll','Expand All','../images/navigate_plus.png');
@@ -715,6 +761,7 @@ function showModalWindow(title,content,width,height){
     wnd.addListener(mxEvent.DESTROY,function(event){
         mxEffects.fadeOut(background,50,true,10,30,true);
     });
+    wnd.setScrollable(true);
     wnd.setVisible(true);
 
     return wnd;
@@ -758,16 +805,8 @@ function addSidebarIcon(graph,sidebar,prototype,image){
             let columnCount=graph.model.getChildCount(parent)+1;
             name=mxUtils.prompt('Introduce el nombre para la nueva columna','COLUMN'+columnCount);
         }else{
-            let tableCount=0;
-            let childCount=graph.model.getChildCount(parent);
-
-            for(let i=0;i<childCount;i++){
-                if(!graph.model.isEdge(graph.model.getChildAt(parent,i))){
-                    tableCount++;
-                }
-            }
-
-            name=mxUtils.prompt('Introduce el nombre para la tabla nueva','TABLE'+(tableCount+1));
+            let childCount=graph.getChildVertices(parent).length;
+            name=mxUtils.prompt('Introduce el nombre para la tabla nueva','TABLE'+(childCount+1));
         }
 
         if(name!=null){
@@ -787,6 +826,9 @@ function addSidebarIcon(graph,sidebar,prototype,image){
                     v1.geometry.alternateBounds=new mxRectangle(0,0,v1.geometry.width,v1.geometry.height);
                     //Editamos el nombre de la columna que contiene la clave primaria para que coincida con el de la tabla
                     v1.children[0].value.name=name+'_ID';
+                }else if(parent.isCollapsed()){
+                    //Corregir bug add columna a tabla colapsada
+                    v1.geometry.height=prototype.geometry.height;
                 }
             } catch (error) {
                 console.log("ERROR addSidebarIcon:");
@@ -837,49 +879,11 @@ function addSidebarIcon(graph,sidebar,prototype,image){
     };
 }
 
-function configureStylesheet(graph){
-    let style=new Object();
-    style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
-    style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-    style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
-    style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
-    style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-    style[mxConstants.STYLE_FONTSIZE] = '11';
-    style[mxConstants.STYLE_FONTSTYLE] = 0;
-    style[mxConstants.STYLE_SPACING_LEFT] = 4; //Modificado para evitar error con getPreferredSizeForCell
-    style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
-    style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
-    style[mxConstants.STYLE_STROKEWIDTH] = '2';
-    style[mxConstants.STYLE_STROKECOLOR] = '#1B78C8';
-    style[mxConstants.STYLE_FILLCOLOR]='#FFFFFF';
-    graph.getStylesheet().putDefaultVertexStyle(style);
-
-    style = new Object();
-    style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_SWIMLANE;
-    style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
-    style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
-    style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-    style[mxConstants.STYLE_GRADIENTCOLOR] = '#41B9F5';
-    style[mxConstants.STYLE_FILLCOLOR] = '#8CCDF5';
-    style[mxConstants.STYLE_SWIMLANE_FILLCOLOR] = '#ffffff';
-    style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-    style[mxConstants.STYLE_STARTSIZE] = '28';
-    style[mxConstants.STYLE_VERTICAL_ALIGN] = 'middle';
-    style[mxConstants.STYLE_FONTSIZE] = '12';
-    style[mxConstants.STYLE_IMAGE] = '../images/icons48/table.png';
-    // Looks better without opacity if shadow is enabled
-    //style[mxConstants.STYLE_OPACITY] = '80';
-    style[mxConstants.STYLE_SHADOW] = 1;
-    style[mxConstants.STYLE_SPACING_LEFT]=48;
-    graph.getStylesheet().putCellStyle('table', style);
-
-    style = graph.stylesheet.getDefaultEdgeStyle();
-    style[mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = '#FFFFFF';
-    style[mxConstants.STYLE_STROKEWIDTH] = '2';
-    style[mxConstants.STYLE_ROUNDED] = true;
-    style[mxConstants.STYLE_EDGE] = mxEdgeStyle.EntityRelation;
-    style[mxConstants.STYLE_STARTSIZE]='8';
-    style[mxConstants.STYLE_ENDSIZE]='8';
+function configureStylesheet(graph){ 
+    let req = mxUtils.load('../editors/config/stylesheet.xml');
+    let root = req.getDocumentElement();
+    let dec = new mxCodec(root.ownerDocument);
+    dec.decode(root, graph.getStylesheet());
 }
 
 //Función para crear las entradas del menú popup
@@ -887,92 +891,18 @@ function createPopupMenu(editor,graph,menu,cell,evt){
     //Comprobamos si hemos hecho click en una tabla o en una columna
     if(cell!=null){
         //Si hemos hecho click en una columna añadimos la entrada propiedades
-        if(graph.isHtmlLabel(cell)||graph.model.isEdge(cell)){
-            menu.addItem('Propiedades','../editors/images/properties.gif',function(){
-                editor.execute('properties',cell);
+        if(graph.isHtmlLabel(cell)){
+            menu.addItem('Subir posición',null,function(){
+                editor.execute('subirColumna',cell);
+            });
+            menu.addItem('Bajar posición',null,function(){
+                editor.execute('bajarColumna',cell);
             });
 
             menu.addSeparator();
-
-            //Si es columna añadimos la opción de subir y bajar
-            if(graph.isHtmlLabel(cell)){
-                menu.addItem('Subir posición',null,function(){
-                    let posicion=(cell.geometry.y-28)/26;
-                    let parent=cell.getParent();
-
-                    if(posicion>0){
-                        let col_encima=graph.model.getChildAt(parent,posicion-1);
-                        let value_encima=col_encima.value.clone();
-                        let value_cell=cell.value.clone();
-                        let temp_style=col_encima.getStyle();
-
-                        //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
-                        if(col_encima.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
-                            intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
-                            intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                        }else if(col_encima.value.relacionAsociada!=null){
-                            intercambioIds(graph,col_encima.value.relacionAsociada,cell.getId(),col_encima.getId());
-                        }else if(cell.value.relacionAsociada!=null){
-                            intercambioIds(graph,cell.value.relacionAsociada,col_encima.getId(),cell.getId());
-                        }
-
-                        //Intercambiamos valores
-                        graph.model.setValue(col_encima,value_cell);
-                        graph.model.setValue(cell,value_encima);
-                        //Intercambiamos estilos
-                        col_encima.setStyle(cell.getStyle());
-                        cell.setStyle(temp_style);
-
-                        //Seleccionamos la celda que hemos movido
-                        graph.setSelectionCell(col_encima);
-                    }
-
-                });
-                menu.addItem('Bajar posición',null,function(){
-                    let posicion=(cell.geometry.y-28)/26;
-                    let parent=cell.getParent();
-                    let hijos=graph.model.getChildCount(parent);
-
-                    if(posicion<hijos-1){
-                        let col_debajo=graph.model.getChildAt(parent,posicion+1);
-                        let value_debajo=col_debajo.value.clone();
-                        let value_cell=cell.value.clone();
-                        let temp_style=col_debajo.getStyle();
-
-                        //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
-                        if(col_debajo.value.relacionAsociada!=null&&cell.value.relacionAsociada!=null){
-                            intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
-                            intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                        }else if(col_debajo.value.relacionAsociada!=null){
-                            intercambioIds(graph,col_debajo.value.relacionAsociada,cell.getId(),col_debajo.getId());
-                        }else if(cell.value.relacionAsociada!=null){
-                            intercambioIds(graph,cell.value.relacionAsociada,col_debajo.getId(),cell.getId());
-                        }
-
-                        graph.model.setValue(col_debajo,value_cell);
-                        graph.model.setValue(cell,value_debajo);
-                        col_debajo.setStyle(cell.getStyle());
-                        cell.setStyle(temp_style);
-
-                        graph.setSelectionCell(col_debajo);
-                    }
-                });
-            }
-
-            menu.addSeparator();
-        }else{
+        }else if(graph.isSwimlane(cell)){
             menu.addItem('Anadir columna','../images/plus.png',function(){
-                //Nueva columna
-                let columnCount=graph.model.getChildCount(cell)+1;
-                let name=mxUtils.prompt('Introduce el nombre para la nueva columna','COLUMN'+columnCount);
-
-                let columnObject=new Column(name);
-                let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
-
-                column.setVertex(true);
-                column.setConnectable(false);
-                //Añadimos la nueva columna a la tabla
-                graph.addCell(column,cell);
+                editor.execute('addColumna',cell);
             });
 
             menu.addSeparator();
@@ -995,9 +925,51 @@ function createPopupMenu(editor,graph,menu,cell,evt){
 
     menu.addSeparator();
 
-    menu.addItem('Mostrar SQL','../images/export1.png',function(){
+    menu.addItem('Mostrar SQL','../images/sql.png',function(){
         editor.execute('showSql',cell);
     });
+    menu.addItem('Mostrar SQLAlchemy','../images/Python-logo_24.png',function(){
+        editor.execute('showSqlAlch',cell);
+    });
+
+    menu.addSeparator();
+
+    menu.addItem('Mostrar Diccionario de datos','../images/dict-icon_24.jpg',function(){
+        editor.execute('diccionario',cell);
+    });
+}
+
+function moverPosicionColumna(graph,col_a_mover,parent,posicion,desp){
+    let col_desplazada=graph.model.getChildAt(parent,posicion-desp);
+    let value_desplazada=col_desplazada.value.clone();
+    let value_cell=col_a_mover.value.clone();
+    let temp_style=col_desplazada.getStyle();
+
+    //Comprobamos si las columnas a mover tienen alguna relación asociada que hay que editar
+    if(col_desplazada.value.relacionAsociada){
+        intercambioIds(graph,col_desplazada.value.relacionAsociada,col_a_mover.getId(),col_desplazada.getId());
+    }
+    if(col_a_mover.value.relacionAsociada){
+        intercambioIds(graph,col_a_mover.value.relacionAsociada,col_desplazada.getId(),col_a_mover.getId());
+    }
+    
+    //Actualizamos referencias a claves primarias
+    if(col_a_mover.value.primaryKey||col_desplazada.value.primaryKey){
+        actualizarRefPK(graph,col_a_mover,col_desplazada,parent);
+    }
+
+    //Intercambiamos los ids en caso de que pertenzcan a un unique compuesto
+    if(parent.value.uniqueComp.length){
+        intercambioIdsUnique(parent,col_a_mover.getId(),col_desplazada.getId());
+    }
+
+    //Actualizamos valores y estilos
+    graph.model.setValue(col_desplazada,value_cell);
+    graph.model.setValue(col_a_mover,value_desplazada);
+    graph.model.setStyle(col_desplazada,col_a_mover.getStyle());
+    graph.model.setStyle(col_a_mover,temp_style);
+
+    graph.setSelectionCell(col_desplazada);
 }
 
 //Asociamos el id de la nueva columna a la relación correspondiente
@@ -1007,6 +979,34 @@ function intercambioIds(graph,relacionId,nuevo,actual){
     for(let i=0;i<clavesForaneas.length;i++){
         if(clavesForaneas[i]==actual){
             clavesForaneas[i]=nuevo;
+        }
+    }
+}
+
+function intercambioIdsUnique(parent,id_1,id_2){
+    for(const arr of parent.value.uniqueComp){
+        let index1=arr.indexOf(id_1);
+        let index2=arr.indexOf(id_2);
+        if(index1>-1){
+            arr[index1]=id_2;
+        }
+        if(index2>-1){
+            arr[index2]=id_1;
+        }
+    }
+}
+
+function actualizarRefPK(graph,key1,key2,tabla){
+    const enlaces=graph.getEdges(tabla,null,true,false);
+    for(const enlace of enlaces){
+        const clavesForaneas=enlace.value.clavesForaneas;
+        for(const fkID of clavesForaneas){
+            let cell=graph.model.getCell(fkID);
+            if(cell.value.pkAsociada===key1.getId()){
+                cell.value.pkAsociada=key2.getId();
+            }else if(cell.value.pkAsociada===key2.getId()){
+                cell.value.pkAsociada=key1.getId();
+            }
         }
     }
 }
@@ -1129,6 +1129,12 @@ function showProperties(graph,cell,properties){
     c_propiedad.outerHTML='<th>Propiedad</th>';
     let c_valor=fila.insertCell(1);
     c_valor.outerHTML='<th>Valor</th>';
+
+    if(graph.isSwimlane(cell)){
+        let uniqueTable=getTableUniqueComp(graph,cell);
+        properties.appendChild(document.createElement('hr'));
+        properties.appendChild(uniqueTable);
+    }
 }
 
 function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
@@ -1140,6 +1146,13 @@ function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
             actualizarClaves(graph,rel);
         }
     }
+}
+
+function handleCambioUnique(cell,parent){
+    if(parent.value.uniqueComp.length){
+        let uniqueComp=parent.value.uniqueComp;
+        parent.value.uniqueComp=uniqueComp.filter(unique=>!unique.includes(cell.getId()));
+    }  
 }
 
 //Actualizamos las claves cuando se cambia la relación entre 2 tablas
@@ -1167,35 +1180,33 @@ function actualizarClaves(graph,cell){
             }
             console.log("Indiferente");
         }
+    }else if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
+        console.log("Tabla intermedia");
+        let nombre=table_s.value.name+'_'+table_t.value.name;
+        let table=obtenerTablaIntermedia(table_s.geometry,table_t.geometry,nombre);
+        graph.addCell(table,graph.getDefaultParent());
+
+        //Claves foraneas
+        let relacion_s=new Relacion("Relacion_s");
+        relacion_s.startArrow='uno_o_mas';
+        relacion_s.endArrow='solo_uno';
+        insertarNuevaRelacion(graph,clone.clone(),relacion_s,table,table_s,primaryKey_s,false);
+
+        let relacion_t=new Relacion("Relacion_t");
+        relacion_t.startArrow='uno_o_mas';
+        relacion_t.endArrow='solo_uno';
+        insertarNuevaRelacion(graph,clone.clone(),relacion_t,table,table_t,primaryKey_t,false);
+        graph.setSelectionCell(table);
     }else{
-        if(relacion.endArrow==='uno_o_mas'||relacion.endArrow==='cero_o_mas'){
-            console.log("Tabla intermedia");
-            let nombre=table_s.value.name+'_'+table_t.value.name;
-            let table=obtenerTablaIntermedia(table_s.geometry,table_t.geometry,nombre);
-            graph.addCell(table,graph.getDefaultParent());
-
-            //Claves foraneas
-            let relacion_s=new Relacion("Relacion_s");
-            relacion_s.startArrow='uno_o_mas';
-            relacion_s.endArrow='solo_uno';
-            insertarNuevaRelacion(graph,clone.clone(),relacion_s,table,table_s,primaryKey_s,false);
-
-            let relacion_t=new Relacion("Relacion_t");
-            relacion_t.startArrow='uno_o_mas';
-            relacion_t.endArrow='solo_uno';
-            insertarNuevaRelacion(graph,clone.clone(),relacion_t,table,table_t,primaryKey_t,false);
-            graph.setSelectionCell(table);
-        }else{
-            console.log("Clave en source");
-            insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
-        }
+        console.log("Clave en source");
+        insertarNuevaRelacion(graph,clone.clone(),relacion,table_s,table_t,primaryKey_t,false);
     }
 }
 
 function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir){
     editarRelacion(graph,enlace,relacion,source,target,invertir);
-    for(let i=0;i<pks.length;i++){
-        let column=addClaveForanea(graph,source,pks[i],enlace.getId());
+    for(let pk of pks){
+        let column=addClaveForanea(graph,source,pk,enlace.getId(),relacion.endArrow,relacion.startArrow);
         relacion.clavesForaneas.push(column.getId());
     }
     graph.setSelectionCell(enlace);
@@ -1229,9 +1240,10 @@ function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
 }
 
 //Añade la columna pasada como clave primaria como clave foranea a la tabla indicada
-function addClaveForanea(graph,table,key,relacionAsociada){
+function addClaveForanea(graph,table,key,relacionAsociada,simbO,simbM){
     let columnObject=new Column("COLUMNA");
     let column=new mxCell(columnObject,new mxGeometry(0,0,0,26));
+    let altura=column.geometry.height;
 
     column.setVertex(true);
     column.setConnectable(false);
@@ -1240,10 +1252,17 @@ function addClaveForanea(graph,table,key,relacionAsociada){
     column.value.type=key.value.type;
     column.value.foreignKey=true;
     column.value.relacionAsociada=relacionAsociada;
+    column.value.notNull=(simbO=='solo_uno'||simbO=='uno_o_mas');//Comprobar obligatoriedad
+    column.value.unique=(simbM=='solo_uno'||simbM=='cero_o_uno');//Comprobar máximo uno
+    column.value.pkAsociada=key.getId();//Asociamos la fk a la clave
 
     column.geometry.y=table.geometry.y; //Ajuste para corregir error con la tabla intermedia
 
     graph.addCell(column,table);
+    if(table.isCollapsed){
+        //Corregir bug add columna a tabla colapsada
+        column.geometry.height=altura;
+    }
 
     return column;
 }
@@ -1271,79 +1290,65 @@ function editarRelacion(graph,edge,relacion,source,target,invertir){
 //Devuelve la celda correspondiente a la clave primaria de la tabla indicada
 function obtenerClavePrimaria(graph,tabla){
     const primaryKey=[]
-    let childCount=graph.model.getChildCount(tabla);
-
-    for(let i=0;i<childCount;i++){
-        let child=graph.model.getChildAt(tabla,i);
-        if(child.value.primaryKey){
-            primaryKey.push(child);
-        }
-    }
-
+    let childs=graph.getChildVertices(tabla);
+    primaryKey.push(...childs.filter(child=>child.value.primaryKey));
     return primaryKey;
 }
 
 //Función que crea el código SQL según los elementos del grafo
 function createSql(graph){
-    const sql=[];
     let parent=graph.getDefaultParent();
-    let childCount=graph.model.getChildCount(parent);
-
-    for(let i=0;i<childCount;i++){
-        let child=graph.model.getChildAt(parent,i);
-
-        if(!graph.model.isEdge(child)){
-            sql.push(addTablaSql(graph,child))
-        }
-    }
-    return sql.join('');
+    let childs=graph.getChildVertices(parent);
+    return childs.map(child=>addTablaSql(graph,child)).join('');
 }
 
 function addTablaSql(graph,tabla){
     const sql=[];
 
     sql.push('CREATE TABLE IF NOT EXISTS '+tabla.value.name+' (');
-    let columnCount=graph.model.getChildCount(tabla);
+    let columnas=graph.getChildVertices(tabla);
 
-    let pks=' PRIMARY KEY(';
-    let pks_num=0;
-    let fks=' FOREIGN KEY(';
-    let fks_num=0;
-
-    if(columnCount>0){
-        for(let j=0;j<columnCount;j++){
-            let columna=graph.model.getChildAt(tabla,j).value;
-            sql.push(addColumnaSql(columna));
-            sql.join('');
-            if(columna.primaryKey){
-                pks+=columna.name+', ';
-                pks_num++;
-            }
-            if(columna.foreignKey){
-                fks+=columna.name+', ';
-                fks_num++;
-            }
+    const pks=[];
+    const fks={};
+    for(let columna of columnas){
+        let value=columna.value;
+        sql.push(addColumnaSql(value));
+        if(value.primaryKey){
+            pks.push(value.name);
         }
-        //Añadimos las claves
-        if(pks_num>0){
-            sql.push('\n'+pks.substring(0,pks.length-2)+')');
-            sql.push(',');
+        if(value.foreignKey){
+            addFKData(graph,value,fks);
         }
-        if(fks_num>0){
-            sql.push('\n'+fks.substring(0,fks.length-2)+')');
-        }else{
-            sql.splice(sql.length-1,1);
-        }
-
-        sql.push('\n);');
     }
-    sql.push('\n');
+
+    //Añadimos las claves
+    if(pks.length){
+        sql.push('\n\tPRIMARY KEY('+pks.join(', ')+')');
+        sql.push(',');
+    }
+    let fksArray=Object.entries(fks).map(([id,val])=>[id,val]);
+    for(let grupo of fksArray){
+        let parent=graph.getModel().getCell(grupo[0]);
+        const nomFks=grupo[1].map(nombre=>nombre[0]);
+        const nomPks=grupo[1].map(nombre=>graph.model.getCell(nombre[1]).value.name);
+
+        sql.push('\n\tFOREIGN KEY ('+nomFks.join(',')+') REFERENCES '+parent.value.name+'('+nomPks.join(',')+')');
+        sql.push(',');
+    }
+    
+    if(tabla.value.uniqueComp.length){
+        sql.push(tabla.value.uniqueComp.map(uniques=>'\n\tUNIQUE('+getNombreUniComp(graph,uniques)+')'));
+    }else{
+        sql.splice(sql.length-1,1);
+    }
+
+    sql.push('\n);\n');
     return sql.join('');
 }
 
 function addColumnaSql(columna){
     const sql=[];
-    sql.push('\n '+columna.name+' '+columna.type);
+    sql.push('\n\t'+columna.name+' '+columna.type);
     if(columna.notNull){
         sql.push(' NOT NULL');
     }
@@ -1360,6 +1365,90 @@ function addColumnaSql(columna){
     return sql.join('');
 }
 
+function createSqlAlchemy(graph){
+    let parent=graph.getDefaultParent();
+    let childs=graph.getChildVertices(parent);
+    return childs.map(child=>addTablaSqlAlchemy(graph,child)+'\n').join('');
+}
+
+function addTablaSqlAlchemy(graph,tabla){
+    const sql=[];
+    sql.push('class '+tabla.value.name+'(Base):\n');
+    sql.push('\t__tablename__=\''+tabla.value.name+'\'\n');
+    let childs=graph.getChildVertices(tabla);
+
+    const fks={};
+
+    for(let child of childs){
+        sql.push(addColumnaSqlAlchemy(graph,child));
+        if(child.value.foreignKey){
+            addFKData(graph,child.value,fks);
+        }
+    }
+
+    let fksArray=Object.entries(fks).map(([id,val])=>[id,val]);
+    
+    if(fksArray.length||tabla.value.uniqueComp.length){
+        sql.push('\t__table_args__=(\n');
+        for(let grupo of fksArray){
+            sql.push('\t\tForeignKeyConstraint(\n');
+            let parent=graph.getModel().getCell(grupo[0]);
+
+            const nomFks=grupo[1].map(nombre=>`"${nombre[0].trim()}"`);
+            const refs=grupo[1].map(nombre=>`"${parent.value.name}.${graph.model.getCell(nombre[1]).value.name.trim()}"`);
+
+            sql.push('\t\t\t['+nomFks.join(', ')+'], ['+refs.join(', ')+']\n\t\t),\n');
+        }
+
+        for(let grupo of tabla.value.uniqueComp){
+            sql.push('\t\tUniqueConstraint(');
+            let nombres=getNombreUniComp(graph,grupo).split(',');
+            sql.push(nombres.map(nom => `"${nom.trim()}"`).join(', ')+'),\n');
+        }
+        sql.push('\t)');
+    }
+    
+    return sql.join('');
+}
+
+function addColumnaSqlAlchemy(graph,columna){
+    const sql=[];
+    sql.push('\t'+columna.value.name+'=Column('+columna.value.type);
+    sql.push(',');
+    if(columna.value.primaryKey){
+        sql.push(' primary_key=True');
+        sql.push(',');
+    }
+    if(columna.value.notNull){
+        sql.push(' nullable=False');
+        sql.push(',');
+    }
+    if(columna.value.default){
+        sql.push(' default='+columna.value.defaultValue);
+        sql.push(',');
+    }
+    if(columna.value.unique){
+        sql.push(' unique=True');
+        sql.push(',');
+    }
+
+    sql.splice(sql.length-1,1);
+    sql.push(')\n');
+    return sql.join('');
+}
+
+function addFKData(graph,value,fks){
+    let relacion=graph.getModel().getCell(value.relacionAsociada);
+    if(relacion){
+        let target=relacion.getTerminal(false);
+        let id=target.getId();
+        if(!fks[id]){
+            fks[id]=[];
+        }
+        fks[id].push([value.name,value.pkAsociada]);
+    }
+}
+
 //Función para obtener la anchura de una cadena de texto en píxeles
 function getTextWidth(text,font){
     const canvas=getTextWidth.canvas || (getTextWidth.canvas=document.createElement("canvas"));
@@ -1372,13 +1461,13 @@ function getTextWidth(text,font){
 function openTabProperties(evt,prop){
     //Manejo de las pestañas del apartado propiedades
     let tabs=document.getElementsByClassName("tab");
-    for(let i=0;i<tabs.length;i++){
-        tabs[i].className=tabs[i].className.replace(" active","");
+    for(let tab of tabs){
+        tab.className=tab.className.replace(" active","");
     }
 
     let tabcontent=document.getElementsByClassName("tabcontent");
-    for(let i=0;i<tabcontent.length;i++){
-        tabcontent[i].style.display="none";
+    for(let content of tabcontent){
+        content.style.display="none";
     }
     document.getElementById(prop).style.display="block";
     evt.currentTarget.className+=" active";
@@ -1411,7 +1500,6 @@ function configurarTabEstilos(graph,cell){
     setEstilosIniciales(style,graph.model.isEdge(cell),{
         colorPicker,
         gradientPicker,
-        gradientCheck,
         selectGradientDirection,
         selectFont,
         tamFont,
@@ -1457,7 +1545,7 @@ function inicializarSombra(tabla,shadowCheck){
 }
 
 function setEstilosIniciales(style,enlace,elementos){
-    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+    const{colorPicker,gradientPicker,selectGradientDirection,selectFont,
         tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
     }=elementos;
 
@@ -1498,10 +1586,9 @@ function setColorFontPicker(style,colorFontPicker,enlace){
 
 function setFontStyle(style,negritaButton,cursivaButton){
     let fontStyle=style[mxConstants.STYLE_FONTSTYLE];
-    if(fontStyle===undefined||fontStyle===null){
-        negritaButton.className=negritaButton.className.replace(" active","");
-        cursivaButton.className=cursivaButton.className.replace(" active","");
-    }else{
+    negritaButton.className=negritaButton.className.replace(" active","");
+    cursivaButton.className=cursivaButton.className.replace(" active","");
+    if(fontStyle){
         toggleButtonActiveStyle(negritaButton,fontStyle&mxConstants.FONT_BOLD);
         toggleButtonActiveStyle(cursivaButton,fontStyle&mxConstants.FONT_ITALIC);
     }
@@ -1516,7 +1603,7 @@ function toggleButtonActiveStyle(button,activo){
 }
 
 function setEstilosDefault(enlace,elementos){
-    const{colorPicker,gradientPicker,gradientCheck,selectGradientDirection,selectFont,
+    const{colorPicker,gradientPicker,selectGradientDirection,selectFont,
         tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
     }=elementos;
 
@@ -1673,6 +1760,182 @@ function obtenerEtiquetaRecortada(label,type,style,width,columna){
     return label;
 }
 
+function obtenerDiccDatos(graph){
+    let div=document.createElement('div');;
+    let titulo=document.createElement('p');
+    titulo.innerHTML='DICCIONARIO DE DATOS';
+    titulo.className='titulo';
+    div.appendChild(titulo);
+    div.appendChild(document.createElement('hr'));
+
+    let parent=graph.getDefaultParent();
+    let childs=graph.getChildVertices(parent);
+    for(let child of childs){
+        let p=document.createElement('p');
+        p.innerHTML=child.value.name;
+        p.className='titulo';
+        div.append(p);
+        let tabla=document.createElement('table');
+        let thead=document.createElement('thead');
+        let trh=document.createElement('tr');
+        trh.appendChild(obtenerDatoTabla('th','Columna'));
+        trh.appendChild(obtenerDatoTabla('th','Tipo de datos'));
+        trh.appendChild(obtenerDatoTabla('th','Titulo'));
+        trh.appendChild(obtenerDatoTabla('th','Descripcion'));
+        thead.appendChild(trh);
+        tabla.appendChild(thead);
+
+        
+        let cols=graph.getChildVertices(child);
+        let tbody=document.createElement('tbody');
+        for(let col of cols){
+            let tr=document.createElement('tr');
+            tr.appendChild(obtenerDatoTabla('td',col.value.name));
+            tr.appendChild(obtenerDatoTabla('td',col.value.type));
+            tr.appendChild(obtenerDatoTabla('td',col.value.titulo));
+            tr.appendChild(obtenerDatoTabla('td',col.value.desc));
+            tbody.appendChild(tr);
+        }
+        tabla.appendChild(tbody);
+
+        div.appendChild(tabla);
+    }
+    div.appendChild(document.createElement('br'));
+    div.style.overflow='auto';
+
+    return div;
+}
+
+function obtenerDatoTabla(tipo,dato){
+    let td=document.createElement(tipo);
+    td.innerHTML=dato;
+    return td;
+}
+
+function getTableUniqueComp(graph,cell){
+    let div=document.createElement('div');
+    let titulo=document.createElement('p');
+    titulo.className='titulo';
+    titulo.innerHTML='Unique compuesto';
+    div.appendChild(titulo);
+
+    let tabla=document.createElement('table');
+    let thead=document.createElement('thead');
+    let trh=document.createElement('tr');
+    trh.appendChild(obtenerDatoTabla('th','Id'));
+    trh.appendChild(obtenerDatoTabla('th','Columnas'));
+    trh.appendChild(obtenerDatoTabla('th','Eliminar'));
+    thead.appendChild(trh);
+    tabla.appendChild(thead);
+    let tbody=document.createElement('tbody');
+
+    if(cell.value.uniqueComp.length){
+        
+        for(let i=0;i<cell.value.uniqueComp.length;i++){
+            let tr=document.createElement('tr');
+            tr.appendChild(obtenerDatoTabla('td',i));
+            let nombres=getNombreUniComp(graph,cell.value.uniqueComp[i]);
+            tr.appendChild(obtenerDatoTabla('td',nombres));
+            let btnEliminar=document.createElement('button');
+            mxEvent.addListener(btnEliminar,'click',function(evt){
+                eliminarUniqueComp(graph,cell,i,tabla);
+            });
+            btnEliminar.innerHTML='Elim';
+            btnEliminar.className='buttonToolbar';
+            let td=document.createElement('td');
+            td.appendChild(btnEliminar);
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        }
+        
+    }
+    tabla.appendChild(tbody);
+    div.appendChild(tabla);
+    div.appendChild(document.createElement('br'));
+    let btnAdd=document.createElement('button');
+    mxEvent.addListener(btnAdd,'click',function(evt){
+        addUniqueComp(graph,cell,tabla);
+    });
+    btnAdd.className='buttonToolbar';
+    btnAdd.innerHTML='Add';
+    div.appendChild(btnAdd);
+
+    return div;
+}
+
+function eliminarUniqueComp(graph,cell,id,tabla){
+    let clone=cell.value.clone();
+    clone.uniqueComp.splice(id,1);
+    graph.model.setValue(cell,clone);
+    tabla.deleteRow(id+1);
+}
+
+function addUniqueComp(graph,cell,tabla){
+    let cols=graph.getChildVertices(cell);
+    if(cols.length>1){
+        //Mostramos ventana
+        let form=new mxForm('Uniques');
+        const ids=[];
+        for(let col of cols){
+            let nombre=col.value.name;
+            let id=col.getId();
+            let input=form.addCheckbox(nombre);
+            mxEvent.addListener(input,'change',function(evt){
+                if(input.checked){
+                    ids.push(id);
+                }else{
+                    ids.splice(ids.lastIndexOf(id),1);
+                }
+            });
+        }
+        let vetnana=null;
+        let acepFunc=function(){
+            if(ids.length>1){
+                let res=getNombreUniComp(graph,ids);
+                let clone=cell.value.clone();
+                clone.uniqueComp.push(ids);
+                graph.model.setValue(cell,clone);
+
+                let row=tabla.tBodies[0].insertRow();
+                let id=row.insertCell(0);
+                id.innerHTML=clone.uniqueComp.length-1;
+                let name=row.insertCell(1);
+                name.innerHTML=res;
+                let cellBtn=row.insertCell(2);
+                let btnEliminar=document.createElement('button');
+                mxEvent.addListener(btnEliminar,'click',function(evt){
+                    eliminarUniqueComp(graph,cell,clone.uniqueComp.length-1,tabla);
+                });
+                btnEliminar.innerHTML='Elim';
+                btnEliminar.className='buttonToolbar';
+                cellBtn.appendChild(btnEliminar);
+
+                vetnana.destroy();
+            }else{
+                alert('Selecciona por lo menos dos columnas');
+            }
+        }
+        let cancelFunc=function(){
+            vetnana.destroy();
+        }
+        form.addButtons(acepFunc,cancelFunc);
+        vetnana=showModalWindow('Unique compuesta',form.getTable(),240,240);
+    }else{
+        alert('Necesitas por lo menos 2 columnas');
+    }
+}
+
+function getNombreUniComp(graph,ids){
+    const texto=[];
+    for(let id of ids){
+        let cell=graph.model.getCell(id)
+        texto.push(cell.value.name);
+        texto.push(', ');
+    }
+    texto.splice(texto.length-1,1);
+    return texto.join('');
+}
+
 
 //Definición del objeto de usuario columna
 function Column(name){
@@ -1693,11 +1956,12 @@ Column.prototype.desc='DESCRIPCION';
 Column.prototype.titulo='TITULO';
 Column.prototype.gradient=false;
 Column.prototype.relacionAsociada=null;
-
+Column.prototype.pkAsociada=null;
 
 //Definición del objeto de usuario tabla
 function Table(name){
     this.name=name;
+    this.uniqueComp=[];
 }
 Table.prototype.clone=function(){
     return mxUtils.clone(this);

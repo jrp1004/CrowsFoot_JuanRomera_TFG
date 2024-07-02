@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
     <head>
+        <title>Crow's Foot</title>
         <link rel="stylesheet" href="./estilos.css" type="text/css">
         <link rel="icon" type="image/x-icon" href="../images/crow-logo.png">
         <script src="./index.js"></script>
@@ -9,7 +10,7 @@
     </head>
     <body onload="main(document.getElementById('graphContainer'),document.getElementById('outlineContainer'),document.getElementById('toolbarContainer'),document.getElementById('sidebarContainer'),document.getElementById('statusContainer'),document.getElementById('propertiesContainer'))">
         <div id="iconoContainer" class="div-html">
-            <img src="../images/crow-logo.png" height="128px">
+            <img src="../images/crows_foot_logo.png" height="144px" alt="crow's foot logo">
         </div>
         <div id="toolbarContainer" class="div-html"></div>
         <div id="sidebarContainer" class="div-html">
@@ -22,6 +23,7 @@
             </div>
             <br>
             <hr>
+            <p class="titulo" style="font-size: 16px;">GENERACIÓN DE CÓDIGO</p>
         </div>
         <div id="graphContainer" class="div-html"></div>
         <div id="outlineContainer" class="div-html"></div>
@@ -59,6 +61,10 @@
                                                 <option value="west">Oeste</option>
                                             </select>
                                         </td>
+                                    </tr>
+                                    <tr id="sombra">
+                                        <td>Sombra</td>
+                                        <td><input type="checkbox" id="shadowCheck"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -99,10 +105,6 @@
                                     <tr>
                                         <td>Estilo</td>
                                         <td style="margin: 8px;"><button class="buttonToolbar" id="negrita">N</button>&emsp;<button class="buttonToolbar" id="cursiva">K</button></td>
-                                    </tr>
-                                    <tr id="sombra">
-                                        <td>Sombra</td>
-                                        <td><input type="checkbox" id="shadowCheck"></td>
                                     </tr>
                                 </tbody>
                             </table>
