@@ -309,7 +309,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 }else if(cell.value.foreignKey){
                     label+='<img title="Foreign key" src="../images/foreign_key.png" width="16" height="16" align="top">&nbsp;';
                 }else{
-                    label+='<img src="spacer/key.png" width="16" height="1" >&nbsp;';
+                    label+='<img src="../images/spacer.gif" width="16" height="1" >&nbsp;';
                 }
 
                 if(cell.value.autoIncrement){
@@ -317,7 +317,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 }else if(cell.value.unique){
                     label+='<img title="Unique" src="../images/check.png" width="16" height="16" align="top">&nbsp;';
                 }else{
-                    label+='<img src="spacer/key.png" width="16" height="1" >&nbsp;';
+                    label+='<img src="../images/spacer.gif" width="16" height="1" >&nbsp;';
                 }
 
                 let style=graph.getStylesheet().getCellStyle(cell.style);
@@ -1806,12 +1806,24 @@ function obtenerDiccDatos(graph){
     return div;
 }
 
+/**
+ * Crea una celda de la tabla html y la devuelve
+ * @param {string} tipo - Tipo de celda de la tabla
+ * @param {*} dato - Dato a insertar en la celda
+ * @returns {HTMLTableDataCellElement} - Celda de la tabla
+ */
 function obtenerDatoTabla(tipo,dato){
     let td=document.createElement(tipo);
-    td.innerHTML=dato;
+    td.textContent=dato;
     return td;
 }
 
+/**
+ * Función para obtener la tabla html con los unique compuestos de la tabla de diagrama
+ * @param {mxGraph} graph - Instacia del grafo
+ * @param {mxCell} cell - Celda correspondiente a la tabla
+ * @returns {HTMLDivElement} - div que contiene la tabla
+ */
 function getTableUniqueComp(graph,cell){
     let div=document.createElement('div');
     let titulo=document.createElement('p');
@@ -1838,7 +1850,7 @@ function getTableUniqueComp(graph,cell){
             tr.appendChild(obtenerDatoTabla('td',nombres));
             let btnEliminar=document.createElement('button');
             mxEvent.addListener(btnEliminar,'click',function(evt){
-                eliminarUniqueComp(graph,cell,i,tabla);
+                eliminarUniqueComp(graph,cell,tr,tabla);
             });
             btnEliminar.innerHTML='Elim';
             btnEliminar.className='buttonToolbar';
@@ -1863,13 +1875,31 @@ function getTableUniqueComp(graph,cell){
     return div;
 }
 
+/**
+ * Elimina un unique compuesto de la tabla
+ * @param {mxGraph} graph - Instacia del grafo
+ * @param {mxCell} cell - Celda correspondiente a la tabla
+ * @param {HTMLTableRowElement} id - Id del unique compuesto a eliminar
+ * @param {HTMLTableElement} tabla - Tabla HTML
+ */
 function eliminarUniqueComp(graph,cell,id,tabla){
     let clone=cell.value.clone();
     clone.uniqueComp.splice(id,1);
     graph.model.setValue(cell,clone);
     tabla.deleteRow(id+1);
+    //Actualizamos los indices de las filas
+    graph.setSelectionCell(cell);
 }
+    
 
+/**
+ * Función que se ejecuta al pulsar el botón de añadir unique compuesto
+ * Muestra un formulario con las columnas de la tabla que se pueden añadir
+ * Si se añade correctamente se muestan en la tabla
+ * @param {mxGraph} graph - Instacia del grafo
+ * @param {mxCell} cell - Celda correspondiente a la tabla
+ * @param {HTMLTableElement} tabla - Tabla HTML
+ */
 function addUniqueComp(graph,cell,tabla){
     let cols=graph.getChildVertices(cell);
     if(cols.length>1){
@@ -1925,6 +1955,12 @@ function addUniqueComp(graph,cell,tabla){
     }
 }
 
+/**
+ * Obtiene el nombre de las columnas de un unique compuesto
+ * @param {mxGraph} graph - Instancia del grafo
+ * @param {Array<number>} ids - Array con los ids de las columnas
+ * @returns {string} - Nombre de las columnas separadas por comas
+ */
 function getNombreUniComp(graph,ids){
     const texto=[];
     for(let id of ids){
@@ -1932,49 +1968,94 @@ function getNombreUniComp(graph,ids){
         texto.push(cell.value.name);
         texto.push(', ');
     }
+    //Elimina la última coma
     texto.splice(texto.length-1,1);
     return texto.join('');
 }
 
 
-//Definición del objeto de usuario columna
+/**
+ * Representa una columna de una tabla en la base de datos
+ * @param {string} name - Nombre de la columna
+ */
 function Column(name){
     this.name=name;
 }
-
+/** @type {string} */
 Column.prototype.type='TEXT';
+/** @type {string} */
 Column.prototype.defaultValue=null;
+/** @type {boolean} */
 Column.prototype.primaryKey=false;
+/** @type {boolean} */
 Column.prototype.foreignKey=false;
+/** @type {boolean} */
 Column.prototype.autoIncrement=false;
+/** @type {boolean} */
 Column.prototype.notNull=false;
+/** @type {boolean} */
 Column.prototype.unique=false;
+/**
+ * Clona la columna
+ * @returns {Column} - Clon de la columna
+ */
 Column.prototype.clone=function(){
     return mxUtils.clone(this);
 }
+/** @type {string} */
 Column.prototype.desc='DESCRIPCION';
+/** @type {string} */
 Column.prototype.titulo='TITULO';
+/** @type {boolean} */
 Column.prototype.gradient=false;
+/** @type {number} */
 Column.prototype.relacionAsociada=null;
+/** @type {number} */
 Column.prototype.pkAsociada=null;
 
-//Definición del objeto de usuario tabla
+/**
+ * Representa una tabla en la base de datos
+ * @param {string} name - Nombre de la tabla
+ */
 function Table(name){
     this.name=name;
+    /**
+     * Matriz con los unique compuestos de la tabla
+     * @type {Array<Array<number>>}
+     */
     this.uniqueComp=[];
 }
+/**
+ * Clona la tabla
+ * @returns {Table} - Clon de la tabla
+ */
 Table.prototype.clone=function(){
     return mxUtils.clone(this);
 }
+/** @type {boolean} */
 Table.prototype.gradient=true;
 
-//Objeto asociado a las relaciones
+/**
+ * Representa una relacion en la base de datos
+ * @param {string} name - Nombre de la relacion
+ */
 function Relacion(name){
     this.name=name;
+    /**
+     * Array con las claves foraneas de la relacion
+     * @type {Array<number>}
+     */
     this.clavesForaneas=[];
 }
+/** @type {string} */
 Relacion.prototype.startArrow="solo_uno";
+/** @type {string} */
 Relacion.prototype.endArrow="solo_uno";
+
+/**
+ * Clona la relacion
+ * @returns {Relacion} - Clon de la relacion
+ */
 Relacion.prototype.clone=function(){
     return mxUtils.clone(this);
 }
