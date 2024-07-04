@@ -1,0 +1,157 @@
+\capitulo{5}{Aspectos relevantes del desarrollo del proyecto}
+
+En este capítulo se comentan los aspectos más relevantes a la hora de desarrollar el proyecto, qué decisiones se tomaron y qué llevó a ellas.
+
+\section{Introducción}
+
+Antes del comienzo del desarrollo de esta aplicación mi trabajo con desarrollo web, y más concretamente con \emph{Javascript}, había sido prácticamente nulo, más allá de algún trabajo concreto realizado durante el curso. Esto ha supuesto varias dificultades que se han tenido que resolver a lo largo del desarrollo.
+
+El trabajo se seleccionó principalmente por falta de alternativas, ya que se solicitó la realización de otro trabajo, pero ante la larga espera, la falta de respuesta a dicha solicitud hizo que cuando se presentó la oportunidad de realizar este proyecto se aceptase rápidamente.
+
+\section{Formación}
+
+Puesto que se partía de una base casi nula en el trabajo con Javascript, el periodo de formación se extendió algo más de lo esperado. Se realilzó un trabajo de formación en Javascript, Node y React, aunque más adelante se descartó el uso de estos frameworks.
+
+\subsection{Javascript}
+
+Para la formación en Javascript se hizo uso de tutoriales disponibles en webs como \url{https://www.w3schools.com/js/}, además de algún ejemplo obtenido de otras webs. Se realizó trabajo con clases, objetos, funciones básicas de Javascript, además de utilidades como fetch.
+
+\subsection{Node}
+
+Igual que como se ha comentado en la sección anterior, los tutoriales de w3schools fueron bastante útiles, además de la formación disponible en la propia web de Node. Para la formación, se realizaron ejemplos para trabajar principalmente con ficheros, además de identificar que recursos mostrar al usuario en función de los parámetros obtenidos.
+
+\subsection{React}
+
+En la formación con React también se siguió la formación de la web mencionada anteriormente, pero en este caso se trabajó más con ejemplos, como el mostrado en la propia web de React, con el que se construye un tres en raya báscio, además de un ejemplo integrando React y Node en el que construimos una aplicación de notas en la web que almacenaba y obtenía los datos con los que el usuario estuviera trabajando desde una base de datos.
+
+\section{Librería mxGraph}
+
+El pilar fundamental de este proyecto es la librería de Javascript \emph{mxGraph}, la cual se encarga de la gestión de gran parte de los elementos de nuestra aplciación. Una vez considreado terminado el apartado de formación anterior, se comenzó a trabajar con esta librería.
+
+\subsection{Formación}
+
+La formación en esta librería consistió basicamente en la lectura y realización de algunos de los diferentes ejemplos que podemos encontrar en la web \url{https://jgraph.github.io/mxgraph/javascript/}, ejemplos disponibles gracias a los propios creadores. También se hizo un uso constante de la documentación disponible en \url{https://jgraph.github.io/mxgraph/docs/js-api/files/index-txt.html}, además de los manuales que podemos encontrar en \url{https://jgraph.github.io/mxgraph/}. Más allá de esto, no se encontró mucho material con el que se formarse en la librería, sin tener en cuenta secciones de código encontradas en webs del estilo \textit{Stackoverflow}.
+
+\subsection{Ejemplos}
+
+Teniendo en cuenta que la mayoría de la formación en la librería se hizo con los ejemplos encontrados, a continuación se listarán algunos de los más relevantes.
+\begin{itemize}
+    \item \textbf{Hello world: }Ejemplo básico de hola mundo para ir familiarizándome con la librería.
+    \item \textbf{User object: }Ejemplo para aprender a trabajar con objetos personalizados dentro de las celdas de mxGraph.
+    \item \textbf{Toolbar: }Ejemplo que nos muetra como implementar una barra de herramientas desde la que añadir elementos a nuestro grafo utilizando drag and drop.
+    \item \textbf{Fileio: }Ejemplo en el que se trata como obtener un grafo a partir de un fichero, en nuestro un fichero XML.
+    \item \textbf{Markers: }Ejemplo que nos enseña como implementar símbolos personalizados en los extremos de los enlaces del grafo.
+    \item \textbf{Schema: }En este ejemplo se muestra como se puede implementar un editor muy sencillo de diagramas de base de datos, con la capacidad de añadir tablas, columnas y relaciones.
+\end{itemize}
+
+Una vez trabajado con todos los ejemplos y entendidos estos, se comenzó a trabajar en la aplicación, tomando el ejemplo \emph{Schema} como base desde la que empezar a construir.
+
+El seguimiento de esta etapa de formación se puede encontrar en el repositorio del proyecto en la rama \emph{Formación}.
+
+\section{Desarrollo de la aplicación}
+
+Una vez considerada completa la formación, comienza el desarrollo de la aplicación. Se consideró que el ejemplo \emph{Schema} podría servir como base sobre la que trabajar, ya que contaba con funcionalidades como incluir tablas y columnas arrastrando, además de la posiblidad de crear relaciones entre las tablas, aunque, a pesar de ser un buen primer punto de contacto, carecía de diversas funcionalidades como los símbolos de patas de cuervo que necesitamos, considerar más de una cardinalidad en la relación, la gestión automática de las claves o una correcta generación de código.
+
+\subsection{Metodologías}
+
+Para el desarrollo del proyecto se intento llevar un enfoque los más profesional posible, utilizando metodologías que se siguen en un entorno empresarial.
+
+Se ha tratado de llevar la metodología ágil \emph{Scrum} en el proyecto, siguiendo el enfoque de desarrollo incremental. Los pasos seguidos fueron:
+\begin{itemize}
+    \item Se dividió el desarrollo incremental en diferentes Sprints.
+    \item Los sprints duraban normalmente entre 1-2 semanas.
+    \item Al comienzo de cada sprint se creaba una pila de tareas que se iban a realizar en dicho sprint.
+    \item Durante el sprint se podían añadir nuevas tareas en función de problemas o cuestiones encontradas.
+\end{itemize}
+
+El desarrollo del código se ha realizado siguiendo una metodología de enseayo y error, añadiendo las funcionalidades de forma paulatina probando hasta obtener el resultado deseado.
+
+\subsection{Aspecto de tablas y columnas}
+
+El ejemplo Schema anteriomente mencionado ya partía con un diseño del aspecto de tablas, columnas y relaciones que tenía buena pinta. Debido a que el tema de este trabajo era tarbajar con la notación de patas de cuervo y no el diseño de tablas y columnas en sí, se decidió mantener este diseño, aunque se realizaron algunos cambios a lo largo del desarrllo para conseguir que el diseño se ajuste mejor al proyecto. Algunos de estos cambios son los siguientes.
+\begin{itemize}
+    \item Ajuste de la etiqueta de la tabla a la izquierda y no centrado
+    \item Borde para todas las columnas
+    \item Icono personalizado para indicar que una columna es clave foránea
+\end{itemize}
+
+Además de estos cambios, más adelante introdujo en la aplicación un apartado que permite modificar alugnos de estos aspectos estéticos de las tablas, columnas y relaciones, del que se hablará más adelante.
+
+\subsection{Símbolos de patas de cuervo}
+
+Al comienzo del desarrollo de la aplicación, se trabajó en la implementación de los símbolos correspondientes a la notación de patas de cuervo. Para una correcta visualización, se implementaron los símbolos personalizados de tal forma que estos sean consistentes y fácilmente identificables independientemente del ángulo del enlace que representa la relación. Esto supuso un inconveniente al principio, pero se solventó rápidamente.
+
+%%%IMAGENES SIMBOLOS
+\imagen{relacion_1}{Símbolos 1}{0.2}
+\imagen{relacion_2}{Símbolos 2}{0.2}
+\imagen{relacion_3}{Símbolos 3}{0.2}
+
+Identificando los símbolos por el tipo de multiplicidad y obligatoriedad de cada uno, implementamos los símbolos \textit{solo\_uno}, \textit{cero\_o\_uno}, \textit{cero\_o\_mas} y \textit{uno\_o\_mas}.
+
+Desde el apartado de propiedades de la relación podemos seleccionar que símbolo se muestra en cade extremo de la relación, actualizando automáticamente las claves foráneas en caso de que se necesario.
+
+\subsection{Diccionario de datos}
+
+Se decidió implementar las propiedades \emph{Título} y \emph{Descripción} en los objetos que representaban a las columnas para permitir al usuario ampliar la información con respecto a los elementos de su diagrama, mostrando toda esta información de forma ordenada desde el botón correspondiente.
+
+\subsection{Ajuste de etiqueta}
+
+Al principio del desarrollo surgió la idea de ajustar la anchura de las tablas y las columnas a la anchura de la etiqueta que se va a mostrar. Esta idea se descartó, en parte debido a que visualmente no es la mejor solución, pero principlamente debido a que la librería contiene problemas sin resolver sobre el ajuste automático del tamaño de sus celdas cuando estas forman parte de un layout de grupo, como en nuestro caso swimlane, provocando que una celda pueda hacerse más grande pero no pueda hacerse más pequeña o recuperar su tamaño inicial.
+
+Después de esto, se decidió modificar como se mostraba la etiqueta para que esta se ajuste a la anchura de la celda. Con la función \textit{getTextWidth} calculamos la anchura de la cadena correspondiente a la etiqueta en píxeles, permitiéndonos calcular que parte de la etiqueta mostrar, añadiendo tres puntos suspensivos (...) al final de la etiqueta indicado que esta continua.
+
+\subsection{Gestión de claves}
+
+Durante el desarrollo se consideró importante el hecho de que, cuando se crea o actualiza una relación entre dos tablas, las claves foráneas necesarias se añaden y eliminan de forma automática de las tablas correspondientes. Además, los parámetros \textit{UNIQUE} y \textit{NOT NULL} de estas nuevas columnas se gestionan de tal forma que corresponda con la multiplicidad y la obligatoriedad de los símbolos del enlace.
+
+Para que esto funcionase correctamente, se implementó en el objeto de las relaciones un array que almacenase las claves foráneas asociadas, de tal forma que en caso de eliminar o actualizar una relación entre dos tablas, las claves foráneas antiguas se eliminen.
+
+Además de lo anteriormente mencionado, se introdujo la posibilidad de añadir Uniques compuestos en las tablas con dos columnas o más, permitiendo el manejo de claves candidatas también.
+
+Teniendo en cuenta que las relaciones M:M normalmente se implementan utilizando una tabla intermedia, cuando el usuario establezca una relación de este tipo entre dos tablas, el sistema incluirá automáticamente una tabla intermedia representando a dicha relación incluyendo como claves foráneas las claves primarias de estas dos tablas.
+
+\subsection{Panel propiedades}
+
+Para mantener un aspecto visual más moderno, se implementó un panel lateral que muestar las propiedades del elemento del diagrama seleccionado. El panel está dividido en dos pestañas, el partado \textit{Estilos} y el apartado \textit{Datos}.
+
+\imagen{panel-propiedades}{Panel propiedades}{0.3}
+
+\subsubsection{Estilos}
+
+Ya que se adoptó la estética de los elementos del diagrama Schema, para obtener una diferenciación más clara se introdujo este panel para permitir al usuario cambiar la apariencia de los elementos de su diagrama.
+
+Entre las características que se permiten cambiar podemos encontrar el color de relleno, el color del texto, fuente, tamaño de fuente, botones de negrita y cursiva, ...
+
+\subsubsection{Datos}
+
+Al comienzo del desarrollo se permitía al usuario editar la información de las columnas con una pequeña ventana modal en la que se podía editar algunas de sus características a la cual se accedía desde el botón de la parte superior o desde el menú popup. Más adelante se decidió eliminar estos botones, moviendo el contenido al panel lateral y ampliándolo.
+
+Se implementó la posibilidad de modificar los datos de las tablas y relaciones, siendo esto indispensable para seleccionar qué símbolos de la relación se deben utilizar y, por tanto, modificando toda la relación.
+
+\subsection{Añadir columnas}
+
+Además de poder añadir columnas nuevas a las tablas arrastrando el icono correspondiente, se consideró otras opciones para agilizar la creación de tablas. Las dos opciones que se consideraron y se terminaron implementando son:
+\begin{itemize}
+    \item Añadir una opción en el menu popup de la tabla que permita añadir una columna
+    \item Añadir un atajo de teclado (F4) que incluya una nueva columna en la tabla seleccionada
+\end{itemize}
+
+\subsection{Mover columnas}
+
+Al utilizar un stacklayout, un layout fijo, para mostrar las columnas y estas tomaban las posición en la tabla según se fueran añadiendo a esta, se tomó la decisión de añadir la posibilidad de mover las columnas de posición dentro de las tablas, moviendo estas hacia arriba o hacia abajo.
+
+Ya que mover las columnas de posición dentro del layout se entendió que no tenía mucho viabilidad, se decidió tomar otro enfoque, en el que en vez de mover "físicamente" de posición las celdas de las columnas, lo que se hace es intercambiar el objeto asociado y su apariencia con la celda de arriba o de abajo. De esta forma, la información sigue siendo la misma, solo se modifica la celda que la contiene. Como las columnas tienen relaciones cruzadas con otros elementos del diagrama, uno de los apartados más destacados fue la modificación de estas referencias.
+
+\subsection{Generación de código}
+
+Como otra funcionalidad importante para la aplicación, se decidió tener un apartado de generación de código en el que el sistema generaría el código equivalente al diagrama que ha creado el usuario.
+
+La generación de código que se implementó fue para SQL y SQLAlchemy, adaptando todas las mejoras mencionadas anteriormente para que se tengan en cuenta cosas como claves foráneas y uniques compuestos.
+
+Las principales dificultades surgieron sobre como tratar claves compuestas, además de referenciar correctamente las claves primarias desde las claves foráneas.
+
+\section{Documentación}
+
+La documentación del proyecto se encuentra en los documentos entregados. Se ha realizado tanto la memoria como los anexos utilizando \LaTeX desde la plataforma \emph{Overleaf}.
+
+Además de estos documentos, se ha generado la documentación \emph{JSDoc} a partir de los comentarios del código de la aplicación. Esta documentación también se incluye.

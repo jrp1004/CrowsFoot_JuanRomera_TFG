@@ -1,0 +1,70 @@
+\capitulo{4}{Técnicas y herramientas}
+
+\section{Metodologías}
+
+\subsection{Scrum}
+Scrum es un proceso en el que se aplican de manera regular un conjunto de buenas prácticas para trabajar colaborativamente, obteniendo el mejor resultado posible. En Scrum se realizan entregas parciales y regulares del producto. Estas entregas ocurren en interaciones conocidas como sprints. \cite{pa:scrum}.
+
+\subsection{Gitflow}
+\emph{Gitflow} es un modelo alternativo de creación de ramas en Git en el que se utilizan ramas de función y varias ramas principales. Con este flujo de trabajo disponemos de la rama \emph{main}, donde se encuentra la última versión estable del proyecto, la rama \emph{develop}, en la que se realizan las nuevas implementaciones para la próxima release. Podemos utilizar diferentes ramas \emph{feature}, por cada característica que queramos desarrollar. En caso de encontrar un fallo en el proyecto que necesite un rápido parcheado, utilizaremos la rama \emph{hotfix}\cite{atla:gitflow}.
+
+\section{Control de versiones}
+\textbf{Herramienta utilizada: } \emph{Git}
+
+Git es un sistema de control de versiones distribuido, pensado en la eficiencia, la confiabilidad y compatibilidad del mantenimiento de versiones\cite{wiki:git}. Git es la herramienta de control de versiones más utilizada actualmente, que además nos permite almacenar una versión local del repositorio.
+
+\section{Hosting del repositorio}
+\textbf{Herramienta utilizada: }\emph{Github}
+
+Github es una plataforma de desarrollo colaborativo para alojar proyectos utilizando el sistema de control de versiones Git\cite{wiki:github}. En Github almacenaremos los recursos utilizados en el proyecto.
+
+\section{Comunicación}
+\textbf{Herramienta utilizada: } \emph{email} y \emph{Teams}
+
+Para mantener la comunicación durante el desarrollo del proyecto se ha utilizado el email para mantener una comunicación mediante mensajes directos y la herramienta Teams para tener un contacto dirento mediante llamadas de vídeo.
+
+\section{Entorno de desarrollo (IDE)}
+\textbf{Herramienta utilizada: }\emph{Visual Studio Code}
+
+Visual Studio Code es un IDE desarrollado por Microsoft bastante ligero y comunmente utilizado para el desarrolo de aplicaciones web mediante Javascript. 
+
+Este IDE nos permite instalar multitud de extensiones que nos permitirán desarrollar nuestra aplicación de manera más cómoda y eficiente. Algunas de las extensiones que se han utilizado son las siguientes.
+\subsection{Extensiones VSCode}
+\subsubsection{Live Server}
+La extensión \emph{Live Server} nos permite desplegar un servidor de manera local en el que ejecutar nuestra aplicación web. De esta forma, podemos tener una rápida visión de como se verá nuestra aplicación en el momento de un despliegue real.
+
+\subsubsection{SonarLint}
+Extensión relacionada con una de las herramientas de integración continua utilizada, Sonarcloud, nos permite ver en el editor las reglas de Sonarcloud que no estamos cumpliendo, permitiendo corregir rápidamente posibles fallos.
+
+\subsection{Codacy}
+Igual que anteriormente con SonarLint, esta extensión conecta con otra herramienta de integtración continua con el mismo nombre.
+
+\section{Documentación}
+\textbf{Herramienta utilizada: }\emph{Overleaf}
+
+Overleaf es una plataforma online para la edición de \LaTeX basado en la nube. La documentación presentada se ha realizado en esta plataforma.
+
+\section{Documentación del código}
+\textbf{Herramienta utilizada: }\emph{JSDoc}
+
+JSDoc es la sintaxis utilizada para documentar el código de Javascript mediante comentarios, además de un módulo que genera automáticamente la documentación del código a partir de dichos comentarios. La sintaxis es muy similar a la utilizada en Javadoc, lo que facilita su uso. Se puede descargar como un módulo de node, lo que nos genera los ficheros HTML con la documentación.
+
+\section{Servicios de integración continua}
+\subsection{Calidad del código}
+\subsubsection{SonarCloud}
+SonarCloud es un servicio de análisis estático de código basado en la nube ofrecido por la empresa SonarQube. Esta herramienta es capaz de detectar problemas de código en 25 lenguajes de programación diferentes. Tiene fácil integración con GitHub y nos permite medir la seguridad de nuetras aplicaciones y mejorar la confiabilidad y mantenibilidad de nuestro código\cite{platzi:sonarcloud}.
+
+\subsubsection{Codacy}
+\emph{Codacy} es otra herramienta de integración continua que monitorizará la calidad de nuestro código, además de duplicaciones y problemas de seguridad. Añade más cobertura además de la que nos pueda proporcionar SonarCloud.
+
+\section{Despliegue}
+\textbf{Herramienta utilizada: }\emph{Vercel}
+
+Vercel es una plataforma de servicio en la nube que permite a los desarrolladores desplegar sus aplicaciones y servicios web. Vercel se integra con GitHub, permitiendo desplegar la aplicación desde el repositorio actualizando cada vez que se realiza un commit en la rama principal.
+
+\section{Librerías}
+\subsection{mxGraph}
+
+mxGraph es una librería de Javascript empleada para la realización de diagramas que utiliza SVG y HTML para renderizado.
+
+Esta la librería es el pilar sobre el que se sostenta este trabajo, realizando la gestión de los datos que se muestran y cómo se muestran. mxGraph se divide en 8 paquetes, teniendo en el nivel más alto la clase \emph{mxClient} la cual se encarga de incluir o importar de forma dinámica el resto de elementos de la librería. Estos paquetes nos proporcionarán las clases necesarias para generar un diagrama en el que añadir los elementos que deseemos, dentro de unos parámetros dados\cite{mxg-api}.

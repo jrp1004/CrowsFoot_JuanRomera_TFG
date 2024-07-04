@@ -1,0 +1,948 @@
+\apendice{Especificación de Requisitos}
+
+\section{Introducción}
+En este anexo se listarán los requisitos que definen el compartamiento de la aplicación desarrollada. Con esta lista de requisitos, se pretende dejar un escrito que sirva como documento contractual con el cliente y como documentación correspondiente a la aplicación.
+Se separa el contenido de este anexo en dos apartados:
+\begin{itemize}
+    \item \textbf{Catálogo de requisitos: } requisitos funcionales y no funcionales del proyecto.
+    \item \textbf{Casos de uso: }Explicación de forma más detallada de las funcionalidades de la aplicación.
+\end{itemize}
+
+\section{Objetivos generales}
+Los objetivos generales del proyecto son:
+\begin{itemize}
+    \item Desarrollar una aplicación web que permita el diseño de diagramas E/R con la notación de patas de cuervo.
+    \item Almacenar los diagramas en un fichero con formato XML, para acceder a ellos posteriormente.
+    \item Generar el código correspondiente al diagrama creado para su posterior implementación.
+    \item Facilitar la creación de relaciones entre las tablas mediante la gestión automática de sus claves foráneas.
+\end{itemize}
+
+\section{Catálogo de requisitos}
+A continuación se enumerarán los requisitos.
+
+\subsection{Requisitos funcionales}
+\begin{itemize}
+    \item \textbf{RF-1 Gestión del grafo: } La aplicación debe ser capaz de gestionar el grafo que contiene los elementos del diagrama E/R.
+    \begin{itemize}
+        \item \textbf{RF-1.1 Importar diagrama: }La aplicación podrá crear un diagrama a partir de un fichero XML formateado correctamente.
+        \item \textbf{RF-1.2 Exportar diagrama: }La aplicación proveerá al usuario un método para exportar el diagrama en un fichero XML.
+        \item \textbf{RF-1.3 Limpiar diagrama: }El usuario podrá eliminar todos los elementos que aparecen en el diagrama.
+        \item \textbf{RF-1.4 Mostrar diccionario de datos: }El usuario podrá acceder a un diccionario de datos que muestre información sobre las columnas de cada tabla.
+    \end{itemize}
+    \item \textbf{RF-2 Gestión de tablas: }La aplicación tiene que ser capaz de gestionar las tablas, que representan las entidades, introducidas en el diagrama.
+    \begin{itemize}
+        \item \textbf{RF-2.1 Añadir tabla: }El usuario podrá añadir una nueva tabla al diagrama.
+        \item \textbf{RF-2.2 Editar tabla: }El usuario podrá editar los datos y el aspecto de las tablas introducidas en el diagrama.
+        \item \textbf{RF-2.3 Eliminar tabla: }El usuario podrá eliminar las tablas introducidas en el diagrama.
+        \item \textbf{RF-2.4 Añadir Unique compuesto: }El usuario podrá crear Uniques compuestos que se almacenarán en la tabla.
+        \item \textbf{RF-2.5 Eliminar Unique compuesto: }El usuario podrá eliminar los Uniques compuestos que haya añadido con anterioridad.
+    \end{itemize}
+    \item \textbf{RF-3 Gestión de columnas: }La aplicación debe ser capaz de gestionar las columnas, representantes de los atributos de las entidades, introducidas en el diagrama.
+    \begin{itemize}
+        \item \textbf{RF-3.1 Añadir columna: }El usuario podrá añadir los atributos que necesite a cada entidad, representados como columnas.
+        \item \textbf{RF-3.2 Editar columna: }El usuario podrá editar la información y el aspecto de las columnas.
+        \item \textbf{RF-3.3 Eliminar columna: }El usuario podrá eliminar las columnas añadidas a una tabla.
+        \item \textbf{RF-3.4 Mover posición: }El usuario podrá mover las columnas hacia arriba o hacia abajo dentro de una tabla.
+    \end{itemize}
+    \item \textbf{RF-4 Gestión de relaciones: }La aplicación debe ser capaz de gestionar las relaciones entre las diferentes tablas del diagrama.
+    \begin{itemize}
+        \item \textbf{RF-4.1 Añadir relación: }El usuario podrá añadir una relación entre dos tablas, conectándolas.
+        \item \textbf{RF-4.2 Editar relación: }El usuario podrá editar la información y el aspecto de las relaciones, siempre dentro de la notación de patas de cuervo.
+        \item \textbf{RF-4.3 Eliminar relación: }El usuario podrá eliminar una relación entre dos tablas.
+    \end{itemize}
+    \item \textbf{RF-5 Gestión de claves: }La aplicación debe ser capaz de gestionar las claves primarias y foráneas de cada tabla.
+    \begin{itemize}
+        \item \textbf{RF-5.1 Añadir clave foránea: }El sistema añadirá automáticamente las claves foráneas en las tablas que corresponda.
+        \item \textbf{RF-5.2 Eliminar clave foránea: }El sistema eliminará automáticamente las claves foráneas en las tablas que corresponda.
+    \end{itemize}
+    \item \textbf{RF-6 Generación de código: }El sistema generará código a partir de los diagramas de usuario para diferentes lenguajes.
+    \begin{itemize}
+        \item \textbf{RF-6.1 Crear SQL: }La aplicación proporcionará al usuario el código SQL correspondiente al diagrama E/R que se muestra en el grafo.
+        \item \textbf{RF-6.2 Crear SQLAlchemy: }La aplicación proporcionará al usuario la creación de las tablas correspondientes al diagrama para utilizar con SQLAlchemy.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Requisitos no funcionales}
+Los requisitos no funcionales son los mencionados a continuación\cite{visrure:rnf}.
+\begin{itemize}
+    \item \textbf{RNF-1 Seguridad: }El sistema debe estar protegido frente al acceso no autorizado.
+    \item \textbf{RNF-2 Actuación: }El sistema debe poder manejar el número requerido de usuario sin ninguna degradación en el rendimiento.
+    \item \textbf{RNF-3 Escalabilidad: }El sistema debe ser capaz de escalar hacia arriba o hacia abajo según sea necesario.
+    \item \textbf{RNF-4 Disponibilidad: }El sistema debe estar disponible cuando sea necesario.
+    \item \textbf{RNF-5 Mantenimiento: }El sistema debe ser fácil de mantener y actualizar.
+    \item \textbf{RNF-6 Portabilidad: }El sistema debe poder ejecutarse en diferentes plataformas con cambios mínimos.
+    \item \textbf{RNF-7 Fiabilidad: }El sistema debe ser confiable y cumplir con los requisitos de usuario.
+    \item \textbf{RNF-8 Usabilidad: }El sistema debe ser fácil de usar y comprender.
+    \item \textbf{RNF-9 Compatibilidad: }El sistema debe ser compatible con otros sistemas.
+    \item \textbf{RNF-10 Cumplimiento de la normativa: }El sistema debe cumplir con todas las leyes y reglamentos aplicables.
+\end{itemize}
+
+
+\section{Especificación de requisitos}
+
+\subsection{Diagrama de casos de uso}
+\imagen{CU-Crows-Foot}{Diagrama de Casos de Uso}
+
+\subsection{Actores}
+Solo se considerarán como actores al sistema y al usuario que interacciona con este.
+
+\subsection{Casos de uso}
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-01}    & \textbf{Gestión del grafo}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-1, RF-1.1, RF-1.2, RF-1.3 \\
+		\textbf{Descripción}          & Permite al usuario gestionar los elementos que se muestran en su diagrama \\
+		\textbf{Precondición}         & La aplicación se encuentra disponible \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación
+			\item El sistema muestra al usuario las opciones que dispone
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario puede diseñar su diagrama sin problemas \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-01 Gestión del grafo}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-02}    & \textbf{Importar diagrama}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-1, RF-1.1, RF-1.2 \\
+		\textbf{Descripción}          & Permite al usuario importar un diagrama creado con anterioridad y exportado a un fichero XML \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible
+            \item El fichero XML está formateado correctamente
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario pulsa el botón \emph{Importar XML}.
+            \item El sistema muestra una ventana en la que importar el fichero XML.
+            \item El usuario selecciona un fichero XML almacenado en su PC.
+            \begin{enumerate}
+                \item El usuario decide importar el diagrama, mostrando los elementos en la aplicación.
+                \item El usuario decide no importar el diagrama.
+            \end{enumerate}
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario obtiene un diagrama a partir del fichero XML importado \\
+		\textbf{Excepciones}          & \begin{itemize}
+		    \item Error al cargar la aplicación
+            \item Error al importar el diagrama desde el fichero
+		\end{itemize} \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-02 Importar diagrama}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-03}    & \textbf{Exportar diagrama}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-1, RF-1.1, RF-1.2 \\
+		\textbf{Descripción}          & Permite al usuario exportar el diagrama creado en el grafo a un fichero XML \\
+		\textbf{Precondición}         & La aplicación se encuentra disponible \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario añade elementos al grafo, creando su diagrama.
+            \item El usuario pulsa el botón \emph{Exportar XML}.
+            \item El sistema genera el código XML correspondiente a los elementos del diagrama, mostrándolo en una ventana.
+            \begin{enumerate}
+                \item Si el usuario pulsa el botón descargar, se mostrará una ventana donde introducir el nombre del fichero y este se descargará.
+                \item El usuario puede cerrar la ventana sin descargar el fichero XML.
+            \end{enumerate}
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario obtiene un fichero XML con los elementos del diagrama \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-03 Exportar diagrama}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-04}    & \textbf{Limpiar diagrama}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-1, RF-1.4 \\
+		\textbf{Descripción}          & Permite al usuario eliminar todos los elementos añadidos a su diagrama \\
+		\textbf{Precondición}         & La aplicación se encuentra disponible \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario añade elementos al grafo, creando su diagrama.
+            \item El usuario pulsa el botón \emph{Borrar todo}.
+            \item El sistema elimina todos los elementos que el usuario hubiera añadido al diagrama.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario obtiene el código SQL correspondiente a su diagrama \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Baja \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-04 Limpiar diagrama}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-05}    & \textbf{Mostrar diccionario de datos}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-1, RF-1.4 \\
+		\textbf{Descripción}          & Permite al usuario consultar un diccionario de datos con toda la información que haya añadido sobre sus las columnas de las tabas que se encuentren en el diagrama. \\
+		\textbf{Precondición}         & La aplicación se encuentra disponible \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario pulsa el botón de la barra inferior \emph{Diccionario de datos}.
+            \item El sistema lista la información almacenada de las columnas de todas las tablas del diagrama.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El sistema muestra una ventana modal con el diccionario de datos \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Baja \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-05 Mostrar diccionario de datos}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-06}    & \textbf{Gestión de tablas}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-2, RF-2.1, RF-2.2, RF-2.3, RF-2.4, RF-2.5 \\
+		\textbf{Descripción}          & Permite al usuario gestionar las tablas que forman parte de su diagrama \\
+		\textbf{Precondición}         & La aplicación se encuentra disponible \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El sistema muestra las opciones para trabajar con las tablas.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de manejar las tablas de su diagrama \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-06 Gestión de tablas}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-07}    & \textbf{Añadir tabla}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-2, RF-2.1 \\
+		\textbf{Descripción}          & Permite al usuario añadir tablas a su diagrama \\
+		\textbf{Precondición}         & La aplicación se encuentra disponible \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario utiliza el icono en el apartado de elementos, arrastrando este sobre el diagrama.
+            \item El usuario introduce un nombre para la nueva tabla.
+            \item El sistema crea la tabla con una clave primaria y la añade al diagrama.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de añadir tablas al diagrama \\
+		\textbf{Excepciones}          & \begin{itemize}
+		    \item Error al cargar la aplicación.
+            \item El usuario ha soltado el icono tabla en un lugar que no corresponde con el diagrama.
+		\end{itemize} \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-07 Añadir tabla}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-08}    & \textbf{Editar tabla}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-2, RF-2.2 \\
+		\textbf{Descripción}          & Permite al usuario editar las tablas de su diagrama \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tabla al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario selecciona una tabla de su diagrama.
+            \item El sistema muestra un panel lateral con las propiedades que puede modificar de elemento tabla.
+            \item El usuario modifica los parámetros que considere.
+            \item El sistema aplica los cambios.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de editar tablas del diagrama \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-08 Editar tabla}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-09}    & \textbf{Eliminar tabla}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-2, RF-2.3 \\
+		\textbf{Descripción}          & Permite al usuario eliminar las tablas de su diagrama \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tabla al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario selecciona una tabla de su diagrama.
+            \begin{enumerate}
+                \item El usuario pulsa el botón \emph{Borrar} de la barra superior.
+                \item El usuario hace click derecho en la tabla
+                \begin{itemize}
+                    \item El sistema muestra un menú popup
+                    \item El usuario pulsa el botón \emph{Borrar}.
+                \end{itemize}
+            \end{enumerate}
+            \item El sistema elimina del diagrama la tabla seleccionada.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de Eliminar tablas del diagrama \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-09 Eliminar tabla}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-010}    & \textbf{Añadir Unique compuesto}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-2, RF-2.4, RF-2.5 \\
+		\textbf{Descripción}          & Permite al añadir Uniques compuestos a sus tablas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tabla al diagrama.
+            \item La tabla contiene, al menos, dos columnas.
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario selecciona una tabla de su diagrama.
+            \item El usuario accede al apartado \emph{Datos} del panel lateral.
+            \item El usuario pulsa el botón añadir en el apartado \emph{Unique compuesto}.
+            \item El sistema lista las columnas de la tabla.
+            \begin{enumerate}
+                \item El usuario selecciona al menos dos columnas
+                \begin{itemize}
+                    \item El usuario pulsa el botón aceptar.
+                    \item El sistema almacena el nuevo unique compuesto.
+                \end{itemize}
+                \item El usuario selecciona únicamente una columna
+                \begin{itemize}
+                    \item El sistema muestra una alerta adviertiendo al usuario que debe seleccionar dos columnas.
+                \end{itemize}
+                \item El usuario pulsa el botón cancelar o cierra la ventana, cancelando la operación
+            \end{enumerate}
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El sistema almacena un unique compuesto \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-10 Añadir Unique compuesto}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-11}    & \textbf{Eliminar Unique compuesto}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-2, RF-2.4, RF-2.5 \\
+		\textbf{Descripción}          & Permite al usuario eliminar los uniques compuestos que haya creado anteriormente \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tabla al diagrama
+            \item El usuario ha añadido, al menos, un unique compuesto a la tabla.
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario selecciona una tabla de su diagrama.
+            \item El usuario accede al apartado \emph{Datos} del panel lateral.
+            \item El sistema lista los uniques compuestos que se han creado para dicha tabla.
+            \item El usuario pulsa el botón eliminar asociado a uno de los posibles unique compuestos.
+            \item El sistema elimina el unique compuesto correspondiente.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de eliminar los Unique compuestos que haya almacenado anteriormente \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-11 Eliminar Unique compuesto}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-12}    & \textbf{Gestión de columnas}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-3, RF-3.1, RF-3.2, RF-3.3, RF-3.4 \\
+		\textbf{Descripción}          & Permite al usuario gestionar las columnas que forman parte de las tablas de su diagrama \\
+		\textbf{Precondición}         & La aplicación se encuentra disponible \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El sistema muestra al usuario las opciones para trabajar con columnas
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de gestionar las columnas de las tablas de sus diagramas \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-12 Gestión de columnas}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-13}    & \textbf{Añadir columna}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-3, RF-3.1 \\
+		\textbf{Descripción}          & Permite al usuario añadir columnas a las tablas de sus diagramas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tabla al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \begin{enumerate}
+                \item El usuario arrastra el icono columna sobre una tabla.
+                \begin{itemize}
+                    \item El usuario introduce el nombre de la columna nueva.
+                \end{itemize}
+                \item El usuario hace click derecho en una tabla.
+                \begin{itemize}
+                    \item El sistema muestra un menú popup
+                    \item El usuario pulsa el botón añadir columna
+                \end{itemize}
+            \end{enumerate}
+            \item El sistema añade una columna a la tabla seleccionada
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de añadir columnas a las tablas de sus diagramas \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-13 Añadir columna}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-14}    & \textbf{Editar columna}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-3, RF-3.2 \\
+		\textbf{Descripción}          & Permite al usuario editar columnas a las tablas de sus diagramas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tabla al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario selecciona una columna de una tabla en el diagrama.
+            \item El sistema muestra un panel lateral con las propiedades que puede modificar del elemento columna.
+            \item El usuario modifica los parámetros que considere.
+            \item El sistema aplica los cambios.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de editlar columnas de sus diagramas \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-14 Editar columna}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-15}    & \textbf{Eliminar columna}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-3, RF-3.3 \\
+		\textbf{Descripción}          & Permite al usuario eliminar columnas a las tablas de sus diagramas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tabla al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario selecciona una columna de una tabla en el diagrama.
+            \begin{enumerate}
+                \item El usuario pulsa el botón \emph{Borrar} de la barra superior.
+                \item El usuario hace click derecho en la columna.
+                \begin{itemize}
+                    \item El sistema muestra un menú popup.
+                    \item El usuario pulsa el botón \emph{Borrar}.
+                \end{itemize}
+            \end{enumerate}
+            \item El sistema elimina del diagrama la columna seleccionada.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de eliminar columnas de sus diagramas \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-15 Eliminar columna}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-16}    & \textbf{Mover posición}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-3, RF-3.4 \\
+		\textbf{Descripción}          & Permite al usuario añadir columnas a las tablas de sus diagramas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tabla al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario selecciona una columna de una tabla en el diagrama.
+            \item El usuario hace click derecho en la columna.
+            \item El sistema muestra un menú popup.
+            \begin{enumerate}
+                \item El usuario pulsa el botón \emph{Subir posición}.
+                \item El usuario pulsa el botón \emph{Bajar posición}.
+            \end{enumerate}
+            \item El sistema comprueba que puede mover la columna
+            \begin{enumerate}
+                \item El sistema coloca la columna en la nueva posición.
+                \item El sistema no mueve la columna.
+            \end{enumerate}
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de mover columnas de posición dentro de las tablas. \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-16 Mover posición}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-17}    & \textbf{Gestión de relaciones}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-4, RF-4.1, RF-4.2, RF-4.3 \\
+		\textbf{Descripción}          & Permite al usuario gestionar las relaciones entre las tablas de sus diagramas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, dos tablas al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El sistema muestra al usuario las opciones para trabajar con relaciones
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de gestionar las relaciones entre las tablas de los diagramas. \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-17 Gestión de relaciones}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-18}    & \textbf{Añadir relación}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-4, RF-4.1 \\
+		\textbf{Descripción}          & Permite al usuario añadir relaciones entre las tablas de sus diagramas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, dos tablas al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario mantiene pulsado sobre una tabla.
+            \item El usuario arrastra sin soltar sobre otra tabla.
+            \item El sistema crea una relación entre las dos tablas.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de añadir relaciones entre las tablas de los diagramas. \\
+		\textbf{Excepciones}          & \begin{itemize}
+		    \item Error al cargar la aplicación
+            \item El usuario suelta el ratón en algún elemento que no es una tabla
+		\end{itemize} \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-18 Añadir relación}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-19}    & \textbf{Editar relación}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-4, RF-4.2 \\
+		\textbf{Descripción}          & Permite al usuario editar las relaciones entre las tablas de sus diagramas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, dos tablas al diagrama
+            \item El usuario ha creado, al menos, una relación entre dos tablas.
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario hace click en una relación.
+            \item El sistema muestra un panel lateral con las propiedades que puede modificar del elemento relación.
+            \item El usuario modifica los parámetros que considere.
+            \item El sistema aplica los cambios.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de editar los datos de relaciones \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-19 Editar relación}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-20}    & \textbf{Eliminar relación}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-4, RF-4.3 \\
+		\textbf{Descripción}          & Permite al usuario eliminar relaciones entre las tablas de sus diagramas \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, dos tablas al diagrama
+            \item El usuario ha creado, al menos, una relación entre dos tablas.
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario hace click en una relación.
+            \begin{enumerate}
+                \item El usuario pulsa el botón \emph{Borrar} de la barra superior.
+                \item El usuario hace click derecho en la columna.
+                \begin{itemize}
+                    \item El sistema muestra un menú popup.
+                    \item El usuario pulsa el botón \emph{Borrar}.
+                \end{itemize}
+            \end{enumerate}
+            \item El sistema elimina del diagrama la relación seleccionada.
+            \item El sistema elimina las columnas correspondientes a claves foráneas asociadas con la relación.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario es capaz de eliminar las relaciones entre dos tablas \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-20 Eliminar relación}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-21}    & \textbf{Gestión de claves}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-5, RF-5.1, RF-5.2 \\
+		\textbf{Descripción}          & Permite al sistema gestionar las claves fóraneas asociadas a cada tabla. \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, dos tablas al diagrama.
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El sistema gestiona las claves foráneas cuando sea necesario.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El sistema es capaz de gestionar las claves foráneas asociadas a cada tabla. \\
+		\textbf{Excepciones}          & Error al cargar la aplicación
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-21 Gestión de claves}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-22}    & \textbf{Añadir clave foránea}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-5, RF-5.1, RF-3.1 \\
+		\textbf{Descripción}          & Permite al sistema añadir las claves fóraneas en las tablas que sea necesario. \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, dos tablas al diagrama.
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario crea una relación entre dos tablas.
+            \item El sistema añade las claves foráneas en las tablas que se necesario, con las propiedades de la clave primaria.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El sistema es capaz de añadir claves foráneas como columnas. \\
+		\textbf{Excepciones}          & \begin{itemize}
+		    \item Error al cargar la aplicación
+            \item La tabla de la que se pretende obtener la clave primaria no cuenta con una
+		\end{itemize} \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-22 Añadir clave foránea}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-23}    & \textbf{Eliminar clave foránea}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-5, RF-5.1, RF-3.3 \\
+		\textbf{Descripción}          & Permite al sistema eliminar las claves fóraneas en las tablas que sea necesario. \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, dos tablas al diagrama.
+            \item El usuario ha añadido, al menos, una relación entre dos tablas.
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario elimina una columna que representa una clave primaria.
+            \item El sistema elimina automáticamente las claves foráneas asociadas con dicha clave primaria.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El sistema es capaz de eliminar claves foráneas automáticamente. \\
+		\textbf{Excepciones}          & Error al cargar la aplicación \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-23 Eliminar clave foránea}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-24}    & \textbf{Generación de código}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-6, RF-6.1, RF-6.2 \\
+		\textbf{Descripción}          & Permite al sistema generar el código correspondiente al diagrama que ha creado el usuario para diferentes lenguajes. \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible.
+            \item El usuario ha añadido, al menos, una tablas al diagrama.
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+            \item El usuario utiliza uno de los botones para generar código.
+            \item El sistema genera el código correspondiente.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El sistema es capaz de generar código a partir del diagrama del usuario. \\
+		\textbf{Excepciones}          & Error al cargar la aplicación
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-24 Generación de código}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-25}    & \textbf{Crear SQL}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-5, RF-5.1 \\
+		\textbf{Descripción}          & Permite al usuario generar código SQL a partir del diagrama creado en la aplicación \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible
+            \item Se han añadido elementos al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario añade elementos al grafo, creando su diagrama.
+            \item El usuario pulsa el botón \emph{Mostrar SQL}.
+            \item El sistema genera el código SQL correspondiente a los elementos que se muestran en el diagrama.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario obtiene el código SQL correspondiente a su diagrama \\
+		\textbf{Excepciones}          & \begin{itemize}
+		    \item Error al cargar la aplicación
+            \item No hay elementos en el diagrama
+		\end{itemize} \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-25 Crear SQL}
+\end{table}
+
+\begin{table}[p]
+    \centering
+    \begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth}}
+		\toprule
+		\textbf{CU-25}    & \textbf{Crear SQLAlchemy}\\
+		\toprule
+		\textbf{Versión}              & 1.0    \\
+		\textbf{Autor}                & Juan Romera Pérez \\
+		\textbf{Requisitos asociados} & RF-5, RF-5.1 \\
+		\textbf{Descripción}          & Permite al usuario generar código para SQLAlchemy a partir del diagrama creado en la aplicación \\
+		\textbf{Precondición}         & \begin{itemize}
+		    \item La aplicación se encuentra disponible
+            \item Se han añadido elementos al diagrama
+		\end{itemize} \\
+		\textbf{Acciones}             &
+		\begin{enumerate}
+			\def\labelenumi{\arabic{enumi}.}
+			\tightlist
+			\item El usuario accede a la aplicación.
+			\item El usuario añade elementos al grafo, creando su diagrama.
+            \item El usuario pulsa el botón \emph{Mostrar SQLAlchemy}.
+            \item El sistema genera el código SQLAlchemy correspondiente a los elementos que se muestran en el diagrama.
+		\end{enumerate}\\
+		\textbf{Postcondición}        & El usuario obtiene el código SQLAlchemy correspondiente a su diagrama \\
+		\textbf{Excepciones}          & \begin{itemize}
+		    \item Error al cargar la aplicación
+            \item No hay elementos en el diagrama
+		\end{itemize} \\
+		\textbf{Importancia}          & Alta \\
+		\bottomrule
+    \end{tabularx}
+    \caption{CU-25 Crear SQLAlchemy}
+\end{table}
