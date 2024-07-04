@@ -679,6 +679,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             mxEvent.removeAllListeners(document.getElementById('negrita'));
             mxEvent.removeAllListeners(document.getElementById('cursiva'));
             mxEvent.removeAllListeners(document.getElementById('shadowCheck'));
+            mxEvent.removeAllListeners(document.getElementById('selectEstiloLinea'));
             //Comprobamos la longitud para evitar error con la selección múltiple
             //Si se ha seleccionado una tabla, columna o enlace mostramos el panel de propiedades
             //si no lo escondemos
@@ -1652,6 +1653,7 @@ function configurarTabEstilos(graph,cell){
     let negritaButton=document.getElementById('negrita');
     let cursivaButton=document.getElementById('cursiva');
     let shadowCheck=document.getElementById('shadowCheck');
+    let selectEstiloLinea=document.getElementById('selectEstiloLinea');
 
     inicializarGradientCheck(gradientCheck,gradientPicker,selectGradientDirection,cell.value.gradient);
     inicializarSombra(graph.isSwimlane(cell),shadowCheck);
@@ -1659,8 +1661,10 @@ function configurarTabEstilos(graph,cell){
     //El degradado no se aplica a los enlaces
     if(graph.model.isEdge(cell)){
         document.getElementById('degradado').style.display="none";
+        document.getElementById('estiloLinea').style.display="table-row";
     }else{
         document.getElementById('degradado').style.display="table-row";
+        document.getElementById('estiloLinea').style.display="none";
     }
 
     //Obtenemos el estilo de la celda
@@ -1675,7 +1679,8 @@ function configurarTabEstilos(graph,cell){
         colorFontPicker,
         negritaButton,
         cursivaButton,
-        shadowCheck
+        shadowCheck,
+        selectEstiloLinea
     });
     //Establecemos los listeners para los cambios de estilos
     setListenersEstilos(graph,graph.model.isEdge(cell),cell,{
@@ -1688,7 +1693,8 @@ function configurarTabEstilos(graph,cell){
         colorFontPicker,
         negritaButton,
         cursivaButton,
-        shadowCheck
+        shadowCheck,
+        selectEstiloLinea
     });
 }
 
@@ -1735,7 +1741,7 @@ function inicializarSombra(tabla,shadowCheck){
  */
 function setEstilosIniciales(style,enlace,elementos){
     const{colorPicker,gradientPicker,selectGradientDirection,selectFont,
-        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
+        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck,selectEstiloLinea
     }=elementos;
 
     if(style!=null){
@@ -1747,6 +1753,7 @@ function setEstilosIniciales(style,enlace,elementos){
         setColorFontPicker(style,colorFontPicker,enlace);
         setFontStyle(style,negritaButton,cursivaButton);
         shadowCheck.checked=style[mxConstants.STYLE_SHADOW];
+        selectEstiloLinea.options.selectedIndex=style[mxConstants.STYLE_DASHED];
     }else{
         setEstilosDefault(enlace,elementos);
     }
@@ -1831,13 +1838,14 @@ function toggleButtonActiveStyle(button,activo){
  */
 function setEstilosDefault(enlace,elementos){
     const{colorPicker,gradientPicker,selectGradientDirection,selectFont,
-        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck
+        tamFont,colorFontPicker,negritaButton,cursivaButton,shadowCheck,selectEstiloLinea
     }=elementos;
 
     //Valores por defecto si el estilo está vacío
     if(enlace){
         colorFontPicker.value='#446299';
         colorPicker.value='#6482B9';
+        selectEstiloLinea.options.selectedIndex=0;
     }else{
         colorPicker.value="#ffffff";
         colorFontPicker.value='#000000'
@@ -1892,6 +1900,9 @@ function setListenersEstilos(graph,enlace,cell,elementos){
     });
     mxEvent.addListener(shadowCheck,'change',function(evt){
         graph.toggleCellStyle(mxConstants.STYLE_SHADOW);
+    });
+    mxEvent.addListener(selectEstiloLinea,'change',function(evt){
+        graph.toggleCellStyle(mxConstants.STYLE_DASHED);
     });
 }
 
