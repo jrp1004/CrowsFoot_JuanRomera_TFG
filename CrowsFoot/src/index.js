@@ -251,14 +251,15 @@ function main(container,outline,toolbar,sidebar,status,properties){
             return layout;
         };
 
-        //Función que se llama cuando cambia la etiqueta de una celda
-        //Cambiamos la función para ajustarnos al objeto que utilizamos
+        /**
+         * Sobreescribimos la función para comprobar donde se está produciendo un cambio en la etiqueta
+         * de un celda, si es desde la propia celda, pulsando F2 o haciendo doble click, o desde el panel
+         * de propiedades y almacenar la etiqueta correctamente
+         * @param {mxCell} cell 
+         * @param {*} value - Objeto de la celda o cadena con la etiqueta
+         * @returns {string} - Etiqueta de la celda
+         */
         graph.model.valueForCellChanged=function(cell,value){
-            //Si el campo value.name es null, el cambio se ha producido al hacer doble click y cambiar el nombre de una celda
-            //Por tanto, el valor de value es ese nombre, sin campo null. En este caso accedemos al objeto de la celda para modificar el campo
-            //name al nuevo valor
-            //En caso de que no sea null, el campo value es el objeto de la columna completo, obtenido al modificar el objeto en las propiedades
-            //Para este caso podemos hacer la llamada normal de la función
             if(value.name!=null){
                 return mxGraphModel.prototype.valueForCellChanged.apply(this,arguments);
             }else{
@@ -282,7 +283,13 @@ function main(container,outline,toolbar,sidebar,status,properties){
             return mxGraph.prototype.convertValueToString.apply(this,arguments);
         };
 
-        //Tooltip para las columnas y las aristas
+        /**
+         * Obtenemos la tooltip de una celda en función del tipo de celda
+         * Si es una columna mostramos la información almacenada en el diccionario de datos
+         * Si es una relación mostramos también el nombre de las tablas que une
+         * @param {mxCellState} state 
+         * @returns {string} - Tooltip para la celda
+         */
         graph.getTooltip=function(state){
             if(this.isHtmlLabel(state.cell)){
                 return 'Titulo: '+state.cell.value.titulo+'\n'
@@ -298,8 +305,13 @@ function main(container,outline,toolbar,sidebar,status,properties){
             return mxGraph.prototype.getTooltip.apply(this,arguments);
         }
 
-        //Creamos dinámicamente la etiqueta para las celdas columna
-        //Según los datos del objeto columna vamos añadiendo iconos a la etiqueta
+        /**
+         * Sobreescribimos la función para obtener la etiqueta de una celda
+         * Si es una columna se formatea añadiendo los iconos correspondientes
+         * Si es una tabla o una columna se comprueba la anchura para devolverla o no recortada
+         * @param {mxCell} cell - Celda del grafo
+         * @returns {string} - Etiqueta de la celda
+         */
         graph.getLabel=function(cell){
             if(this.isHtmlLabel(cell)){
                 let label='';
@@ -338,8 +350,9 @@ function main(container,outline,toolbar,sidebar,status,properties){
             return mxGraph.prototype.getLabel.apply(this,arguments);
         }
 
-        //Elimina el vértice origen si se elimina la arista
-        //Las aristas sueltas se eliminan al no estar permitadas en el setAllowDanglingEdges
+        /**
+         * Listener para eliminar las claves foráneas de las relaciones cuando se elimina una relación
+         */
         graph.addListener(mxEvent.REMOVE_CELLS,function(sender,evt){
             let cells=evt.getProperty('cells');
             for(let cell of cells){
@@ -391,8 +404,16 @@ function main(container,outline,toolbar,sidebar,status,properties){
         //Insertamos la celda columna en la tabla
         table.insert(firstColumn);
 
-        //Editamos la función para añadir aristas para que esta añada una columna con la referencia
-        //a la tabla objetivo en la tabla de la que nace la arista
+        /**
+         * Sobreescribimos la función para añadir un enlace para que utilice
+         * nuestras funcionalidades
+         * @param {mxCell} edge - Enlace a añadir
+         * @param {mxCell} parent - Celda padre del enlace
+         * @param {mxCell} source - Celda origen del enlace
+         * @param {mxCell} target - Celda destino del enlace
+         * @param {number} index - Índice del enlace
+         * @returns {*} - El enlace añadido o null en caso de error
+         */
         graph.addEdge=function(edge,parent,source,target,index){
             const primaryKey=obtenerClavePrimaria(this,target);
 
@@ -663,7 +684,10 @@ function main(container,outline,toolbar,sidebar,status,properties){
         }
 
         let datosDiv=document.getElementById("datos");
-        //Listener para cambiar el panel de propiedades
+        
+        /**
+         * Añadimos un listener para los cambios de selección del grafo para actualizar el panel de propiedades
+         */
         graph.getSelectionModel().addListener(mxEvent.CHANGE,function(sender,event){
             datosDiv.innerHTML='<br>';
             //Los últimos elementos seleccionados se encuentran en la propiedad removed del evento
@@ -1349,7 +1373,7 @@ function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
  * @param {number} relacionAsociada - Id de la relación asociada
  * @param {string} simbO - Símbolo de obligatoriedad
  * @param {string} simbM - Símbolo de multiplicidad
- * @returns 
+ * @returns {mxCell} - Nueva columna añadida
  */
 function addClaveForanea(graph,table,key,relacionAsociada,simbO,simbM){
     let columnObject=new Column("COLUMNA");
