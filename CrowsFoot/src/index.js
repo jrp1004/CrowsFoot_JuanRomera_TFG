@@ -490,8 +490,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         editor.configure(config);
 
         //Añadimos el resto de botones
-        //Para estos botones no hace falta añadir funciones puesto que ya están definidas en el editor
-        addToolbarButton(editor,toolbar,'borrar','Delete','../images/delete2.png');
+        addToolbarButton(editor,toolbar,'borrar','Borrar elemento','../images/delete2.png');
         addToolbarButton(editor,toolbar,'clear','Borrar todo','../images/delete2.png');
         toolbar.appendChild(spacer.cloneNode(true));
 
@@ -500,8 +499,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
         toolbar.appendChild(spacer.cloneNode(true));
 
-        addToolbarButton(editor,toolbar,'show','Show','../images/camera.png');
-        addToolbarButton(editor,toolbar,'print','Print','../images/printer.png');
+        addToolbarButton(editor,toolbar,'show','Imagen','../images/camera.png');
 
         toolbar.appendChild(spacer.cloneNode(true));
 
@@ -566,7 +564,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
             showModalWindow('XML', div, 410, 480);
         });
-        addToolbarButton(editor,toolbar,'export','Export XML','../images/export1.png');
+        addToolbarButton(editor,toolbar,'export','Exportar XML','../images/export1.png');
 
         editor.addAction('import',function(editor,cell){
             let div=document.createElement('div');
@@ -638,8 +636,8 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
         status.appendChild(spacer.cloneNode(true));
 
-        addToolbarButton(editor,status,'collapseAll','Collapse All','../images/navigate_minus.png');
-        addToolbarButton(editor,status,'expandAll','Expand All','../images/navigate_plus.png');
+        addToolbarButton(editor,status,'collapseAll','Colapsar todo','../images/navigate_minus.png');
+        addToolbarButton(editor,status,'expandAll','Expandir todo','../images/navigate_plus.png');
 
         status.appendChild(spacer.cloneNode(true));
 
