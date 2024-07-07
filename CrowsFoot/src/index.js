@@ -332,10 +332,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
                     label+='<img src="../images/spacer.gif" width="16" height="1" >&nbsp;';
                 }
 
-                let style=graph.getStylesheet().getCellStyle(cell.style);
-                if(style==null){
-                    style=graph.getStylesheet().getDefaultVertexStyle();
-                }
+                let style=graph.getStylesheet().getCellStyle(cell.style)||graph.getStylesheet().getDefaultVertexStyle();
 
                 let nueva_etiqueta=cell.value.name+": "+cell.value.type;
                 let etiqueta_final=obtenerEtiquetaRecortada(nueva_etiqueta,cell.value.type,style,cell.geometry.width,true);
@@ -358,9 +355,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             for(let cell of cells){
                 if(this.model.isEdge(cell)){
                     const clavesForaneas=cell.value.clavesForaneas;
-                    for(let id of clavesForaneas){
-                        this.model.remove(this.model.getCell(id));
-                    }
+                    clavesForaneas.forEach(id=>this.model.remove(this.model.getCell(id)));
                 }
             }
         });
@@ -452,6 +447,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         editor.addAction('borrar',function(editor,cell){
             cell=cell||graph.getSelectionCell();
             if(cell&&graph.isHtmlLabel(cell)){
+                //Manejamos el posible borrado de una clave primaria
                 if(cell.value.primaryKey){
                     cell.value.primaryKey=false;
                     handleCambioClavePrimaria(graph,graph.getModel().getParent(cell),true,false);
@@ -670,21 +666,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         //Creamos la vista que se ve arriba a la derecha en el grafo
         new mxOutline(graph,outline);
 
-        //Hace un fundido para la splashscreen en caso de que haya alguna
-        let splash=document.getElementById('splash');
-        if(splash!=null){
-            try {
-                mxEvent.release(splash);
-                mxEffect.fadeOut(splash,100,true);
-            } catch (error) {
-                console.log("ERROR splash:");
-                console.log(error);
-                splash.parentNode.removeChild(splash);
-            }
-        }
-
         let datosDiv=document.getElementById("datos");
-        
         /**
          * Añadimos un listener para los cambios de selección del grafo para actualizar el panel de propiedades
          */
@@ -731,7 +713,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
  * @param {string} image - URL de la imagen del botón
  * @param {boolean} isTransparent - Indica si el fondo del botón será transparente
  */
-function addToolbarButton(editor,toolbar,action,label,image,isTransparent){
+function addToolbarButton(editor,toolbar,action,label,image){
     //Creamos le botón HTML
     let button=document.createElement('button');
     button.classList.add('buttonToolbar');
@@ -745,12 +727,6 @@ function addToolbarButton(editor,toolbar,action,label,image,isTransparent){
         img.style.verticalAlign='middle';
         img.style.marginRight='2px';
         button.appendChild(img);
-    }
-
-    if(isTransparent){
-        button.style.background='transparent';
-        button.style.color='#FFFFFF';
-        button.style.border='none';
     }
 
     //Añadimos un listener mediante un evento de mxGraph
@@ -1051,6 +1027,7 @@ function intercambioIds(graph,relacionId,nuevo,actual){
     for(let i=0;i<clavesForaneas.length;i++){
         if(clavesForaneas[i]==actual){
             clavesForaneas[i]=nuevo;
+            break;
         }
     }
 }
@@ -1076,7 +1053,7 @@ function intercambioIdsUnique(parent,id_1,id_2){
 }
 
 /**
- * Actualizamos las referencias a las claves primarias que pueda tener una clave foráne
+ * Actualizamos las referencias a las claves primarias que pueda tener una clave foránea
  * cuando movemos de posición una columna dentro de una tabla
  * @param {mxGraph} graph - Instancia del grafo
  * @param {mxCell} key1 - Id de una de las columnas a mover
@@ -1233,7 +1210,7 @@ function showProperties(graph,cell,properties){
  * Maneja un cambio de clave primara de una tabla
  * Se actualizan las relaciones entrantes, añadiendo o eliminando la clave foránea correspondiente
  * @param {mxGraph} graph - Instancia del grafo
- * @param {*} tabla - Celda de la tabla
+ * @param {mxCell} tabla - Celda de la tabla
  * @param {boolean} oldValue - Valor anterior
  * @param {boolean} newValue - Valor nuevo
  */
@@ -1242,9 +1219,7 @@ function handleCambioClavePrimaria(graph,tabla,oldValue,newValue){
     if(oldValue!=newValue){
         //Actualizamos las relaciones entrantes
         let relaciones=graph.getEdges(tabla,null,true,false);
-        for(let rel of relaciones){
-            actualizarClaves(graph,rel);
-        }
+        relaciones.forEach(rel=>{actualizarClaves(graph,rel)});
     }
 }
 
@@ -1413,9 +1388,7 @@ function addClaveForanea(graph,table,key,relacionAsociada,simbO,simbM){
  */
 function editarRelacion(graph,edge,relacion,source,target,invertir){
     if(invertir){
-        let temp=relacion.startArrow;
-        relacion.startArrow=relacion.endArrow;
-        relacion.endArrow=temp;
+        [relacion.startArrow,relacion.endArrow]=[relacion.endArrow,relacion.startArrow];
     }
 
     relacion.clavesForaneas=[];
@@ -1451,13 +1424,13 @@ function obtenerClavePrimaria(graph,tabla){
 function createSql(graph){
     let parent=graph.getDefaultParent();
     let childs=graph.getChildVertices(parent);
-    return childs.map(child=>addTablaSql(graph,child)).join('');
+    return childs.map(child=>addTablaSql(graph,child)+'\n').join('');
 }
 
 /**
  * Transforma la tabla indicada en código SQL
  * @param {mxGraph} graph - Instancia del grafo
- * @param {Table} tabla - Tabla de la que obtenemos los datos
+ * @param {mxCell} tabla - Tabla de la que obtenemos los datos
  * @returns {string} - Código SQL de la tabla
  */
 function addTablaSql(graph,tabla){
@@ -1542,7 +1515,7 @@ function createSqlAlchemy(graph){
 /**
  * Transforma la tabla indicada en código SQLAlchemy
  * @param {mxGraph} graph - Instancia del grafo
- * @param {Table} tabla - Tabla de la que obtenemos los datos
+ * @param {mxCell} tabla - Tabla de la que obtenemos los datos
  * @returns {string} - Código SQLAlchemy correspondiente a la tabla indicada
  */
 function addTablaSqlAlchemy(graph,tabla){
@@ -1579,7 +1552,7 @@ function addTablaSqlAlchemy(graph,tabla){
             let nombres=getNombreUniComp(graph,grupo).split(',');
             sql.push(nombres.map(nom => `"${nom.trim()}"`).join(', ')+'),\n');
         }
-        sql.push('\t)');
+        sql.push('\t)\n');
     }
     
     return sql.join('');
