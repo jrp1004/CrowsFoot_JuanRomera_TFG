@@ -833,24 +833,24 @@ function addSidebarIcon(graph,sidebar,prototype,image){
 
         if(name!=null){
             //Creamos la celda nueva y editamos el modelo
-            let v1=model.cloneCell(prototype);
+            let celda=model.cloneCell(prototype);
 
             model.beginUpdate();
             try {
                 //Añadimos nombre y coordenadas de la celda nueva
-                v1.value.name=name;
-                v1.geometry.x=pt.x;
-                v1.geometry.y=pt.y;
+                celda.value.name=name;
+                celda.geometry.x=pt.x;
+                celda.geometry.y=pt.y;
 
                 //Añadimos la celda nueva a su padre, el grafo si es una tabla, una tabla si es una columna
-                graph.addCell(v1,parent);
+                graph.addCell(celda,parent);
                 if(isTable){
-                    v1.geometry.alternateBounds=new mxRectangle(0,0,v1.geometry.width,v1.geometry.height);
+                    celda.geometry.alternateBounds=new mxRectangle(0,0,celda.geometry.width,celda.geometry.height);
                     //Editamos el nombre de la columna que contiene la clave primaria para que coincida con el de la tabla
-                    v1.children[0].value.name=name+'_ID';
+                    celda.children[0].value.name=name+'_ID';
                 }else if(parent.isCollapsed()){
                     //Corregir bug add columna a tabla colapsada
-                    v1.geometry.height=prototype.geometry.height;
+                    celda.geometry.height=prototype.geometry.height;
                 }
             } catch (error) {
                 console.log("ERROR addSidebarIcon:");
@@ -858,7 +858,7 @@ function addSidebarIcon(graph,sidebar,prototype,image){
             }finally{
                 model.endUpdate();
             }
-            graph.setSelectionCell(v1);
+            graph.setSelectionCell(celda);
         }
     }
 
