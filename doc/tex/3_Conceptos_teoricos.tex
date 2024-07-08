@@ -1,13 +1,13 @@
 \capitulo{3}{Conceptos teóricos}
-En el apartado teórico hablaremos sobre el \emph{modelo relacional}, modelo en el cual se utiliza la notación de \emph{patas de cuervo}, sobre los \emph{diagramas entidad-relación} y sobre la notación de \emph{patas de cuervo}.
+En el apartado teórico hablaremos sobre el \emph{modelo relacional}, modelo en el cual se utiliza la notación de \emph{patas de cuervo}, sobre los \emph{diagramas relacionales} y sobre la notación de \emph{patas de cuervo}.
 
 \section{Modelo relacional}
-El \emph{modelo relacional} es un acercamiento a la gestión de datos utilizando una estructura y un lenguaje coherentes con la lógica de predicados de primer orden\cite{wiki:relational_model}.
+El \emph{modelo relacional} es un acercamiento a la gestión de datos utilizando una estructura y un lenguaje coherentes con la lógica de predicados de primer orden.
 
 El elemento central del modelo relacional es la Relación. Una relación tiene un nombre, un conjunto de atributos que representan sus propiedades y un conjunto de tuplas que incluyen los valores que cada uno de los atributos toma para cada elemento de la relación. El Dominio es otro elemento importante, el cual describe los valores válidos que un atributo puede tomar\cite{des-bd}.
 
 Las relaciones se representan con una tabla de dos dimensiones, siendo las columnas sus diferentes atributos y las filas las tuplas. Ejemplo de relación \textit{Alumnos}:
-\imagen{rel-alumnos}{Alumnos}{1}
+\imagen{rel-alumnos}{Alumnos\cite{des-bd}}{1}
 
 \subsection{Restricciones inherentes}
 El modelo relacional impone una serie de restricciones inherentes:
@@ -24,31 +24,35 @@ El modelo relacional también proporciona mecanismos para recoger \emph{restricc
     \item \textbf{Restricción de \textit{clave primaria} (PRIMARY KEY): }Permite declarar un atributo o conjunto de atributos como la clave primaria de una relación que identifica inequívocamente cada tupla de la relación. Por la restricciones inherentes anteriores, es necesario definir en toda relación una clave primaria que no puede ser nula.
     \item \textbf{Restricción de \textit{unicidad}(UNIQUE): }Permite definir claves de identificación alternativas (los valores de uno o varios atributos no pueden repetirse en la relación).
     \item \textbf{Restricción de \textit{obligatoriedad} (NOT NULL): }Permite declarar si uno o varios atributos de una relación deben tomar siempre un valor, no puede tomar valores nulos.
-    \item \textbf{Restricción de \textit{clave ajena}(FOREIGN KEY): }Permite enlazar relaciones de una base de datos. La integridad referencial indica que los valores de la clave ajena en la relación que referencia deben corresponderse con alguno de los valores existentes de clave definida en la relación referenciada, o tener un valor nulo si se permite. Los atributos que son clave ajena enuna relació no necesitan tener los mismos nombres que los atributos de la calve primaria con la que se corresponden.
+    \item \textbf{Restricción de \textit{clave ajena}(FOREIGN KEY): }Permite enlazar relaciones de una base de datos. La integridad referencial indica que los valores de la clave ajena en la relación que referencia deben corresponderse con alguno de los valores existentes de clave definida en la relación referenciada, o tener un valor nulo si se permite. Los atributos que son clave ajena en una relación no necesitan tener los mismos nombres que los atributos de la clave primaria con la que se corresponden.
 \end{itemize}
 
-\section{Diagramas entidad-relación}
-Los diagramas entidad-relación son un tipo de diagramas de flujo que representan como las entidades se relacionan unas con otras en un sistema\cite{lc:erd}. Estos diagramas son utilizados comúnmente para diseñar bases de datos relacionales, utilizando un conjunto definido de símbolos, como rectángulos, óvalos, rombos y líneas conectando unas entidades con otras.
-Normalmente, cuando nos referimos a entidades en estos diagramas, estaremos hablando de personas o roles u objetos de negocio, tanto tangibles como intangibles. Las relaciones definen cómo dichas entidades se enlazan unas con otras.
+\subsubsection{Claves primarias}
+Este atributo define de forma inequívoca un ejemplar de una relación determinada, de tal manera que no podemos encontrar dos ejemplares distintos con una misma clave primaria. Se representa visualmente de la siguiente forma.
+%Imagen PK
+\imagen{primary-key}{Clave primaria\cite{vp:erd}}{1}
 
-\subsection{Cuándo utilizar diagramas entidad-relación}
-Mientras que los modelos entidad-relación están desarrollados principalmente para el diseño de bases de datos relacionales, existen otras situaciones en las que estos diagramas pueden ser útiles. A continuación, se muestran algunos casos de uso habituales\cite{vp:erd}:
-\begin{itemize}
-    \item \textbf{Diseño de bases de datos: } Dependiendo de la magnitud del cambio, puede ser arriesgado modificar la estructura de la base de datos directamente en el SGBD. Para evitar perder una base de datos de producción es importante planear los cambios con cuidado. Para llevar a cabo dicha planificación, puede sernos útil dibujar diagramas E/R para visualizar ideas de diseño de la base de datos.
-    \item \textbf{Depuración de bases de datos: } Visualizar el esquema de una base de datos mediante un diagrama E/R nos ayudará a situar las entidades y sus atributos e identificar las relaciones, haciendo que sea más sencillo analizar la base de datos y depurar sus posibles problemas.
-    \item \textbf{Creación de bases de datos y parcheado: }Algunas herramientas para diseñar diagramas E/R soportan herramientas de generación de bases de datos, automatizando la creación de estas.
-    \item \textbf{Apoyo en la recopilación de requisitos: }Mediante la visualización de un diagrama E/R se puede facilitar la recopilación de requisitos, facilitando el entendimiento de las entidades y sus relaciones de forma visual.
-\end{itemize}
+En la imagen vemos como se identifica a un producto por su atributo ID, siendo la tercera entrada no válida debido a que este se encuentra repetido.
+
+\subsubsection{Claves foráneas}
+La clave foránea alamcenará la clave primaria del ejemplar de la otra relación con el que se enlaza.
+%Imagen FK
+\imagen{foreign-key}{Clave foránea\cite{vp:erd}}{1}
+
+Podemos observar como el atributo \textit{ID} de la relación \textit{Manufacturer} se almacena como clave foránea en la relación \emph{Product}, indicando su enlace.
+
 
 \section{Notación patas de cuervo}
 \subsection{Historia}
 La notación de \textbf{\textit{patas de cuervo}} nace en 1976, apareciendo por primera vez en un artículo de Gordon Everest\cite{ge-bdsm}, aunque la notación ha ido evolucionando a lo largo del tiempo. Llamada por primera vez \emph{flecha invertida} para distinguirla de otras notaciones, se escogió este símbolo porque no implica direccionalidad o un acceso físico, además de ser visualmente intuitivo\cite{vert:crowsfoot}. Aunque el tema principal del artículo publicado por Gordon Everest era las estructuras de bases de datos explicadas con ejemplos, el uso de esta nueva notación fue fortuito aunque cuidadosamente elegido.
 
 \subsection{Símbolos en la notación de patas de cuervo}
-En esta notación encontramos los típicos símbolos de los diagramas E/R mencionados anteriormente, con algunas modificaciones.
+En esta notación encontramos los típicos símbolos de los diagramas relacionales mencionados anteriormente, con algunas modificaciones.
 Los símbolos en esta notación se dibujan de la siguiente forma:
 \subsubsection{Entidades}
 En la notación de patas de cuervo, las \emph{entidades} se representan mediante tablas, con el nombre escrito en la parte superior y sus atributos debajo.
+
+Para la realización de este proyecto se han utilizado las entidades para representar las relaciones o tablas utilizadas en el modelo relacional.
 
 \subsubsection{Atributos}
 Como se ha visto en el modelo relacional, los atributos forman parte de las relaciones, en este caso llamadas entidades, simbolizando sus propiedades. Los atributos de una entidad se mostrarán en la tabla que la representa, presentándose uno debajo de otro. Los atributos que describan la entidad de forma única, como su clave primaria o los atributos unique, se indicarán de forma especial.
@@ -60,41 +64,31 @@ En los extremos de la relación encontraremos dos indicadores, uno a cada lado, 
 \begin{itemize}
     \item \textbf{Multiplicidad: } Indica el número máximo de ejemplares que podemos encontrar en la relación de la entidad a la que apunta. En la notación de patas de cuervo disponemos de \emph{multiplicidad de uno} y de \emph{multiplicidad de muchos}. Interpretaremos la multiplicidad según el extremo del símbolo, como se muestra en la imagen:
     %Imagen multiplicidad
-    \imagen{crows-foot-notation-multiplicity-of-one}{Multiplicidad de uno}{1}
-    \imagen{crows-foot-notation-multiplicity-of-many}{Multiplicidad de muchos}{1}
+    \imagen{crows-foot-notation-multiplicity-of-one}{Multiplicidad de uno\cite{vert:crowsfoot}}{1}
+    \imagen{crows-foot-notation-multiplicity-of-many}{Multiplicidad de muchos\cite{vert:crowsfoot}}{1}
     
     \item \textbf{Opcionalidad: }Indica el número mínimo de ejemplares de una entidad que podemos encontrar, pudiendo ser \emph{obligatoria} (mínimo una ocurrencia) u \emph{opcional} (no hay mínimo de ocurrencias). La opcionalidad se muestra en la parte interior de la relación:
     %Imagen opcionalidad
-    \imagen{crows-foot-notation-mandatory}{Obligatoria}{1}
-    \imagen{crows-foot-notation-optional}{Opcional}{1}
+    \imagen{crows-foot-notation-mandatory}{Obligatoria\cite{vert:crowsfoot}}{1}
+    \imagen{crows-foot-notation-optional}{Opcional\cite{vert:crowsfoot}}{1}
 \end{itemize}
 
 Mediante la combinación de la multiplicidad y la opcionalidad obtendremos los símbolos que utilizaremos en la notación de patas de cuervo. Tenemos cuatro posibilidades diferentes:
 %Imágenes símbolos patas de cuervo
-\imagen{crows-foot-notation-zero-or-many}{Cero o muchos}{1}
-\imagen{crows-foot-notation-one-or-many}{Uno o muchos}{1}
-\imagen{crows-foot-notation-one}{Uno y solo uno}{1}
-\imagen{crows-foot-notation-one-or-zero}{Cero o uno}{1}
+\imagen{crows-foot-notation-zero-or-many}{Cero o muchos\cite{vert:crowsfoot}}{1}
+\imagen{crows-foot-notation-one-or-many}{Uno o muchos\cite{vert:crowsfoot}}{1}
+\imagen{crows-foot-notation-one}{Uno y solo uno\cite{vert:crowsfoot}}{1}
+\imagen{crows-foot-notation-one-or-zero}{Cero o uno\cite{vert:crowsfoot}}{1}
 
-Combinando estos símbolos en los extremos de una relación, obtendremos los diferentes grados:
-\imagen{crows-foot-notation-one-to-one}{Relación Uno-a-Uno}{1}
-\imagen{crows-foot-notation-one-to-many}{Relación Uno-a-Muchos}{1}
-\imagen{crows-foot-notation-many-to-many}{Relación Muchos-a-Muchos}{1}
+Combinando estos símbolos en los extremos de una relación, obtendremos los diferentes grados\footnote{Las imágenes utilizadas se han escogido para mostrar los diferentes grados, no representan una implementación real}:
+\imagen{crows-foot-notation-one-to-one}{Relación Uno-a-Uno\cite{vert:crowsfoot}}{1}
+\imagen{crows-foot-notation-one-to-many}{Relación Uno-a-Muchos\cite{vert:crowsfoot}}{1}
+\imagen{crows-foot-notation-many-to-many}{Relación Muchos-a-Muchos\cite{vert:crowsfoot}}{1}
 
 \subsection{Claves primarias y claves foráneas}
-Para distinguir los diferentes ejemplares y sus relaciones de cada entidad, en los diagramas E/R utilizamos un atributo conocido como claves, siendo las claves primarias para diferenciar cada ejemplar de una entidad y las claves foráneas para determinar con que otros ejemplares de otras entidades se relaciona el ejemplar con el que estemos trabajando.
+Para distinguir los diferentes ejemplares y sus relaciones de cada entidad, en los diagramas de patas de cuervo relacionales utilizamos un atributo conocido como claves, siendo las claves primarias para diferenciar cada ejemplar de una entidad y las claves foráneas para determinar con que otros ejemplares de otras entidades se relaciona el ejemplar con el que estemos trabajando.
 
-\subsubsection{Claves primarias}
-También conocida como PK (Primary Key), la clave primaria es un atributo especial de cada entidad. Este atributo define de forma inequívoca un ejemplar de una entidad determinada, de tal manera que no podemos encontrar dos ejemplares distintos con una misma clave primaria.
-%Imagen PK
-\imagen{primary-key}{Clave primaria}{1}
-
-\subsubsection{Claves foráneas}
-También conocida como FK (Foreign Key), la clave foránea referencia una clave primaria de otra tabla, identificando una relación entre las dos entidades. La clave foránea alamcenará la clave primaria del ejemplar de la otra entidad con el que se relaciona.
-%Imagen FK
-\imagen{foreign-key}{Clave foránea}{1}
-
-\subsection{Cardinalidad}
+\subsection{Tratamiento de las cardinalidades en el modelo relacional}
 Una vez hemos visto las diferentes relaciones que podemos encontrar en la notación de patas de cuervo y el uso de las claves primarias y claves foráneas para identificar dichas relaciones, podemos continuar con la cardinalidad de las relaciones y el manejo de las claves en función de esta\cite{vert:cardin}.
 
 \subsubsection{Cardinalidad Uno-a-Uno (1:1)}
@@ -102,19 +96,24 @@ En una relación Uno-a-Uno encontramos que un ejemplar de una entidad se relacio
 
 Teniendo en cuenta la opcionalidad de la que disponemos en la notación de patas de cuervo, encontramos diferentes casos con esta cardinalidad.
 \begin{itemize}
-    \item \textbf{Ambos lados obligatorios u opcionales}: En este caso, la entidad en la que situar la clave foránea es indiferente, a criterio del programador.
+    \item \textbf{Ambos lados obligatorios u opcionales}: En este caso, la entidad en la que situar la clave foránea queda a criterio del programador.
     \item \textbf{Un lado opcional y otro obligatorio}: Cuando uno de los lados sea opcional, colocaremos la clave foránea en el lado opcional, asumiendo que siempre que exista el lado opcional existirá el lado obligatorio, pero no viceversa.
 \end{itemize}
-%Imagen relación 1:1
+
+En la cardinalidad uno a uno, la clave foránea será \textit{UNIQUE}, evitando así que los registros de un lado de la relación se relacionen más de una vez con registros del otro lado de la relación.
+
+En el caso que el lado de la relación contrario al lado donde se almacena la clave foránea sea obligatorio, entonces la clave foránea deberá ser \textit{NOT NULL}, puesto que siempre va a existir un registro de dicho lado de la relación (es obligatorio) cuando exista uno con el que se relaciona de este lado.
+
+Las relaciones uno a uno en la que tengamos ambos lados de la relación obligatorios es un caso complejo que deberemos tratar con especial cuidado, debido a que al tener que cumplir la integridad referencial en ambos lados de la relación, cuando tratemos de insertar un nuevo registro en una de las tablas obtendremos un error al no existir el otro registro. Debido a esto, el tratamiento de este tipo de relaciones queda al criterio del programador, ya sea bien utilizando valores nulos temporales (no cumpliendo la restricción de obligatoriedad) que se actualizarán posteriormente, utilizando transacciones atómicas para insertar ambos registros secuencialmente o triggers para manejar la inserción automática en la tabla relacionada, entre algunas de las opciones.
 
 \subsubsection{Cardinalidad Uno-a-Muchos (1:M)}
 En una relación Uno-a-Muchos un ejemplar de una entidad determinada se relaciona con diversos ejemplares de otra entidad, pero los ejemplares de dicha entidad se relacionan únicamente con un ejemplar de la primera entidad.
 
 En este caso, la clave foránea se situará en el lado muchos.
-%Imagen relación 1:M
+
+Si el lado a uno de la relación es obligatorio, entonces la clave foránea será \textit{NOT NULL}, obligando a que siempre exista un registro en el otro lado de la relación con el que se asocia.
 
 \subsubsection{Cardinalidad Muchos-a-Muchos (M:M)}
 Una relación Muchos-a-Muchos muchos ejemplares de una entidad se relacionan con muchos ejemplares de otra entidad.
 
-Este es un caso especial, ya que las bases de datos no soportan este tipo de relación. Para implementar esta cardinalidad, se utiliza una tercera tabla intermedia, la cual contiene como claves foráneas las claves primarias de las dos tablas a las que hace referencia.
-%Imagen relación M:M
+Para implementar esta cardinalidad, se utiliza una tercera tabla intermedia, la cual contiene como claves foráneas las claves primarias de las dos tablas a las que hace referencia. La combinación de las dos claves foráneas será la clave primaria de dicha tabla intermedia.

@@ -1,1 +1,28 @@
 \capitulo{7}{Conclusiones y Líneas de trabajo futuras}
+
+En este apartado se comentan las conclusiones extraídas después de completar el proyecto, además de las posibles líneas de trabajo futuras por las que se podría continuar el proyecto más adelante.
+
+\section{Conclusiones}
+
+Las conclusiones obtenidas después del desarrollo de la aplicación son las siguientes:
+\begin{itemize}
+    \item La aplicación desarrollada cumple con el objetivo propuesto, permitiendo al usuario diseñar diagramas relacionales utilizando la notación de patas de cuervo (Crow's Foot), además de permitir al usuario importar y exportar sus diagramas en formato XML y obtener el código SQL y SQLAlchemy necesario para la creación de las tablas del diagrama.
+    \item Se ha utilizado para todo el desarrollo la librería de Javascript \emph{mxGraph}. Esta librería utilizada para el diseño de grafos en aplicaciones web se lleva desarrollando desde el año 2005, por lo que se puede entender la profundidad de esta. Debido a esta profundidad, aunque se ha trabajado de forma intensiva con ella, considero que aún queda mucho por aprender y mejorar. Entendiendo el control que otorgaba la librería, a lo largo del desarrollo se decidió entregarle el control de la aplicación a mxGraph y no integrar ningún framework adicional. mxGraph ha permitido una implementación fluida y con buen rendimiento.
+    \item Durante el desarrollo se han obtenido gran cantidad de nuevos conocimientos, principalmente en el desarrollo web y el lenguaje de programación Javascript, con el que no se había trabajado a este nivel con anterioridad. Este falta de trabajo previo probablemente haya afectado a la calidad del producto final, puesto que el aprendizaje ha sido continuo durante todo el desarrollo, mejorando paso a paso.
+\end{itemize}
+
+\section{Líneas de trabajo futuras}
+
+Como posible línea de trabajo a seguir en versiones futuras de la aplicación, se podrían incluir las siguientes funcionalidades y mejores:
+\begin{itemize}
+    \item Implementar la gestión necesaria para las relaciones reflexivas, permitiendo al usuario dibujar estas.
+    \item Introducir el manejo de múltiples relaciones entre las mismas dos tablas.
+    \item Mejorar el manejo de claves de la aplicación, proporcionando al usuario más control sobre estas.
+    \item Implementar un backend que permita al usuario registrarse y almacenar sus diagramas en la nube.
+    \item Permitir la colaboración en tiempo real entre múltiples usuarios, siendo una herramienta colaborativa al estilo de \textit{Google Docs}.
+    \item Ampliar las posibilidades de la generación de código, incluyendo soporte para mayor número de lenguajes de bases de datos, plataformas y librerías diferentes.
+    \item Incluir una sección de \emph{Ayuda}, que guíe al usuario en sus primeros pasos en la aplicación, además de una sección de \emph{Soporte}, en caso de que algo salga mal.
+    \item Introducir la IA en la aplicación, proporcionando al usuario una guía en tiempo real mientras desarrolla su diagrama, así como validación de que el diagrama es correcto.
+    \item Ampliar la variedad de formatos en la que se pueden importar y exportar los diagramas, fomentando la compatibilidad con otras herramientas.
+    \item Traducir la aplicación a diferentes idiomas, consiguiendo de esta forma que sea más accesible.
+\end{itemize}

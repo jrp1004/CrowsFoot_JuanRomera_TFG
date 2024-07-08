@@ -14,7 +14,7 @@ Puesto que se partía de una base casi nula en el trabajo con Javascript, el per
 
 \subsection{Javascript}
 
-Para la formación en Javascript se hizo uso de tutoriales disponibles en webs como \url{https://www.w3schools.com/js/}, además de algún ejemplo obtenido de otras webs. Se realizó trabajo con clases, objetos, funciones básicas de Javascript, además de utilidades como fetch.
+Para la formación en Javascript se hizo uso de tutoriales disponibles en webs como \href{https://www.w3schools.com/js/}{W3Schools}, además de algún ejemplo obtenido de otras webs. Se realizó trabajo con clases, objetos, funciones básicas de Javascript, además de utilidades como fetch.
 
 \subsection{Node}
 
@@ -30,7 +30,7 @@ El pilar fundamental de este proyecto es la librería de Javascript \emph{mxGrap
 
 \subsection{Formación}
 
-La formación en esta librería consistió basicamente en la lectura y realización de algunos de los diferentes ejemplos que podemos encontrar en la web \url{https://jgraph.github.io/mxgraph/javascript/}, ejemplos disponibles gracias a los propios creadores. También se hizo un uso constante de la documentación disponible en \url{https://jgraph.github.io/mxgraph/docs/js-api/files/index-txt.html}, además de los manuales que podemos encontrar en \url{https://jgraph.github.io/mxgraph/}. Más allá de esto, no se encontró mucho material con el que se formarse en la librería, sin tener en cuenta secciones de código encontradas en webs del estilo \textit{Stackoverflow}.
+La formación en esta librería consistió basicamente en la lectura y realización de algunos de los diferentes ejemplos que podemos encontrar en \href{https://jgraph.github.io/mxgraph/javascript/}{directorio de ejemplos de mxGraph}, ejemplos disponibles gracias a los propios creadores. También se hizo un uso constante de la documentación disponible en la \href{https://jgraph.github.io/mxgraph/docs/js-api/files/index-txt.html}{especificación de la API de mxGraph}, además de los manuales que podemos encontrar en la web de \href{https://jgraph.github.io/mxgraph/}{mxGraph}. Más allá de esto, no se encontró mucho material con el que se formarse en la librería, sin tener en cuenta secciones de código encontradas plataformas de preguntas y respuestas en línea destinadas al intercambio de conocimiento entre desarrolladores, como \textit{Stackoverflow}.
 
 \subsection{Ejemplos}
 
@@ -44,7 +44,7 @@ Teniendo en cuenta que la mayoría de la formación en la librería se hizo con 
     \item \textbf{Schema: }En este ejemplo se muestra como se puede implementar un editor muy sencillo de diagramas de base de datos, con la capacidad de añadir tablas, columnas y relaciones.
 \end{itemize}
 
-Una vez trabajado con todos los ejemplos y entendidos estos, se comenzó a trabajar en la aplicación, tomando el ejemplo \emph{Schema} como base desde la que empezar a construir.
+Una vez trabajado con todos los ejemplos y entendidos estos, se comenzó a trabajar en la aplicación, tomando el ejemplo \emph{Schema}\footnote{\url{https://jgraph.github.io/mxgraph/javascript/examples/schema.html}} como base desde la que empezar a construir.
 
 El seguimiento de esta etapa de formación se puede encontrar en el repositorio del proyecto en la rama \emph{Formación}.
 
@@ -68,14 +68,14 @@ El desarrollo del código se ha realizado siguiendo una metodología de enseayo 
 
 \subsection{Aspecto de tablas y columnas}
 
-El ejemplo Schema anteriomente mencionado ya partía con un diseño del aspecto de tablas, columnas y relaciones que tenía buena pinta. Debido a que el tema de este trabajo era tarbajar con la notación de patas de cuervo y no el diseño de tablas y columnas en sí, se decidió mantener este diseño, aunque se realizaron algunos cambios a lo largo del desarrllo para conseguir que el diseño se ajuste mejor al proyecto. Algunos de estos cambios son los siguientes.
+El ejemplo Schema anteriomente mencionado ya partía con un diseño del aspecto de tablas, columnas y relaciones que tenía buena pinta. Debido a que el tema de este trabajo era trabajar con la notación de patas de cuervo y no el diseño de tablas y columnas en sí, se decidió mantener este diseño, aunque se realizaron algunos cambios a lo largo del desarrollo para conseguir que el diseño se ajuste mejor al proyecto. Algunos de estos cambios son los siguientes.
 \begin{itemize}
     \item Ajuste de la etiqueta de la tabla a la izquierda y no centrado
     \item Borde para todas las columnas
     \item Icono personalizado para indicar que una columna es clave foránea
 \end{itemize}
 
-Además de estos cambios, más adelante introdujo en la aplicación un apartado que permite modificar alugnos de estos aspectos estéticos de las tablas, columnas y relaciones, del que se hablará más adelante.
+Además de estos cambios, más adelante introdujo en la aplicación un apartado que permite modificar algunos de estos aspectos estéticos de las tablas, columnas y relaciones, del que se hablará más adelante.
 
 \subsection{Símbolos de patas de cuervo}
 
@@ -88,15 +88,21 @@ Al comienzo del desarrollo de la aplicación, se trabajó en la implementación 
 
 Identificando los símbolos por el tipo de multiplicidad y obligatoriedad de cada uno, implementamos los símbolos \textit{solo\_uno}, \textit{cero\_o\_uno}, \textit{cero\_o\_mas} y \textit{uno\_o\_mas}.
 
-Desde el apartado de propiedades de la relación podemos seleccionar que símbolo se muestra en cade extremo de la relación, actualizando automáticamente las claves foráneas en caso de que se necesario.
+Desde el apartado de propiedades de la relación podemos seleccionar qué símbolo se muestra en cada extremo de la relación, actualizando automáticamente las claves foráneas en caso de que se necesario.
 
 \subsection{Diccionario de datos}
 
 Se decidió implementar las propiedades \emph{Título} y \emph{Descripción} en los objetos que representaban a las columnas para permitir al usuario ampliar la información con respecto a los elementos de su diagrama, mostrando toda esta información de forma ordenada desde el botón correspondiente.
 
+\subsection{Tipo de datos de las columnas}
+
+Durante el desarrollo se tomó la decisión de mantener el tipo de dato como una cadena de texto introducida por el usuario, dejando bajo su responsabilidad introducir dicho valor correctamente correspondiendo con la base de datos que esté utilizando, ya que dicho atributo de los objetos de las columnas será utilizado más adelante en la generación de código.
+
+Se decidió mantener el atributo así ya que se consideró que el resultado obtenido con la cantidad de trabajo requerido no merecía la pena, además de no ser este el enfoque principal del trabajo. Dejarlo bajo responsabilidad del usuario fue la opción mejor valorada.
+
 \subsection{Ajuste de etiqueta}
 
-Al principio del desarrollo surgió la idea de ajustar la anchura de las tablas y las columnas a la anchura de la etiqueta que se va a mostrar. Esta idea se descartó, en parte debido a que visualmente no es la mejor solución, pero principlamente debido a que la librería contiene problemas sin resolver sobre el ajuste automático del tamaño de sus celdas cuando estas forman parte de un layout de grupo, como en nuestro caso swimlane, provocando que una celda pueda hacerse más grande pero no pueda hacerse más pequeña o recuperar su tamaño inicial.
+Al principio del desarrollo surgió la idea de ajustar la anchura de las tablas y las columnas a la anchura de la etiqueta que se va a mostrar. Esta idea se descartó, en parte debido a que visualmente no es la mejor solución, pero principalmente debido a que la librería contiene problemas sin resolver sobre el ajuste automático del tamaño de sus celdas cuando estas forman parte de un layout de grupo, como en nuestro caso swimlane, provocando que una celda pueda hacerse más grande pero no pueda hacerse más pequeña o recuperar su tamaño inicial. El layout Swimlane, o layout de carriles, organiza la información en diferentes carriles, similares a los que podrías encontrar en una piscina. En la aplicación, utilizamos este layout para representar las tablas utilizando carriles verticales, teniendo como título del carril el nombre de la tabla y dentro del carril situamos cada columna de esta. Para organizar las columnas dentro del carril se utiliza un \textit{Stacklayout}, en el cual apilamos de forma vertical cada columna en el interior de la tabla. Así, no necesitamos realizar un control exacto de la posición de las columnas, puesto que estas se apiliarán unas debajo de otras cada vez que se incluya una nueva. Además, utilizar el layout Swimlane nos facilita expandir y colapsar las tablas en el diagrama, mostrando el título de la tabla y todas las columnas o solo el título, respectivamente.
 
 Después de esto, se decidió modificar como se mostraba la etiqueta para que esta se ajuste a la anchura de la celda. Con la función \textit{getTextWidth} calculamos la anchura de la cadena correspondiente a la etiqueta en píxeles, permitiéndonos calcular que parte de la etiqueta mostrar, añadiendo tres puntos suspensivos (...) al final de la etiqueta indicado que esta continua.
 
@@ -104,11 +110,13 @@ Después de esto, se decidió modificar como se mostraba la etiqueta para que es
 
 Durante el desarrollo se consideró importante el hecho de que, cuando se crea o actualiza una relación entre dos tablas, las claves foráneas necesarias se añaden y eliminan de forma automática de las tablas correspondientes. Además, los parámetros \textit{UNIQUE} y \textit{NOT NULL} de estas nuevas columnas se gestionan de tal forma que corresponda con la multiplicidad y la obligatoriedad de los símbolos del enlace.
 
-Para que esto funcionase correctamente, se implementó en el objeto de las relaciones un array que almacenase las claves foráneas asociadas, de tal forma que en caso de eliminar o actualizar una relación entre dos tablas, las claves foráneas antiguas se eliminen.
+Para que esto funcionase correctamente, se implementó en el objeto de las relaciones un array que almacenase las claves foráneas asociadas, de tal forma que en caso de eliminar o actualizar una relación entre dos tablas, las claves foráneas antiguas se eliminen. Para identificar fácilmente en que tabla se encuentran las claves foráneas, se tomó la decisión de diseño de que todos los enlaces que representan las relaciones tengan en su lado origen la tabla que contiene las claves foráneas y en su lado destino la tabla con la clave primaria referenciada. Además, de esta forma podemos identificar rápidamente desde una tabla qué enlaces insertan columnas en ellas y cuáles hacen una copia de sus claves primarias en otra, ayudando a la hora de actualizar posibles referencias o tener que añadir o eliminar celdas.
 
 Además de lo anteriormente mencionado, se introdujo la posibilidad de añadir Uniques compuestos en las tablas con dos columnas o más, permitiendo el manejo de claves candidatas también.
 
-Teniendo en cuenta que las relaciones M:M normalmente se implementan utilizando una tabla intermedia, cuando el usuario establezca una relación de este tipo entre dos tablas, el sistema incluirá automáticamente una tabla intermedia representando a dicha relación incluyendo como claves foráneas las claves primarias de estas dos tablas.
+Teniendo en cuenta que las relaciones M:M se implementan utilizando una tabla intermedia, cuando el usuario establezca una relación de este tipo entre dos tablas, el sistema incluirá automáticamente una tabla intermedia representando a dicha relación incluyendo como claves foráneas las claves primarias de estas dos tablas.
+
+Hasta el momento, la aplicación es capaz de trabajar únicamente con claves primarias y claves foráneas simples, aunque se permite la declaración de Uniques compuestos, con los que ya trabaja la aplicación.
 
 \subsection{Panel propiedades}
 
@@ -155,3 +163,23 @@ Las principales dificultades surgieron sobre como tratar claves compuestas, adem
 La documentación del proyecto se encuentra en los documentos entregados. Se ha realizado tanto la memoria como los anexos utilizando \LaTeX desde la plataforma \emph{Overleaf}.
 
 Además de estos documentos, se ha generado la documentación \emph{JSDoc} a partir de los comentarios del código de la aplicación. Esta documentación también se incluye.
+
+\section{Diferencias entre el ejemplo Schema y este trabajo}
+
+Como se ha comentado anteriormente, al comienzo del trabajo se tomo como base sobre la que empezar a construir el ejemplo Schema\footnote{Ejemplo desarrollado por mxGraph que se puede encontrar en \url{https://jgraph.github.io/mxgraph/javascript/examples/schema.html}}. A continuación, se listan las diferencias o mejoras diferenciales implementadas en el proyecto.
+
+\begin{itemize}
+    \item Panel lateral derecho, el cual cambia según el elemento del diagrama seleccionado, que permite editar tanto la apariencia de cada uno de los elementos, como sus datos.
+    \item Se han implementado propiedades a las tablas y relaciones, las cuales pueden ser modificadas desde el panel lateral mencionado anteriormente.
+    \item La aplicación permite declarar Uniques compuestos en aquellas tablas con dos o más columnas.
+    \item Las claves foráneas se añadirán y eliminarán de forma automática, ya sea cuando cambien las claves de las tablas asociadas, cuando cambie el tipo de relación o cuando una relación entre dos tablas se elimine.
+    \item Se han implementado los símbolos correspondientes a la notación de patas de cuervo, con la posibilidad de cambiar entre ellos.
+    \item Cuando el usuario establece una relación N:M entre dos tablas, automáticamente se genera una tabla intermedia que represente dicha relación.
+    \item El usuario tiene la posibilidad de añadir título y descripción para cada una de las columnas de su diagrama, cuya información podrá consultar en el diccionario de datos que tiene disponible.
+    \item Se permite tanto la descarga del fichero XML correspondiente al diagrama creado por el usuario, como la posterior importación del diagrama a partir de dicho fichero.
+    \item La etiqueta de tablas y columnas se ajusta al ancho de estas.
+    \item Es posible mover de posición verticalmente las columnas dentro de una tabla.
+    \item Es posible añadir una columna a una tabla o bien utilizando el menú popup, o el atajo de teclado F4.
+    \item El botón borrar todo de la barra de herramientas superior eliminará todos los elementos del diagrama del usuario.
+    \item Se ha mejorado la generación de código SQL, mejorando las referencias a las claves primarias y foráneas y añadiendo el manejo de uniques compuestos, además de haber implementado la posibilidad de generar el código para SQLAlchemy, teniendo en cuenta todo lo anterior.
+\end{itemize}

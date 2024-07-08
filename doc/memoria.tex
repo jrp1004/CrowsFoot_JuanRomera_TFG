@@ -23,6 +23,9 @@
 % Ecuaciones
 \usepackage{amsmath}
 
+\usepackage{amssymb}
+\usepackage{tablefootnote}
+
 % Rutas de fichero / paquete
 \newcommand{\ruta}[1]{{\sffamily #1}}
 
@@ -357,7 +360,7 @@
 % Datos de portada
 \title{Herramienta de modelado de bases de datos relacionales con Crows Foot}
 \author{\nombre}
-\tutor{Jesus Manuel Maudes Raedo}
+\tutor{Jesús Manuel Maudes Raedo}
 \date{\today}
 
 \begin{document}
@@ -374,7 +377,7 @@
 
 \noindent\includegraphics[width=\textwidth]{cabecera}\vspace{1cm}
 
-\noindent D. nombre tutor, profesor del departamento de nombre departamento, área de nombre área.
+\noindent D. Jesús Maudes Raedo, profesor del departamento de Ingeniería Informática, área de Lenguajes y Sistemas Informáticos.
 
 \noindent Expone:
 
@@ -389,27 +392,27 @@ En Burgos, {\large \today}
 \vfill\vfill\vfill
 
 % Author and supervisor
-\begin{minipage}{0.45\textwidth}
-\begin{flushleft} %\large
-Vº. Bº. del Tutor:\\[2cm]
-D. nombre tutor
-\end{flushleft}
-\end{minipage}
-\hfill
-\begin{minipage}{0.45\textwidth}
-\begin{flushleft} %\large
-Vº. Bº. del co-tutor:\\[2cm]
-D. nombre co-tutor
-\end{flushleft}
-\end{minipage}
-\hfill
+%\begin{minipage}{0.45\textwidth}
+%\begin{flushleft} %\large
+%Vº. Bº. del Tutor:\\[2cm]
+%D. nombre tutor
+%\end{flushleft}
+%\end{minipage}
+%\hfill
+%\begin{minipage}{0.45\textwidth}
+%\begin{flushleft} %\large
+%Vº. Bº. del co-tutor:\\[2cm]
+%D. nombre co-tutor
+%\end{flushleft}
+%\end{minipage}
+%\hfill
 
-\vfill
+%\vfill
 
 % para casos con solo un tutor comentar lo anterior
 % y descomentar lo siguiente
-%Vº. Bº. del Tutor:\\[2cm]
-%D. nombre tutor
+Vº. Bº. del Tutor:\\[2cm]
+D. Jesús Maudes Raedo
 
 
 \newpage\null\thispagestyle{empty}\newpage
@@ -422,14 +425,14 @@ D. nombre co-tutor
 % Abstract en castellano
 \renewcommand*\abstractname{Resumen}
 \begin{abstract}
-El uso de sistemas de bases de datos ha aumentado en gran medida, con lo que la necesidad de facilitar la comprensión de su arquitectura y funcionamiento consecuentemente se ha visto en auge. Para suplir esta necesidad, disponemos de los diagramas entidad-relación con los que representar bases de datos relacionales.
+El uso de sistemas de bases de datos ha aumentado en gran medida, con lo que la necesidad de facilitar la comprensión de su arquitectura y funcionamiento consecuentemente se ha visto en auge. Para suplir esta necesidad, disponemos de los diagramas relacionales con los que representar bases de datos.
 
 En este trabajo se explora la creación de una aplicación web que permita modelar dicho tipo de diagramas utilizando la notación Crows Foot, permitiendo almacenar los diagramas para su reedición y que es capaz de generar un script relacional de creación de tablas a partir del diagrama del usuario.
 \end{abstract}
 
 \renewcommand*\abstractname{Descriptores}
 \begin{abstract}
-Aplicación web, diagrama entidad-relación, base de datos relacional.
+Aplicación web, diagrama relacionales, base de datos relacional.
 \end{abstract}
 
 \clearpage
@@ -437,14 +440,14 @@ Aplicación web, diagrama entidad-relación, base de datos relacional.
 % Abstract en inglés
 \renewcommand*\abstractname{Abstract}
 \begin{abstract}
-The use of data base systems has increased greatly, so the need to provide an easy way to understand the architecture and operation has grown. To meet this need, entity-relationship diagrams are available to represent relational databases.
+The use of data base systems has increased greatly, so the need to provide an easy way to understand the architecture and operation has grown. To meet this need, relational diagrams are available to represent databases.
 
 In this work we explore the creation of a web application that allows modeling this type of diagram using the Crows Foot notation, allowing to store the diagrams for their re-edition and that is able to generate a relational script to create tables from the user's diagram.
 \end{abstract}
 
 \renewcommand*\abstractname{Keywords}
 \begin{abstract}
-Web application, entity-relationship diagram, relational database.
+Web application, relational diagram, relational database.
 \end{abstract}
 
 \clearpage

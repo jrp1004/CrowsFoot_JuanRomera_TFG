@@ -147,16 +147,16 @@ En este apartado se detallan los costes relativos al software, por lo que tambi�
 Estos costes se han calculado suponiendo un proyecto realizado en un entorno empresarial y asumiendo un dinero invertido durante 12 meses (1 año) de suscripciones, habiendo sido usadas durante 4 meses. Por simplicidad, los precios encontrados en dólares se han trasladado 1:1 a euros.
 
 \textbf{Coste de personal}
-En este apartado se detalla el coste de tener a una persona desarrollando el proyecto durante 4 meses. Considerenado un salario mensual neto de 1200 euros mensuales (12 pagas), los costes obtenidos son los siguientes.
+En este apartado se detalla el coste de tener a una persona desarrollando el proyecto durante 4 meses. Considerenado un salario mensual bruto de 2000 euros mensuales (12 pagas), los costes obtenidos son los siguientes.
 \begin{table}[H]
     \centering
     \begin{tabular}{@{}lll@{}}\toprule
          \textbf{Concepto }& \textbf{Coste(€)} \\ \midrule
-         Salario mensual neto & 1200\\
+         Salario mensual bruto & 2000\\
          Retención IRPF & 326.68\\
          Seguridad Social & 651.18\\
-         Salario mensual bruto & 2177.86\\ \midrule
-         Total & 8711.44\\ \bottomrule
+         Salario mensual que paga la empresa & 3629.76\\ \midrule
+         Total & 14518.96\\ \bottomrule
     \end{tabular}
     \caption{Costes Personal}
     \label{ve:cost-per}
@@ -171,68 +171,41 @@ Los costes se han calculado teniendo en cuenta un 15\% de IRPF \cite{ia:irpf} y 
          \textbf{Concepto} & \textbf{Coste} \\ \midrule
          Hardware & 857.14 \\
          Software & 277.33\\
-         Personal & 8711.44\\ \midrule
-         Total & 9845.91\\ \bottomrule
+         Personal & 14518.96\\ \midrule
+         Total & 15653.23\\ \bottomrule
     \end{tabular}
     \caption{Costes Total}
     \label{ve:cost-tot}
 \end{table}
 
 \subsubsection{Beneficios}
-La aplicación desarrollada se distribuirá de forma gratuita y no presenta ningún sistema de monetización implementado.
 
-Se podría monetizar la aplicación mediante sistemas de suscripción, ofreciendo más funcionalidades al producto. Implementando un sistema de almacenamiento en la nube y de asistente virtual, podríamos presentar el siguiente tipo de suscripciones.
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{@{}lll@{}}\toprule
-        \textbf{Tipo} & \textbf{Tipo Almacenamiento} & \textbf{Cantidad} \\ \midrule
-        Community & Local & - \\
-        Pro & Local/Nube & 100 diagramas \\
-        Enterprise & Local/Nube & 10000 diagramas \\ \bottomrule
-    \end{tabular}
-    \caption{Suscripciones Almacenamiento}
-    \label{ve:susc}
-\end{table}
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{@{}lll@{}}\toprule
-        \textbf{Tipo} & \textbf{Asistente virtual} \\ \midrule
-        Community & No \\
-        Pro & No \\
-        Enterprise & Sí \\ \bottomrule
-    \end{tabular}
-    \caption{Suscripciones Asistente}
-    \label{ve:susc}
-\end{table}
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{@{}lll@{}}\toprule
-        \textbf{Tipo} & \textbf{Nº usuarios} & \textbf{Precio}\\ \midrule
-        Community & 1 & Gratuito \\
-        Pro & 4 & 4.99€/mes \\
-        Enterprise & 100 & 200€/mes \\ \bottomrule
-    \end{tabular}
-    \caption{Suscripciones Precio}
-    \label{ve:susc}
-\end{table}
+La aplicación desarrollada se distribuirá de forma gratuita y no presenta ningún sistema de monetización implementado. La aplicación estará disponible de forma libre para todo el mundo, siendo una aplicación de código abierto mantenida por la comunidad.
 
 \subsection{Viabilidad legal}
 En este apartado se detallarán las licencias software de las dependencias del proyecto.
 
+En la siguiente tabla se listan las licencias de las dependencias usadas.
 \begin{table}[H]
     \centering
     \begin{tabular}{@{}lll@{}}\toprule
         \textbf{Herramienta} & \textbf{Versión} & \textbf{Licencia}\\ \midrule
-        MxGraph & 4.2.2 & Commercial \\
-        GitHub & 3.13.0 & GNU \\
-        grunt & 1.0.1 & Commercial \\
-        webpack & 2.2.1 & MIT \\
-        actions/checkout & 3.0.0 & MIT \\
-        SonarSource/sonarcloud-github-action & - & LGPL-3.0\\ \bottomrule
+        MxGraph & 4.2.2 & Apache 2.0 \\
+        webpack & 2.2.1 & MIT \\ \bottomrule
     \end{tabular}
-    \caption{Caption}
+    \caption{Licencias}
     \label{tab:my_label}
 \end{table}
+
+La licencia utilizada por la librería \textit{mxGraph} es Apache 2.0\footnote{En el repositorio no aparece explícitamente Apache 2.0, pero lo podemos encontrar en la \href{https://www.npmjs.com/package/mxgraph}{la página de su paquete npm}.}. Esta es la licencia menos permisiva que encontramos, por lo que nuestra licencia debe cumplir sus restricciones.
+
+Para cumplir con las restricciones de la licencia Apache 2.0 debemos:
+\begin{itemize}
+    \item Incluir una copia de la licencia Apache 2.0 en nuestro proyecto.
+    \item Debemos avisar de cualquier modificación en alguno de los ficheros de la dependencia.
+    \item Debemos conservar todos los avisos de derechos de autos, patente, marca registrada y atribución.
+    \item Si la dependencia incluye algún fichero NOTICE debemos incluirlo también.
+    \item No podemos trabajar o integrar la librería con un producto o servicio propiedad o comercializado por una entidad de \textit{Atlassian}.
+\end{itemize}
+
+Cumpliendo con lo anterior, una de las licencias que mejor nos puede encajar es la licencia \emph{MIT}. Esta es una licencia de código libre muy permisiva y compatible con la licencia Apache 2.0, lo que nos permitirá distribuir nuestra aplicación de forma libre y mantener el código fuente como código libre para que la comunidad pueda contribuir.
