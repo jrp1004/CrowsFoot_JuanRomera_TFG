@@ -1,0 +1,140 @@
+\apendice{Especificación de diseño}
+
+\section{Introducción}
+
+En esta especificación de diseño se detallan las decisiones de diseño tomadas durante el proceso de desarrollo de la aplicación. A continuación, se analizan los datos que va a manejar la aplicación, sus detalles procedimentales y la arquitectura utilizada.
+
+\section{Diseño de datos}
+
+En este apartado describiremos las estructuras de datos utilizadas en la aplicación para representar los diagramas.
+
+\subsection{Entidades}
+
+En la aplicación se maneja la representación de los diagramas utilizando tres entidades, que describiremos a continuación.
+
+Las entidades aquí descritas corresponden a los objetos almacenados en los objetos celda de la librería mxGraph. En la descripción se incluirán diferentes atributos de los objetos \emph{mxCell}, ya que se han utilizado durante el desarrollo y no se almacenan, al no ser necesario. Dichos atributos se diferenciarán correctamente (escribiéndolos en cursiva) de los de nuestros objetos. No se incluirán todos los atributos de esta clase, sólo los relevantes para nuestra aplicación.
+
+\subsubsection{Tabla}
+
+La entidad \emph{Tabla} representa una tabla en el diagrama. A cada tabla se le asigna un nombre y puede contener diferentes columnas. Los atributos utilizados son:
+\begin{itemize}
+    \item \textbf{\textit{Id}: }Id asociado a la celda que representa la tabla.
+    \item \textbf{name: }Nombre de la tabla.
+    \item \textbf{uniqueComp: }Array compuesto por arrays de enteros, que almacenan los identificadores de las columnas asociadas al unique compuesto.
+    \item \textbf{gradient: }Booleano que indica si mostrar degradado o no en la tabla.
+    \item \textbf{\textit{geometry: }}Geometría asociada a la celda de la tabla.
+    \item \textbf{\textit{style: }}Estilo asociado a la celda de la tabla.
+\end{itemize}
+
+\subsubsection{Columna}
+
+La entidad \emph{Columna} representa una columna dentro de una tabla del diagrama. Cada columna tiene asociado un nombre, su tipo y diferentes propiedades correspondientes con la base de datos. Además, tiene asociada una referencia a la tabla que la contiene (su celda padre en mxGraph) y, en caso de que la columna sea una clave foránea, tendrá asociada una referencia a la clave primaria y a la relación correspondientes. Los atributos de este objeto son:
+\begin{itemize}
+    \item \textbf{\textit{Id}: }Id asociado a la celda que representa la columna.
+    \item \textbf{\textit{parent}: }Referencia a la celda padre que contiene la columna, en este caso, una tabla del diagrama.
+    \item \textbf{name: }Nombre de la columna.
+    \item \textbf{type: }Tipo de la columna.
+    \item \textbf{defaultValue: }Valor que debe tomar por defecto la columna.
+    \item \textbf{primaryKey: }Indica si la columna es clave primaria.
+    \item \textbf{foreignKey: }Indica si la columna es clave foránea.
+    \item \textbf{autoIncrement: }Indica si el valor de la columna se debe auto incrementar.
+    \item \textbf{notNull: }Indica si el valor de la columna no puede ser nulo.
+    \item \textbf{unique: }Indica si el valor de la columna no se puede repetir.
+    \item \textbf{desc: }Almacena la descripción asociada a la columna.
+    \item \textbf{titulo: }Almacena el título de la columna.
+    \item \textbf{relacionAsociada: }Almacena el id de la relación que tiene asociada, en caso de que la columna sea clave foránea.
+    \item \textbf{pkAsociada: }Almacena el id de la columna de otra tabla que tiene asociada, en caso de que la columna sea clave foránea.
+    \item \textbf{\textit{geometry}: }Geometría asociada a la celda de la columna.
+    \item \textbf{\textit{style}: }Estilo asociado a la celda de la columna.
+\end{itemize}
+
+\subsubsection{Relación}
+
+La entidad \emph{Relación} representa la conexión entre dos tablas que se relacionan entre sí. Las relaciones tendrán dos tablas asociadas, con un símbolo para cada extremo. Los atributos del objeto asociado son:
+\begin{itemize}
+    \item \textbf{\textit{Id}: }Id asociado a la celda que representa la relación.
+    \item \textbf{\textit{source}: }Referencia a la tabla que se encuentra en el lado origen de la relación. En esta tabla se encontrarán las claves foráneas asociadas a la relación.
+    \item \textbf{\textit{target}: }Referencia a la tabla que se encuentra en el lado destino de la relación.
+    \item \textbf{name: }Nombre de la relación.
+    \item \textbf{clavesForaneas: }Array de números compuesto por los ids de las columnas que corresponden a las claves foráneas asociadas a la relación.
+    \item \textbf{startArrow: }Indica el símbolo de la notación de patas de cuervo que se debe mostrar en el lado origen de la relación.
+    \item \textbf{endArrow: }Indica el símbolo de la notación de patas de cuervo que se debe mostrar en el lado destino de la relación.
+    \item \textbf{\textit{geometry}: }Geometría asociada a la celda de la relación.
+    \item \textbf{\textit{style}: }Estilo asociado a la celda de la relación.
+\end{itemize}
+
+\subsection{Diagrama de clases}
+
+\imagen{diagrama-clases}{Diagrama de clases}
+
+En el diagrama de clases se han incluido las clases Tabla, Relación y Columna como especializaciones de \emph{value}, el atributo en el que se almacenan, ya que, aunque no tengan atributos o comportamientos similares, cumplen la misma función dentro de los objetos celda (\textit{mxCell}). Se ha decidido incluir también que un elemento \emph{mxGraph} está compuesto por 0 o muchos elementos \emph{mxCell}, siendo estas dos las clases más relevantes para el tema tratado.
+
+%%%\subsection{Diagrama relacional}
+
+\section{Diseño procedimental}
+
+\subsection{Introducción}
+
+En este apartado se describen los procedimientos y métodos implementados en la aplicación para manejar los datos y la lógica de negocio. Se detallan las funciones principales, su propósito y cómo interactúan entre sí, junto a los diagramas necesarios para visualizar dichos procesos.
+
+\subsection{Configuración del grafo}
+
+La configuración del grafo se realiza desde la función \emph{main}. Desde esta función, configuraremos los parámetros básicos del grafo. Añadimos los símbolos personalizados, correspondientes a la notación de patas de cuervo, configuramos las propiedades y estilos de los elementos del diagrama e inicializamos los componentes de la interfaz de usuario.
+
+\subsection{Añadir Tabla/Columna}
+
+Para añadir una tabla o una columna al diagrama utilizaremos la función asociada al icono correspondiente del panel lateral, añadido desde la función \emph{addSidebarIcon}. En esta función añadiremos los iconos de tabla y columna, transformándolos en elementos \textit{draggable} y añadiremos una función con la que manejaremos la incorporación de nuevos elementos al diagrama, después de haber comprobado que el drop del elemento se puede completar.
+
+Una vez comprobado que el destino para el nuevo elemento es válido, ejecutaremos nuestra función. El sistema comprobará donde ha ocurrido el evento de soltado del ratón. En función del prototipo indicado, el nuevo elemento será tabla o columna.
+\begin{enumerate}
+    \item Si es \emph{columna}, comprobaremos si debajo del punto obtenido hay una tabla. Si hay una tabla, se continua con el proceso, ajustando el punto para que se ajuste a la geometría de la tabla padre. Solicitaremos un nombre para la columna al usuario y añadiremos la columna a la tabla.
+    \item Si es una \emph{tabla}, solicitaremos un nombre al usuario y añadiremos una nueva tabla en el punto obtenido.
+\end{enumerate}
+
+\imagen{addtabla-columna-sqd}{Diagrama secuencia añadir Tabla/Columna}
+
+\subsection{Añadir relación}
+
+Utilizamos la función \emph{addEdge} de mxGraph para crear una nueva relación entre dos tablas. Primero, comprobamos que la tabla destino del enlace tiene clave primaria, pues está se añadirá como clave foránea en la tabla origen. Si tiene clave primaria, creamos un nuevo objeto \textit{Relacion} y llamamos a la función \emph{insertarNuevaRelacion}. En esta función, configuramos la nueva relación con la función \emph{editarRelacion} añadiéndola al diagrama, y añadimos las claves foráneas necesarios con la función \emph{addClaveForanea}.
+
+\imagen{addEdge-sqd}{Diagrama secuencia añadir relación}
+
+\subsection{Editar elemento}
+
+Cada vez que cambia el elemento seleccionado en el diagrama, el listener incluido en \emph{getSelectionModel} de mxGraph cambiará los elementos del panel lateral de propiedades. Este panel está compuesto por el apartado de \textit{Estilos} y el apartado de \textit{Datos}. En el caso de que el elemento seleccionada sea una celda de mxGraph, es decir, una tabla, columna o relación, el panel se mostrará. Si se deja de seleccionar un elemento de este tipo el panel se oculta.
+
+\subsubsection{Estilos}
+
+Cada vez que cambie la selección se llama a la función \emph{configurarTabEstilos}, desde la que se establecerán los valores para cada elemento obteniendo dichos valores desde el atributo \textit{style} de la celda seleccionada, mostrando u ocultando elementos si fuera necesario con la función \emph{setEstilosIniciales}. A cada elemento de configuración de estilos se le añade un listener desde la función \emph{setListenersEstilos}, que realizará las comprobaciones necesarias y modificará la apariencia de la celda. Una vez se cambia de selección, se eliminan todos estos listeners para no modificar varias celdas a la vez.
+
+\subsubsection{Datos}
+
+Para cada tipo de elemento se creará una tabla con los parámetros que se pueden modificar desde la función \emph{showProperties}. La tabla tiene un listener que modifica la información de la celda cada vez que ocurre un cambio.
+
+A continuación, se describe el proceso en los cambios más relevantes que pueden ocurrir.
+
+\textbf{Actualizar relaciones}
+
+Desde el panel de datos podemos editar los símbolos de la notación de patas de cuervo que aparecen en las relaciones. Con cada cambio se actualizarán las claves con la función \emph{actualizarClaves}, ajustando la tabla en la que se muestran y sus parámetros. Desde la función actualizar claves se eliminará la celda correspondiente al enlace actual y se añadirá una nueva relación con los nuevos parámetros utilizando la función \emph{insertarNuevaRelacion}. En caso de que sea necesario, se insertará una tabla intermedia con la función \emph{obtenerTablaIntermedia}.
+
+\imagen{actualizarClaves-sqd}{Diagrama secuencia actualizar relaciones}
+
+\textbf{Cambio clave primaria}
+
+Cuando una columna cambie su atributo de clave primaria, se actualizarán las claves de las relaciones que pudiera tener asociada su tabla padre utilizando la función \emph{handleCambioClavePrimaria}. Desde esta función se obtendrán todas las relaciones entrantes a la tabla padre, actualizando dichas relaciones con la nueva PK utilizando la función \emph{actualizarClaves}.
+
+\imagen{handleCambioPK-sqd}{Diagrama secuencia cambio clave primaria}
+
+\textbf{Añadir Unique compuesto}
+
+Cuando se quiera añadir un nuevo Unique compuesto, utilizando la función \emph{addUniqueComp}, el sistema comprobará que la tabla tiene al menos dos columnas. Después se mostrará un formulario con las columnas disponibles a añadir. Al finalizar, se almacena un array con los ids de las columnas seleccionadas en la tabla correspondiente.
+
+\subsection{Mover posición columna}
+
+Cada vez que se quiera mover de posición una columna, se comprobará que hay una celda disponible en la dirección en la que se pretende mover. En caso de que existe, se llamará a la función\emph{moverPosicionColumna}. Se actualizarán las posibles referencias que pudieran tener las columnas con las funciones \emph{intercambioIds}, \emph{actualizarRefPK} y \emph{intercambioIdsUnique}, y las celdas asociadas se intercambiarán los atributos \textit{value} y \textit{style}.
+
+\imagen{moverPosicionColumna-sqd}{Diagrama secuencia mover columna}
+
+\subsection{Generación de código}
+
+El proceso seguido para los dos tipos de generación de código disponibles es muy similar, por lo que se describirá de forma general. Cuando se utilice uno de los botones de generación de código se utilizará la función \emph{createSql} o \emph{createSqlAlchemy}, que recorren todas las tablas del diagrama llamando a \emph{addTablaSql} o \emph{addTablaSqlAlchemy} para cada una. Desde estas funciones, se introduce el código correspondiente a la creación de la tabla, recorriendo todas sus columnas e incluyendo sus datos con \emph{addColumnaSql} o \emph{addColumnaSqlAlchemy}. Al final de cada columna se añaden claves primarias, en el caso de SQL, claves foráneas y uniques compuestos y se une todo el contenido obtenido al final.

@@ -1,0 +1,83 @@
+\capitulo{6}{Trabajos relacionados}
+
+\section{Artículos científicos}
+
+\subsection{Basic Data Structure Models Explained With A Common Example}
+Este artículo escrito en 1976, se trata de la primera aparición de las \emph{patas de cuervo}. Conocidas primero como \emph{flechas invertidas}, su autor, Gordon C. Everest, menciona que el artículo no trata sobre la notación, aunque esta fue escogida cuidadosamente. Conocida primero como \emph{fork} (tenedor), fue seleccionada por su facilidad para representarse mediante caracteres estándar (---<) y debido a que no implica ni direccionalidad ni un acceso físico.\cite{ge-bdsm}.
+
+En este artículo no se utiliza la notación de patas de cuervo con bases de datos relacionales, ya que estas acababan de nacer, pero es la primera referencia que se tiene de dicha notación, la cual evolucionaría con el paso del tiempo para trabajar con bases de datos relacionales.
+
+\section{Proyectos}
+
+\subsection{mxGraph Schema}
+Ejemplo de los creadores de la librería \emph{mxGraph}, muestra las funcionalidades básicas para implementar una aplicación de diseño de diagramas de bases de datos. La aplicación desarrollada toma como base este ejemplo, mejorándolo y ampliándolo con la notación de patas de cuervo. En el ejemplo únicamente disponemos de relaciones direccionales sin cardinalidad y un simple manejo de claves foráneas añadiendo la clave primaria de la tabla con la que se relaciona. En la aplicación desarrollada se han extendido las funcionalidades, tanto en las relaciones con la nueva notación, como en las columnas ampliando sus atributos.
+
+\begin{itemize}
+    \item Web del ejemplo: \url{https://jgraph.github.io/mxgraph/javascript/examples/schema.html}
+\end{itemize}
+
+\subsection{Microsoft Visio}
+La aplicación \emph{Visio} de Microsoft es utilizada para el diseño de diagramas y gráficos vectoriales. Esta aplicación nos permite, entre otros, diseñar diagramas entidad-relación disponiendo de diferentes notaciones. Entre las notaciones que podemos utilizar encontramos la notación de patas de cuervo, aquí denominada notación de patas de gallo. Con Visio podemos diseñar nuestros diagramas, añadiendo las tablas, columnas y relaciones que necesitemos. Microsoft Visio cuenta con diferentes licencias, gratuitas y de pago, lamentablemente, la notación de patas de cuervo se encuentra únicamente disponible en la versión de pago.
+
+\begin{itemize}
+    \item Web de la aplicación: \url{https://www.microsoft.com/es-es/microsoft-365/visio/flowchart-software}.
+\end{itemize}
+
+\subsection{draw.io}
+\emph{draw.io} es una aplicación web pensada para el diseño de multitud de diagramas. Esta aplicación, desarrollada por \emph{JGraph} los creadores de la librería \emph{mxGraph}, también nos permite diseñar diagramas entidad-relación utilizando la notación de patas de cuervo, teniendo a disposición las tablas y columnas que representarán a las entidades y sus atributos, y todas las posibles relaciones que podemos encontrar entre las tablas.
+
+\begin{itemize}
+    \item Web de la aplicación: \url{https://app.diagrams.net/}
+\end{itemize}
+
+\subsection{Visual Paradigm}
+\emph{Visual Paradigm} cuenta con una herramienta online para diseñar infinidad de gráficos y diagramas. Entre la multitud de opciones de las que dispone, podemos diseñar diagramas E/R utilizando la notación de patas de cuervo. Aunque las opciones que dispone son algo limitadas, es una buena opción a considerar teniendo en cuenta la posibilidad de trabajar online y su acceso gratuito.
+
+\begin{itemize}
+    \item Web de la aplicación: \url{https://online.visual-paradigm.com/es/}
+\end{itemize}
+
+\section{Fortalezas y debilidades del proyecto}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccccc}\toprule
+        Características & Crow's Foot & Schema & Visio & draw.io & VP \\ \midrule
+        Añadir elementos\tablefootnote{Los elementos necesarios para la notación de patas de cuervo, es decir, tablas, columnas y relaciones.} & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark \\
+        Patas de cuervo & \cellcolor{green!25} \checkmark & \cellcolor{red!25} {$\times$} & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark\\
+        Claves automática & \cellcolor{green!25} \checkmark & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} \\
+        Panel propiedades & \cellcolor{green!25} \checkmark & \cellcolor{red!25} {$\times$} & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{red!25} {$\times$} \\
+        Generación SQL & \cellcolor{green!25} \checkmark & \cellcolor{yellow!25} Parcial & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} \\
+        Generación SQLAlchemy & \cellcolor{green!25} \checkmark & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} \\
+        Múltiples relaciones & \cellcolor{red!25} {$\times$} & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark \\
+        Relaciones reflexivas & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark \\
+        Mover columnas & \cellcolor{green!25} \checkmark & \cellcolor{red!25} {$\times$} & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark \\
+        Mover relaciones & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark \\
+        Modelo relacional & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark \\
+        Modelo E/R & \cellcolor{red!25} {$\times$} & \cellcolor{red!25} {$\times$} & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark & \cellcolor{green!25} \checkmark\\ \midrule
+        Plataformas & Web App & Web App & Desk App & Web App & Web App \\ \bottomrule
+    \end{tabular}
+    \caption{Comparativa de características}
+    \label{tr:comparativa}
+\end{table}
+
+\subsection{Principales fortalezas}
+
+\begin{itemize}
+    \item Es posible acceder a la aplicación desde cualquier dispositivo\footnote{Es posible acceder desde dispositivos móviles a la aplicación, aunque al no estar pensada para controles táctiles, aunque funcionan, presentan problemas.} que disponga de conexión a Internet.
+    \item No necesita instalación, más allá del propio navegador con el que se acceda a la aplicación.
+    \item El sistema gestiona automáticamente cuando tiene que añadir o eliminar claves de cada tabla.
+    \item Se permite personalizar los elementos del diagrama visualmente, teniendo la posibilidad de cambiar color de relleno, degradado, fuente, etc.
+    \item La posibilidad de importar y exportar el diagrama nos permite continuar con el desarrollo en cualquier momento.
+    \item Podemos conseguir una rápida implementación de nuestros diagramas gracias a la generación de código.
+    \item Se cumplen muchos de los requisitos de la notación de patas de cuervo de forma automática por el sistema, como añadir las claves foráneas en las tablas correspondientes con los parámetros adecuados o incluir una tabla intermedia de forma automática para las relaciones N:M.
+\end{itemize}
+
+\subsection{Principales debilidades}
+
+\begin{itemize}
+    \item Los diagramas se tienen que almacenar en un fichero XML y volver a importar desde dicho fichero, lo que entorpece el diseño.
+    \item El usuario no tiene el control total sobre las claves de sus tablas al estar estas decididas por el sistema.
+    \item La generación de código tiene únicamente dos posibilidades.
+    \item La aplicación está disponible únicamente en castellano, limitando el número de usuarios que pueden hacer uso de ella.
+\end{itemize}

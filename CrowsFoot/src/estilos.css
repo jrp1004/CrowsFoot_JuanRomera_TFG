@@ -44,7 +44,7 @@ no se aplique a los elementos que se añaden en el js*/
     right: 265px;
     width: 200px;
     height: 140px;
-    background: transparent;
+    background-color: white;
     border-style: solid;
     border-color: black;
 }

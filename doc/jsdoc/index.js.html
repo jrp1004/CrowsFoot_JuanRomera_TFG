@@ -1,4 +1,32 @@
-function main(container,outline,toolbar,sidebar,status,properties){
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: index.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: index.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>function main(container,outline,toolbar,sidebar,status,properties){
     //Comprobamos si el navegador está soportado
     if(!mxClient.isBrowserSupported()){
         mxUtils.error("Navegador no soportado",200,false);
@@ -271,7 +299,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
         //Las columnas se crean utilizando HTML
         graph.isHtmlLabel=function(cell){
-            return !this.isSwimlane(cell)&&!this.model.isEdge(cell);
+            return !this.isSwimlane(cell)&amp;&amp;!this.model.isEdge(cell);
         };
 
         //Devuelve el campo name como etiqueta de la celda
@@ -317,19 +345,19 @@ function main(container,outline,toolbar,sidebar,status,properties){
                 let label='';
 
                 if(cell.value.primaryKey){
-                    label+='<img title="Primary key" src="../images/key.png" width="16" height="16" align="top">&nbsp;';
+                    label+='&lt;img title="Primary key" src="../images/key.png" width="16" height="16" align="top">&amp;nbsp;';
                 }else if(cell.value.foreignKey){
-                    label+='<img title="Foreign key" src="../images/foreign_key.png" width="16" height="16" align="top">&nbsp;';
+                    label+='&lt;img title="Foreign key" src="../images/foreign_key.png" width="16" height="16" align="top">&amp;nbsp;';
                 }else{
-                    label+='<img src="../images/spacer.gif" width="16" height="1" >&nbsp;';
+                    label+='&lt;img src="../images/spacer.gif" width="16" height="1" >&amp;nbsp;';
                 }
 
                 if(cell.value.autoIncrement){
-                    label+='<img title="Auto Increment" src="../images/plus.png" width="16" height="16" align="top">&nbsp;';
+                    label+='&lt;img title="Auto Increment" src="../images/plus.png" width="16" height="16" align="top">&amp;nbsp;';
                 }else if(cell.value.unique){
-                    label+='<img title="Unique" src="../images/check.png" width="16" height="16" align="top">&nbsp;';
+                    label+='&lt;img title="Unique" src="../images/check.png" width="16" height="16" align="top">&amp;nbsp;';
                 }else{
-                    label+='<img src="../images/spacer.gif" width="16" height="1" >&nbsp;';
+                    label+='&lt;img src="../images/spacer.gif" width="16" height="1" >&amp;nbsp;';
                 }
 
                 let style=graph.getStylesheet().getCellStyle(cell.style)||graph.getStylesheet().getDefaultVertexStyle();
@@ -446,7 +474,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
         });
         editor.addAction('borrar',function(editor,cell){
             cell=cell||graph.getSelectionCell();
-            if(cell&&graph.isHtmlLabel(cell)){
+            if(cell&amp;&amp;graph.isHtmlLabel(cell)){
                 //Manejamos el posible borrado de una clave primaria
                 if(cell.value.primaryKey){
                     cell.value.primaryKey=false;
@@ -473,7 +501,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             if(graph.isHtmlLabel(cell)){
                 let posicion=(cell.geometry.y-28)/26;
                 let parent=cell.getParent();
-                if(posicion<parent.getChildCount()-1){
+                if(posicion&lt;parent.getChildCount()-1){
                     moverPosicionColumna(graph,cell,parent,posicion,-1);
                 }
             }
@@ -643,7 +671,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
             wnd=showModalWindow('IMPORTAR',div,410,480);
         });
-        addToolbarButton(editor,toolbar,'import','Importar XML','../editors/images/open.gif');
+        addToolbarButton(editor,toolbar,'import','Importar XML',null);
 
         editor.addAction('diccionario',function(editor,cell){
             let dicc=obtenerDiccDatos(graph);
@@ -671,7 +699,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
          * Añadimos un listener para los cambios de selección del grafo para actualizar el panel de propiedades
          */
         graph.getSelectionModel().addListener(mxEvent.CHANGE,function(sender,event){
-            datosDiv.innerHTML='<br>';
+            datosDiv.innerHTML='&lt;br>';
             //Los últimos elementos seleccionados se encuentran en la propiedad removed del evento
             let cells=event.getProperty('removed');
             //Eliminamos todos los listeners añadidos al panel de estilo
@@ -689,7 +717,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
             //Comprobamos la longitud para evitar error con la selección múltiple
             //Si se ha seleccionado una tabla, columna o enlace mostramos el panel de propiedades
             //si no lo escondemos
-            if(cells!=null&&cells.length>0){
+            if(cells!=null&amp;&amp;cells.length>0){
                 properties.style.display="inline";
                 showProperties(graph,cells[0],datosDiv);
                 configurarTabEstilos(graph,cells[0]);
@@ -1024,7 +1052,7 @@ function moverPosicionColumna(graph,col_a_mover,parent,posicion,desp){
 function intercambioIds(graph,relacionId,nuevo,actual){
     let relacion=graph.model.getCell(relacionId);
     let clavesForaneas=relacion.value.clavesForaneas;
-    for(let i=0;i<clavesForaneas.length;i++){
+    for(let i=0;i&lt;clavesForaneas.length;i++){
         if(clavesForaneas[i]==actual){
             clavesForaneas[i]=nuevo;
             break;
@@ -1195,9 +1223,9 @@ function showProperties(graph,cell,properties){
     let cabecera=tabla.createTHead();
     let fila=cabecera.insertRow(0);
     let c_propiedad=fila.insertCell(0);
-    c_propiedad.outerHTML='<th>Propiedad</th>';
+    c_propiedad.outerHTML='&lt;th>Propiedad&lt;/th>';
     let c_valor=fila.insertCell(1);
-    c_valor.outerHTML='<th>Valor</th>';
+    c_valor.outerHTML='&lt;th>Valor&lt;/th>';
 
     if(graph.isSwimlane(cell)){
         let uniqueTable=getTableUniqueComp(graph,cell);
@@ -1294,7 +1322,7 @@ function actualizarClaves(graph,cell){
  * @param {Relacion} relacion - Relación entre las tablas
  * @param {mxCell} source - Tabla origen
  * @param {mxCell} target - Tabla destino
- * @param {Array<mxCell>} pks - Array de claves primarias
+ * @param {Array&lt;mxCell>} pks - Array de claves primarias
  * @param {boolean} invertir - Indica si invertir la relación
  */
 function insertarNuevaRelacion(graph,enlace,relacion,source,target,pks,invertir){
@@ -1317,7 +1345,7 @@ function obtenerTablaIntermedia(geometry_s,geometry_t,nombre){
     let distancia=geometry_t.x-(geometry_s.x+200);
 
     let x=geometry_t.x-100-distancia/2;
-    let y=geometry_s.y<geometry_t.y?geometry_t.y:geometry_s.y;
+    let y=geometry_s.y&lt;geometry_t.y?geometry_t.y:geometry_s.y;
 
     //Creamos nueva tabla para la relación
     let tableObject=new Table(nombre);
@@ -1407,7 +1435,7 @@ function editarRelacion(graph,edge,relacion,source,target,invertir){
  * Devuelve las celdas correspondientes a las claves primarias de la tabla indicada
  * @param {mxGraph} graph - Instancia del grafo
  * @param {mxCell} tabla - Tabla de la que obtenemos las claves
- * @returns {Array<mxCell>} - Claves primarias de la tabla
+ * @returns {Array&lt;mxCell>} - Claves primarias de la tabla
  */
 function obtenerClavePrimaria(graph,tabla){
     const primaryKey=[]
@@ -1810,8 +1838,8 @@ function setFontStyle(style,negritaButton,cursivaButton){
     negritaButton.className=negritaButton.className.replace(" active","");
     cursivaButton.className=cursivaButton.className.replace(" active","");
     if(fontStyle){
-        toggleButtonActiveStyle(negritaButton,fontStyle&mxConstants.FONT_BOLD);
-        toggleButtonActiveStyle(cursivaButton,fontStyle&mxConstants.FONT_ITALIC);
+        toggleButtonActiveStyle(negritaButton,fontStyle&amp;mxConstants.FONT_BOLD);
+        toggleButtonActiveStyle(cursivaButton,fontStyle&amp;mxConstants.FONT_ITALIC);
     }
 }
 
@@ -1956,7 +1984,7 @@ function handleGradientCheckChange(graph,gradientCheck,gradientPicker,selectGrad
 function handleFontStyleButtonClick(graph,cell,button,styleFlag){
     graph.toggleCellStyleFlags(mxConstants.STYLE_FONTSTYLE,styleFlag);
     let fontStyle=graph.getStylesheet().getCellStyle(cell.style)[mxConstants.STYLE_FONTSTYLE];
-    toggleButtonActiveStyle(button,fontStyle&styleFlag);
+    toggleButtonActiveStyle(button,fontStyle&amp;styleFlag);
 }
 
 /**
@@ -1966,7 +1994,7 @@ function handleFontStyleButtonClick(graph,cell,button,styleFlag){
  * @returns {number} - Índice de la opción que coincide con el valor
  */
 function getSelectIndex(options,value){
-    for(let i=0;i<options.length;i++){
+    for(let i=0;i&lt;options.length;i++){
         if(options[i].value===value){
             return i;
         }
@@ -2019,10 +2047,10 @@ function obtenerEtiquetaRecortada(label,type,style,width,columna){
 
     let fontstyle_n=style[mxConstants.STYLE_FONTSTYLE];
     let fontstyle="";
-    if(fontstyle_n&mxConstants.FONT_BOLD){
+    if(fontstyle_n&amp;mxConstants.FONT_BOLD){
         fontstyle+="bold ";
     }
-    if(fontstyle_n&mxConstants.FONT_ITALIC){
+    if(fontstyle_n&amp;mxConstants.FONT_ITALIC){
         fontstyle+="italic ";
     }
 
@@ -2036,7 +2064,7 @@ function obtenerEtiquetaRecortada(label,type,style,width,columna){
             }else{
                 etiqueta_temp=label.slice(0,i)+"...";
             }
-            if(getTextWidth(etiqueta_temp,font)<width){
+            if(getTextWidth(etiqueta_temp,font)&lt;width){
                 return etiqueta_temp;
             }
         }
@@ -2135,7 +2163,7 @@ function getTableUniqueComp(graph,cell){
 
     if(cell.value.uniqueComp.length){
         
-        for(let i=0;i<cell.value.uniqueComp.length;i++){
+        for(let i=0;i&lt;cell.value.uniqueComp.length;i++){
             let tr=document.createElement('tr');
             tr.appendChild(obtenerDatoTabla('td',i));
             let nombres=getNombreUniComp(graph,cell.value.uniqueComp[i]);
@@ -2250,7 +2278,7 @@ function addUniqueComp(graph,cell,tabla){
 /**
  * Obtiene el nombre de las columnas de un unique compuesto
  * @param {mxGraph} graph - Instancia del grafo
- * @param {Array<number>} ids - Array con los ids de las columnas
+ * @param {Array&lt;number>} ids - Array con los ids de las columnas
  * @returns {string} - Nombre de las columnas separadas por comas
  */
 function getNombreUniComp(graph,ids){
@@ -2305,7 +2333,7 @@ function Table(name){
     this.name=name;
     /**
      * Matriz con los unique compuestos de la tabla
-     * @type {Array<Array<number>>}
+     * @type {Array&lt;Array&lt;number>>}
      */
     this.uniqueComp=[];
 }
@@ -2327,7 +2355,7 @@ function Relacion(name){
     this.name=name;
     /**
      * Array con las claves foraneas de la relacion
-     * @type {Array<number>}
+     * @type {Array&lt;number>}
      */
     this.clavesForaneas=[];
 }
@@ -2342,4 +2370,26 @@ Relacion.prototype.endArrow="solo_uno";
  */
 Relacion.prototype.clone=function(){
     return mxUtils.clone(this);
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Column">Column</a></li><li><a href="global.html#Relacion">Relacion</a></li><li><a href="global.html#Table">Table</a></li><li><a href="global.html#actualizarClaves">actualizarClaves</a></li><li><a href="global.html#actualizarRefPK">actualizarRefPK</a></li><li><a href="global.html#addClaveForanea">addClaveForanea</a></li><li><a href="global.html#addColumnaSql">addColumnaSql</a></li><li><a href="global.html#addColumnaSqlAlchemy">addColumnaSqlAlchemy</a></li><li><a href="global.html#addFKData">addFKData</a></li><li><a href="global.html#addSidebarIcon">addSidebarIcon</a></li><li><a href="global.html#addTablaSql">addTablaSql</a></li><li><a href="global.html#addTablaSqlAlchemy">addTablaSqlAlchemy</a></li><li><a href="global.html#addToolbarButton">addToolbarButton</a></li><li><a href="global.html#addUniqueComp">addUniqueComp</a></li><li><a href="global.html#clavesForaneas">clavesForaneas</a></li><li><a href="global.html#configurarTabEstilos">configurarTabEstilos</a></li><li><a href="global.html#configureStylesheet">configureStylesheet</a></li><li><a href="global.html#createPopupMenu">createPopupMenu</a></li><li><a href="global.html#createSql">createSql</a></li><li><a href="global.html#createSqlAlchemy">createSqlAlchemy</a></li><li><a href="global.html#descarga">descarga</a></li><li><a href="global.html#editarRelacion">editarRelacion</a></li><li><a href="global.html#eliminarUniqueComp">eliminarUniqueComp</a></li><li><a href="global.html#getNombreUniComp">getNombreUniComp</a></li><li><a href="global.html#getSelectIndex">getSelectIndex</a></li><li><a href="global.html#getTableUniqueComp">getTableUniqueComp</a></li><li><a href="global.html#getTextWidth">getTextWidth</a></li><li><a href="global.html#handleCambioClavePrimaria">handleCambioClavePrimaria</a></li><li><a href="global.html#handleCambioUnique">handleCambioUnique</a></li><li><a href="global.html#handleColorPickerChange">handleColorPickerChange</a></li><li><a href="global.html#handleFontStyleButtonClick">handleFontStyleButtonClick</a></li><li><a href="global.html#handleGradientCheckChange">handleGradientCheckChange</a></li><li><a href="global.html#inicializarGradientCheck">inicializarGradientCheck</a></li><li><a href="global.html#inicializarSombra">inicializarSombra</a></li><li><a href="global.html#insertarNuevaRelacion">insertarNuevaRelacion</a></li><li><a href="global.html#intercambioIds">intercambioIds</a></li><li><a href="global.html#intercambioIdsUnique">intercambioIdsUnique</a></li><li><a href="global.html#moverPosicionColumna">moverPosicionColumna</a></li><li><a href="global.html#obtenerClavePrimaria">obtenerClavePrimaria</a></li><li><a href="global.html#obtenerDatoTabla">obtenerDatoTabla</a></li><li><a href="global.html#obtenerDiccDatos">obtenerDiccDatos</a></li><li><a href="global.html#obtenerEtiquetaRecortada">obtenerEtiquetaRecortada</a></li><li><a href="global.html#obtenerTablaIntermedia">obtenerTablaIntermedia</a></li><li><a href="global.html#openTabProperties">openTabProperties</a></li><li><a href="global.html#setColorFontPicker">setColorFontPicker</a></li><li><a href="global.html#setColorPicker">setColorPicker</a></li><li><a href="global.html#setEstilosDefault">setEstilosDefault</a></li><li><a href="global.html#setEstilosIniciales">setEstilosIniciales</a></li><li><a href="global.html#setFontStyle">setFontStyle</a></li><li><a href="global.html#setGradientPicker">setGradientPicker</a></li><li><a href="global.html#setListenersEstilos">setListenersEstilos</a></li><li><a href="global.html#setTamFont">setTamFont</a></li><li><a href="global.html#showModalWindow">showModalWindow</a></li><li><a href="global.html#showProperties">showProperties</a></li><li><a href="global.html#toggleButtonActiveStyle">toggleButtonActiveStyle</a></li><li><a href="global.html#uniqueComp">uniqueComp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Mon Jul 08 2024 20:47:47 GMT+0200 (hora de verano de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

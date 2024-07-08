@@ -1,0 +1,211 @@
+\apendice{Plan de Proyecto Software}
+
+\section{Introducción}
+En el siguiente anexo se realizará un análisis de la planificación temporal junto con la viabilidad legal y económica del proyecto.
+
+\section{Planificación temporal}
+\subsection{Introducción}
+Para la planificación temporal del proyecto se ha seguido la metodología \emph{Scrum}, como se menciona en la memoria.
+
+El proyecto se ha dividido en dos fases, estando comprendida la primera entre el Sprint 0 y el Sprint 2, siendo esta una fase enfocada a la formación en diferentes elementos del desarrollo web y a familiarizarse con la librería de Javascript \emph{mxGraph}, fundamental en este proyecto. La segunda fase comprende entre el Sprint 3 y el Sprint Final, donde nos hemos centrado en el desarrollo e implementación de la aplicación y en la búsqueda de la información necesaria para llevar a cabo esta tarea.
+
+\subsection{Sprints}
+A continuación se detalla la planificación seguida durante los Sprints realizados, detallando los Issues realizados en cada uno.
+
+\subsubsection{Sprint 0}
+\textbf{(05/03/2024 - 24/03/2024)}
+\begin{itemize}
+    \item \textbf{Formación en Javascript}
+    \item \textbf{Formación en React}
+    \item \textbf{Formación en Node}
+\end{itemize}
+
+\subsubsection{Sprint 1}
+\textbf{(25/03/2024 - 31/03/2024)}
+\begin{itemize}
+    \item \textbf{Formación en mxGraph.} Toma de contacto con la librería, estudiando y realizando diferentes ejemplos.
+    \item \textbf{Crear la estructura de la documentación}. Creamos la estructura de la documentación el la plataforma \emph{Overleaf}, siguiendo la plantilla indicada.
+\end{itemize}
+
+\subsubsection{Sprint 2}
+\textbf{(08/04/2024 - 14/04/2024)}
+\begin{itemize}
+    \item \textbf{Ajustar el tamaño de una celda a la longitud de su etiqueta.} Investigación en la librería mxGraph y Javascript para ajustar el tamaño de una celda al de su etiqueta.
+    \item \textbf{Transformar las aristas en la notación de patas de cuervo.} Investigar como transformar los símbolos utilizados en la librería mxGraph al final de las aristas para representar la notación de patas de cuervo.
+\end{itemize}
+
+\subsubsection{Sprint 3}
+\textbf{(15/04/2024 - 28/04/2024)}
+\begin{itemize}
+    \item \textbf{Edición de columnas.} Estudiar como implementar añadir, eliminar y modificar columnas.
+    \item \textbf{Diccionario de datos.} Implementación de un diccionario de datos, mostrando la información adicional de las columnas como tooltip.
+    \item \textbf{Atributos de la tabla al crear una relación.} Estudiar que elementos se deben añadir a las tablas cuando se crea una nueva relación entre dos tablas.
+    \item \textbf{Ajustar el tamaño de tablas y columnas.} Ajustar el tamaño de tablas y columnas cuando alguno de los elementos que forman la tabla cambie, manteniendo una anchura y altura mínimos y máximos. Este Issue se descartó por problemas de la librería.
+\end{itemize}
+
+\subsubsection{Sprint 4}
+\textbf{(05/05/2024 - 12/05/2024)}
+\begin{itemize}
+    \item \textbf{Demo.} Implementación de una primera demostración con los conceptos estudiados hasta el momento.
+    \item \textbf{Ajuste de la etiqueta mostrada al tamaño de la celda.} Ajustaremos la etiqueta que se muestra para las tablas y columnas al tamaño de estas. Teniendo en cuenta el número de caracteres que forman la etiqueta junto a la anchura de la celda, se mostrará completa o se cortará terminando en 3 puntos suspensivos (...), indicando que la etiqueta continua.
+\end{itemize}
+
+\subsubsection{Sprint 5}
+\textbf{(13/05/2024 - 26/05/2024)}
+\begin{itemize}
+    \item \textbf{Documentación.} Continuar con el desarrollo de la memoria.
+    \item \textbf{Mejorar generación SQL.} Una vez se ha implementado correctamente la notación de patas de cuervo, podemos mejorar la generación de código SQL a partir del grafo diseñado por el usuario.
+    \item \textbf{Error tooltip enlaces.} Corregir error que causa que la tooltip de los enlaces no se muestre.
+    \item \textbf{Manejo de claves.} Hasta ahora solo se han tenido en cuenta claves primarias simples. Implementar manejo de claves foráneas y claves compuestas.
+    \item \textbf{Refactorizar actualizarClaves.} La función actualizarClaves cuenta con numeroso código repetido que sería conveniente refactorizar
+\end{itemize}
+
+\subsubsection{Sprint 6}
+\textbf{(27/05/2024 - 09/06/2024)}
+\begin{itemize}
+    \item \textbf{Div con las propiedades.} Implementar un div lateral donde se muestren las propiedades de cada elemento, eliminando la ventana utilizada hasta ahora. El div implementado cambiará en función del elemento seleccionado, escondiéndose en caso de que no haya nada seleccionado.
+    \item \textbf{Modificar tamaño y disposición de los div.} Modificar la disposición de los elementos de la interfaz de nuestra aplicación.
+    \item \textbf{Nuevos iconos para tabla y columna.} Implementar nuevos iconos que identifiquen mejor las tablas y las columnas, más acordes con la nueva interfaz.
+    \item \textbf{Problema relaciones 1:1.} Corregir problema en las relaciones 1:1 cuando uno de los lados es opcional. El símbolo se debe colocar en la tabla correspondiente y la clave foránea se debe situar en el lado opcional.
+    \item \textbf{Mover los estilos a un fichero CSS.} Mover los estilos de los div y demás elementos de la interfaz a un fichero CSS para tener una mejor organización de los contenidos.
+\end{itemize}
+
+\subsubsection{Sprint 7}
+\textbf{(19/06/2024 - 25/06/2024)}
+\begin{itemize}
+    \item \textbf{Despliegue del proyecto.} Reorganizar el repositorio para una primera release. Una vez reorganizado, desplegar la aplicación utilizando la plataforma Vercel.
+    \item \textbf{Integrar herramientas de CI.} Implementar en el repositorio herramientas de integración continua.
+    \item \textbf{Implementar limpiar diagrama.} Implementar un botón en la aplicación que al pulsarlo elimine todos los elementos del diagrama introducidos por el usuario.
+    \item \textbf{Añadir claves foráneas en relaciones ya creadas.} Cuando se añade una nueva clave primaria en una tabla, añadir esta columna como clave foránea donde sea necesario. La actualización de las claves foráneas ocurre tanto cuando una columna pasa a ser clave primaria como cuando esta deja de serlo.
+    \item \textbf{Refactorizar funciones.} Con SonarCloud se ha descubierto que las funciones \textit{getLabel}, \textit{actualizarClaves}, \textit{createSql} y \textit{configurarTabEstilos} tienen una complejidad cognitiva demasiado elevada. Es conveniente refactorizar estas funciones para un mantenimiento de la aplicación más sencillo.
+    \textbf{Memoria.} Continuar con el desarrollo de la documentación.
+    \textbf{Limpiar código.} Eliminar líneas de código innecesarias y mejoras de facilidad de mantenimiento de código.
+\end{itemize}
+
+\subsection{Sprint 8}
+\textbf{(26/06/2024 - 02/07/2024)}
+\begin{itemize}
+    \item \textbf{Unique compuesto.} Implementar una opción en las tablas que permita establecer Unique compuestos. Estos Unique compuestos se almacenarán en las tablas y se mostrarán en el código generado.
+    \item \textbf{Ventana diccionario de datos.} Implementar una ventana donde se muestre el diccionario de datos de todas las columnas del diagrama. Se listarán las columnas de cada tabla una a una mostrando nombre, tipo, título y descripción.
+    \item \textbf{Generar SQLAlchemy.} Implementar la generación de código para SQLAlchemy a partir de diagrama del usuario.
+    \item \textbf{Propiedades claves foráneas.} Corregir las propiedades NOT NULL y UNIQUE de las claves foráneas. Estas propiedades se estableceran automáticamente según el tipo de relación que dispongamos.
+    \item \textbf{Detección de errores importar XML.} Implementar detección de errores a la hora de importar un diagrama desde un fichero XML. En caso de que el fichero contenga errores, no se importará nada.
+    \item \textbf{Modificar bucles for por bucles for of.} Simplificar bucles donde sea necesario utilizando for of en vez de for.
+    \item \textbf{Implementar control por teclado. }Configurar el diagrama para utilizar atajos de teclado.
+    \item \textbf{Asociar PK a FK. }Almacenar el id de la clave primaria asociada con la clave foránea para posterior acceso a sus datos. utilizar este id a la hora de mostrar el nombre al crear el código SQL y SQLAlchemy.
+    \item \textbf{Extraer configuración estilos a XML. }Extraer la configuración de los estilos de los elementos del diagrama a un fichero XML desde el que importarlos.
+\end{itemize}
+
+\subsection{Sprint 9}
+\textbf{(02/07/2024 - 09/07/2024)}
+\begin{itemize}
+    \item \textbf{Reemplazar innerHTML por textContent}
+    \item \textbf{Limpiar código y documentar. }Eliminar líneas de código innecesarias y añadir comentarios JSDoc.
+    \item \textbf{Finalizar documentación}
+    \item \textbf{Selección estilo línea. }Implementar una selección que permita al usuario elegir el estilo de línea de los enlaces entre línea continua y línea discontinua.
+\end{itemize}
+
+\section{Estudio de viabilidad}
+
+\subsection{Viabilidad económica}
+En el caso de que el proyecto se hubiera realizado con un enfoque empresarial y no académico, los costes y beneficios de la explotación del proyecto serían los que se detallan a continuación.
+
+\subsubsection{Costes}
+Esta sección detalla los distintos costes del proyecto.
+
+\textbf{Costes de Hardware}
+
+Los costes necesarios relativos al hardware para realizar este proyecto son únicamente un ordenador, portátil o de sobremesa, y sus periféricos. En este caso, se ha utilizado un portátil junto con unos periféricos adquiridos hace 6 años, asumiendo que la vida útil de un portátil entorno a los 1000 euros se encuentra entre los 4 y 7 años\cite{minitool:vida-util}, y teniendo en cuenta que este material se ha utilizado para la realización de ejercicios anteriores en cursos pasados, podemos asumir la total amortiazación del equipo. Aun así, calculando con los 6 años utilizados, teniendo el equipo una vida útil de 7 años, obtenemos los siguientes costes.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}lll@{}}\toprule
+         \textbf{Concepto} & \textbf{Coste(€)} & \textbf{Coste amortizado(€)}  \\ \midrule
+         Portátil y periféricos & 1000 & 857.14\\ \midrule
+         Total & 1000 & 857.14\\ \bottomrule
+    \end{tabular}
+    \caption{Costes Hardware}
+    \label{ve:cost-hard}
+\end{table}
+
+\textbf{Costes de Software}
+
+En este apartado se detallan los costes relativos al software, por lo que también se tendrá en cuenta costes de despliegue, almacenamiento y suscripciones de análisis de código e integración continua. Teniendo en cuenta que el resto de herramientas software empleadas son de uso gratuito, los costes son los siguientes.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}lll@{}}\toprule
+         \textbf{Concepto} & \textbf{Coste(€)} & \textbf{Coste amortizado(€)} \\ \midrule
+         Vercel Pro & 240 & 80\\
+         Codacy Pro & 180 & 60\\
+         Sonarcloud Developer & 160 & 53.33\\
+         Github Enterprise & 252 & 84\\ \midrule
+         Total & 832 & 277.33\\ \bottomrule
+    \end{tabular}
+    \caption{Costes Software}
+    \label{ve:cost-soft}
+\end{table}
+
+Estos costes se han calculado suponiendo un proyecto realizado en un entorno empresarial y asumiendo un dinero invertido durante 12 meses (1 año) de suscripciones, habiendo sido usadas durante 4 meses. Por simplicidad, los precios encontrados en dólares se han trasladado 1:1 a euros.
+
+\textbf{Coste de personal}
+En este apartado se detalla el coste de tener a una persona desarrollando el proyecto durante 4 meses. Considerenado un salario mensual bruto de 2000 euros mensuales (12 pagas), los costes obtenidos son los siguientes.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}lll@{}}\toprule
+         \textbf{Concepto }& \textbf{Coste(€)} \\ \midrule
+         Salario mensual bruto & 2000\\
+         Retención IRPF & 326.68\\
+         Seguridad Social & 651.18\\
+         Salario mensual que paga la empresa & 3629.76\\ \midrule
+         Total & 14518.96\\ \bottomrule
+    \end{tabular}
+    \caption{Costes Personal}
+    \label{ve:cost-per}
+\end{table}
+
+Los costes se han calculado teniendo en cuenta un 15\% de IRPF \cite{ia:irpf} y un 29.9\% de cotización a la Seguridad Social \cite{ss:cotiz}.
+
+\textbf{Costes totales}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}lll@{}}\toprule
+         \textbf{Concepto} & \textbf{Coste} \\ \midrule
+         Hardware & 857.14 \\
+         Software & 277.33\\
+         Personal & 14518.96\\ \midrule
+         Total & 15653.23\\ \bottomrule
+    \end{tabular}
+    \caption{Costes Total}
+    \label{ve:cost-tot}
+\end{table}
+
+\subsubsection{Beneficios}
+
+La aplicación desarrollada se distribuirá de forma gratuita y no presenta ningún sistema de monetización implementado. La aplicación estará disponible de forma libre para todo el mundo, siendo una aplicación de código abierto mantenida por la comunidad.
+
+\subsection{Viabilidad legal}
+En este apartado se detallarán las licencias software de las dependencias del proyecto.
+
+En la siguiente tabla se listan las licencias de las dependencias usadas.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}lll@{}}\toprule
+        \textbf{Herramienta} & \textbf{Versión} & \textbf{Licencia}\\ \midrule
+        MxGraph & 4.2.2 & Apache 2.0 \\
+        webpack & 2.2.1 & MIT \\ \bottomrule
+    \end{tabular}
+    \caption{Licencias}
+    \label{tab:my_label}
+\end{table}
+
+La licencia utilizada por la librería \textit{mxGraph} es Apache 2.0\footnote{En el repositorio no aparece explícitamente Apache 2.0, pero lo podemos encontrar en la \href{https://www.npmjs.com/package/mxgraph}{la página de su paquete npm}.}. Esta es la licencia menos permisiva que encontramos, por lo que nuestra licencia debe cumplir sus restricciones.
+
+Para cumplir con las restricciones de la licencia Apache 2.0 debemos:
+\begin{itemize}
+    \item Incluir una copia de la licencia Apache 2.0 en nuestro proyecto.
+    \item Debemos avisar de cualquier modificación en alguno de los ficheros de la dependencia.
+    \item Debemos conservar todos los avisos de derechos de autos, patente, marca registrada y atribución.
+    \item Si la dependencia incluye algún fichero NOTICE debemos incluirlo también.
+    \item No podemos trabajar o integrar la librería con un producto o servicio propiedad o comercializado por una entidad de \textit{Atlassian}.
+\end{itemize}
+
+Cumpliendo con lo anterior, una de las licencias que mejor nos puede encajar es la licencia \emph{MIT}. Esta es una licencia de código libre muy permisiva y compatible con la licencia Apache 2.0, lo que nos permitirá distribuir nuestra aplicación de forma libre y mantener el código fuente como código libre para que la comunidad pueda contribuir.

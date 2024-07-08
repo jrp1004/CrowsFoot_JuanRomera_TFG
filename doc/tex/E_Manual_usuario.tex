@@ -1,0 +1,211 @@
+\apendice{Documentación de usuario}
+
+\section{Introducción}
+En este manual se detalla como puede el usuario acceder y trabajar con la aplicación.
+
+\section{Requisitos de usuarios}
+Al tratarse de una aplicación web, el usuario necesita disponer de un PC con navegador instalado que le permita poder acceder a esta. Todo se ejecuta desde la web, el usuario no necesita disponer de nada más.
+
+La aplicación está pensada para ser ejecutada desde un ordenador, aunque es posible, no se recomienda acceder desde un dispositivo móvil, ya que ni la distribución de la interfaz está pensada para una pantalla vertical, ni se dispone de soporte para controles táctiles.
+
+\section{Manual del usuario}
+
+\imagen{imagen_general}{Aplicación}
+
+\subsection{Elementos del diagrama}
+Lo más importante a la hora de diseñar nuestro diagramas son los elementos que podemos utilizar, en nuestro caso, las tablas, sus columnas y las relaciones existentes. En la aplicación disponemos de los siguientes elementos que podremos añadir a nuestros diagramas.
+
+\subsubsection{Tablas}
+Para añadir una tabla al diagrama, arrastraremos el icono correspondiente sobre el diagrama.
+
+\imagen{table}{Icono tabla}
+
+Una vez soltemos el icono sobre el grafo, la aplicación nos solicitará el nombre de la nueva tabla, proponiéndonos un nombre genérico.
+
+\imagen{add_tabla}{Añadir tabla}
+
+Una vez demos nombre a la tabla esta se añade al diagrama.
+
+\imagen{tabla_nueva}{Nueva tabla añadida}
+
+Como podemos ver, en el apartado superior se distingue el nombre de la tabla en el recuadro azul, representando a esta, además de una primera columna añadida de forma genérica a todas las tablas al crear, que corresponde con su posible clave primaria.
+
+\subsubsection{Columnas}
+Las columnas pueden ser añadidas a las tablas de dos formas:
+
+\textbf{Arrastrando el icono}
+
+\imagen{columna}{Icono columna}
+
+Arrastrando el siguiente icono encima de una tabla crearemos una nueva columna para dicha tabla. Es importante señalar, ya que las columnas no pueden existir por si mismas, no podemos soltar el icono sobre el diagrama, tiene que ser siempre sobre una tabla.
+
+\textbf{Menú popup}
+
+\imagen{pop-up-columna}{Añadir columna desde menú popup}
+
+Haciendo click derecho en una tabla se desplegará un menú popup que nos presenta la opción "Añadir columna". Si pulsamos dicha opción se añadirá una columna a la tabla.
+
+\textbf{Atajo de teclado}
+Cuando tengamos seleccionada una tabla, si pulsamos el atajo de teclado \textbf{F4}, podremos añadir una nueva columna a dicha tabla.
+
+
+Una vez hemos completado una de estas acciones, de nuevo se nos solicitará un nombre para la columna, proporcionando uno genérico.
+
+\subsubsection{Relaciones}
+Para crear una relación entre dos tablas, colocaremos el cursor sobre una de las tablas, apareciendo el icono de una flecha cuando se pueda añadir la relación. Manteniendo pulsado el click izquierdo, arrastraremos el cursor hasta la tabla con la que queramos crear la relación. Cuando sea posible crear una relación con dicha tabla esta se resaltará de color verde.
+
+\imagen{flecha-nueva-relación}{Icono flecha}
+
+\imagen{posible-relacion}{Soltar para añadir relación}
+
+Una vez soltamos el click izquierdo, se creará el nuevo enlace entre las dos tablas. Las relaciones nuevas siempre son 1:1, colocando la clave primaria de la tabla donde hemos soltado el cursor como clave foránea en la primera tabla. Además, se le añade un nombre genérico a la relación.
+
+\imagen{relacion-nueva}{Nueva relación creada}
+
+\subsection{Panel propiedades}
+En el lado derecho de la ventana, disponemos de un panel que nos permite editar los diferentes elementos que aparecen en nuestro diagrama. Simplemente seleccionando uno de estos elementos, ya sea una tabla, columna o relación, el panel mostrará automáticamente las opciones que disponemos para modificar.
+
+\imagen{panel-propiedades}{Panel propiedades}
+
+Este panel lateral se divide en dos pestañas con utilidades diferentes.
+
+\subsubsection{Pestaña Estilos}
+En este apartado podemos modificar la apariencia de los elementos del diagrama. Para ello, disponemos de dos secciones diferentes, una para el relleno y otra para el texto. Todas las opciones que se pueden modificar en este apartado únicamente tienen impacto estético.
+
+\textbf{Relleno}
+
+\imagen{relleno}{Apartado relleno}
+
+En esta sección podemos modificar el color y el degradado, en el caso de las tablas y las columnas, y el color de la línea en el caso de las relaciones. Además, en el caso de las tablas, podemos escoger si mostramos su sombra.
+
+\textbf{Texto}
+
+\imagen{texto}{Apartado texto}
+
+Esta sección permite editar el estilo del texto que se muestra en cada elemento. Podemos modificar la fuente, pudiendo escoger entre las siguientes opciones.
+\begin{itemize}
+    \item Arial
+    \item Serif
+    \item Sans-Serif
+    \item Tahoma
+    \item Verdana
+    \item Dialog
+    \item Times New Roman
+\end{itemize}
+
+Además, es posible modificar el tamaño del texto, su color y seleccionar si mostrar el texto en negrita y en cursiva.
+
+\subsubsection{Pestaña Datos}
+Desde el apartado datos podemos modificar la información de cada uno de los elementos del diagrama.
+
+\textbf{Tabla}
+
+En las tablas del diagrama podemos modificar su nombre, además de gestionar los posibles Unique compuestos que pudiera tener esta tabla. Un Unique compuesto indica que la combinación de las columnas que lo forman es siempre única. Para añadir, un Unique compuesto necesitamos que la tabla seleccionada tenga al menos dos columnas. Una vez disponemos de estas dos columnas, pulsaremos el botón correspondiente, mostrando el siguiente panel.
+
+\imagen{form-unique}{Formulario para añadir unique compuesto}
+
+El panel listará todas las columnas que forman la tabla, pudiendo seleccionar todas las deseadeas con un mínimo de dos. Una vez añadido el Unique compuesto, el sistema mostrará en la tabla todos aquellos que se hayan creado, además de un botón que nos permite eliminar cada uno de ellos.
+
+\textbf{Relación}
+
+Para las relaciones, en el apartado Datos podemos modificar también su nombre, además de la cardinalidad de la relación en cada uno de los extremos del enlace.
+
+\imagen{form-relacion}{Formulario editar relación}
+
+Cuando seleccionemos una cardinalidad nueva, el sistema automáticamente modificará el símbolo en el extremo correspondiente para mostrar el indicado. Además, se actualizarán de forma automática las claves foráneas, colocándolas en la tabla correspondiente junto con los parámetros necesarios. En el caso de las relaciones M:M, se creará una tabla intermedia representando esta relación, con una relación 1:M con las tablas correspondientes. Esta tabla se creará con una clave primaria propia incluyendo las claves primarias de las otras dos tablas como claves foráneas.
+
+\textbf{Columnas}
+En las columnas, además del nombre como en el resto de elementos, podremos modificar los siguientes apartados.
+
+\begin{itemize}
+    \item \textbf{Tipo: }Tipo de dato correspondiente a la columna. El tipo de dato es una cadena introducida por el usuario. Es responsabilidad de este que el tipo esté introducido correctamente.
+    \item \textbf{Clave primaria: }Indica si la columna seleccionada es clave primaria.
+    \item \textbf{Clave foránea: }Indica si la columna seleccionada es clave foránea.
+    \item \textbf{Auto incrementar: }Indica si la columna seleccionada se debe incrementar automáticamente.
+    \item \textbf{No Nulo: }Indica si la columna seleccionada no puede tomar el valor nulo.
+    \item \textbf{Único: }Indica si la columna seleccionada no puede tomar valores repetidos.
+    \item \textbf{Por defecto: }Indica el valor que toma la columna por defecto. Solo mostrará y almacenará información en caso de que la casilla \textit{Usar por defecto} este marcada.
+    \item \textbf{Usar por defecto: }Indica si se debe utilizar un valor por defecto.
+    \item \textbf{Título: }Nombre más descriptivo para la columna, usado en el diccionario de datos.
+    \item \textbf{Descripción: }Descripción completa de la columna, usada en el diccionario de datos.
+\end{itemize}
+
+Toda la información que se modifique en las columnas tendrá impacto sobre el diagrama, ya sea visualmente, a la hora de generar código o en el diccionario de datos.
+
+\subsection{Panel edición}
+
+\imagen{panel-edicion}{Panel edición}
+
+En esta sección encontramos diferentes botones con los que editar el diagrama. Los botones disponibles son:
+\begin{itemize}
+    \item \textbf{Borrar elemento: }Elimina el elemento seleccionado.
+    \item \textbf{Borrar todo: }Elimina todos los elementos del diagrama.
+    \item \textbf{Deshacer: }Deshace la última acción realizada en el diagrama.
+    \item \textbf{Rehacer: }Rehace la última acción deshecha.
+    \item \textbf{Imagen: }Muestra una pestaña nueva en el navegador con una imagen de todos los elementos que el usuario haya añadido al diagrama.
+    \item \textbf{Exportar XML: }Muestra una ventana modal con el diagrama en código XML, permitiendo al usuario descargar el contenido en un fichero para continuar con la edición posteriormente.
+    \item \textbf{Importar XML: }Importa un diagrama desde un fichero XML. El diagrama importado debe estar formateado correctamente.
+\end{itemize}
+
+\subsubsection{Diccionario de datos}
+En este apartado encontraremos una descripción más detallada del significado de cada columna de nuestro diagrama. La infromación del diccionario de datos debe ser previamente introducida por el usuario, en el correspondiente apartado en el panel de propiedades.
+
+\subsection{Panel vista}
+
+\imagen{panel-vista}{Panel vista}
+
+En la sección inferior disponemos de botones que nos permiten modificar como se ve nuestro diagrama. Los botones de los que se dispone son:
+\begin{itemize}
+    \item \textbf{Diccionario: }Muestra una ventana modal con el diccionario de datos correspondiente a los elementos que el usuario haya introducido en el diagrama.
+    \item \textbf{Colapsar todo: }Colapsa todas las tablas del diagrama.
+    \item \textbf{Expandir todo: }Expande todas las tablas del diagrama.
+    \item \textbf{Zoom in: }Aumenta el zoom.
+    \item \textbf{Zoom out: }Disminuye el zoom.
+    \item \textbf{Tamaño real: }Aumenta o disminuye el zoom para que los elementos del diagrama se muestren a su tamaño real.
+    \item \textbf{Ajustar a ventana: }Ajusta el zoom para que el tamaño del diagrama se ajuste al tamaño de la ventana.
+\end{itemize}
+
+\subsection{Generación de código}
+
+\imagen{generacion-codigo}{Generación de código}
+
+En el apartado inferior izquierdo disponemos de la sección de generación de código. Utilizando estos botones, el usuario podrá generar el código correspondiente a los elementos que haya introducido en su diagrama. La generación de código tendrá en cuenta todas las tablas incluidas en el diagrama, junto con sus columnas y relaciones, además de las propiedades especiales de cada elemento.
+
+Se generará código a partir del diagrama únicamente para la creación de las tablas introducidas en este, el resto de configuración de la base de datos depende del usuario.
+
+El código se mostrará en una ventana modal formada por un área de texto desde la que el usuario podrá tanto copiar como modificar el código obtenido
+
+Hasta el momento, disponemos de las siguientes posibilidades en cuanto a generación de código.
+
+\subsubsection{SQL}
+
+Después de añadir diferentes elementos al diagrama, pulsando el botón \emph{SQL} obtendremos el correspondiente código necesario para la creación de las tablas que hemos introducido.
+
+\subsubsection{SQLAlchemy}
+
+A partir del diagrama del usuario podemos obtener el código para crear las clases que representarán las tablas en la librería \emph{SQLAlchemy}, librería de \emph{Python}.
+
+\subsection{Atajos de teclado}
+
+Para agilizar el uso de la aplicación y optimizar el trabajo del usuario, se han añadido algunos atajos de teclado. Los atajos incluidos en la aplicación son los siguientes.
+
+\begin{itemize}
+    \item \textbf{Flecha derecha: }Selecciona el siguiente elemento en el plano en el que estemos. Es decir, recorre las tablas y relaciones del diagrama, o cambia entre las columnas de dentro de una tabla.
+    \item \textbf{Flecha izquierda: }Selecciona el elemento anterior, igual que flecha derecha.
+    \item \textbf{Flecha abajo: }Selecciona el hijo, es decir, si tenemos seleccionada una tabla, cambia a las columnas de esta.
+    \item \textbf{Flecha arriba: }Selecciona al padre. Igual que flecha abajo, pero esta vez selecciona la tabla correspondiente desde una columna.
+    \item \textbf{Suprimir: }Borra del diagrama el elemento seleccionado.
+    \item \textbf{Ctrl+A: }Selecciona todos los elementos del diagrama.
+    \item \textbf{Ctrl+Z: }Deshacer.
+    \item \textbf{Ctrl+Y: }Rehacer.
+    \item \textbf{F2: }Permite cambiar la etiqueta del elemento seleccionado.
+    \item \textbf{Num pad +: }Aumenta el zoom.
+    \item \textbf{Num pad -: }Disminuye el zoom.
+    \item \textbf{W: }Sube de posición una columna dentro de una tabla.
+    \item \textbf{S: }Baja de posición una columna dentro de una tabla.
+    \item \textbf{Borrar: }Colapsa la tabla seleccionada.
+    \item \textbf{Intro: }Expande la tabla seleccionada.
+    \item \textbf{F4: }Añade una columna a la tabla seleccionada.
+    \item \textbf{Ctrl+Click derecho: }Desplaza la vista sobre el diagrama.
+    \item \textbf{Fin: }Recarga el diagrama, en caso de que algo no haya ido bien.
+\end{itemize}
