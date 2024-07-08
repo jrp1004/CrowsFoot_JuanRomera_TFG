@@ -643,7 +643,7 @@ function main(container,outline,toolbar,sidebar,status,properties){
 
             wnd=showModalWindow('IMPORTAR',div,410,480);
         });
-        addToolbarButton(editor,toolbar,'import','Importar XML',null);
+        addToolbarButton(editor,toolbar,'import','Importar XML','../editors/images/open.gif');
 
         editor.addAction('diccionario',function(editor,cell){
             let dicc=obtenerDiccDatos(graph);
