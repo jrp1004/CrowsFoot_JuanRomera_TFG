@@ -11,7 +11,7 @@ Se separa el contenido de este anexo en dos apartados:
 \section{Objetivos generales}
 Los objetivos generales del proyecto son:
 \begin{itemize}
-    \item Desarrollar una aplicación web que permita el diseño de diagramas E/R con la notación de patas de cuervo.
+    \item Desarrollar una aplicación web que permita el diseño de diagramas relacional con la notación de patas de cuervo.
     \item Almacenar los diagramas en un fichero con formato XML, para acceder a ellos posteriormente.
     \item Generar el código correspondiente al diagrama creado para su posterior implementación.
     \item Facilitar la creación de relaciones entre las tablas mediante la gestión automática de sus claves foráneas.
@@ -22,7 +22,7 @@ A continuación se enumerarán los requisitos.
 
 \subsection{Requisitos funcionales}
 \begin{itemize}
-    \item \textbf{RF-1 Gestión del grafo: } La aplicación debe ser capaz de gestionar el grafo que contiene los elementos del diagrama E/R.
+    \item \textbf{RF-1 Gestión del grafo: } La aplicación debe ser capaz de gestionar el grafo que contiene los elementos del diagrama relacional.
     \begin{itemize}
         \item \textbf{RF-1.1 Importar diagrama: }La aplicación podrá crear un diagrama a partir de un fichero XML formateado correctamente.
         \item \textbf{RF-1.2 Exportar diagrama: }La aplicación proveerá al usuario un método para exportar el diagrama en un fichero XML.
@@ -57,7 +57,7 @@ A continuación se enumerarán los requisitos.
     \end{itemize}
     \item \textbf{RF-6 Generación de código: }El sistema generará código a partir de los diagramas de usuario para diferentes lenguajes.
     \begin{itemize}
-        \item \textbf{RF-6.1 Crear SQL: }La aplicación proporcionará al usuario el código SQL correspondiente al diagrama E/R que se muestra en el grafo.
+        \item \textbf{RF-6.1 Crear SQL: }La aplicación proporcionará al usuario el código SQL correspondiente al diagrama relacional que se muestra en el grafo.
         \item \textbf{RF-6.2 Crear SQLAlchemy: }La aplicación proporcionará al usuario la creación de las tablas correspondientes al diagrama para utilizar con SQLAlchemy.
     \end{itemize}
 \end{itemize}
